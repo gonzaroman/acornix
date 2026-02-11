@@ -8,11 +8,17 @@ config = {"label": "Uninstaller Functionality", "icon": "🧹"}
 
 # Core system files that should not be deleted
 PROTECTED = {
-    "web_creator.py",
-    "free_mode.py",
+    "agent_mode.py",
+    "app_creator.py",
     "auto_envolve.py",
     "projectmanager.py",
-    "__init__.py"
+    "deleteApps",
+    "import_export",
+    "settings_manager",
+    "time_machine",
+    "uninstaller_plugins",
+    "__init__.py",
+    "help"
 }
 
 def _get_plugins():
