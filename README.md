@@ -1,3 +1,56 @@
+
+
+---
+
+## NUEVO PROYECTO
+
+## 🧠 IHMT: Memoria Infinita a Largo Plazo para IA
+
+¿Te imaginas que Claude, ChatGPT o Gemini recordaran todo lo que has hablado con ellos sin importar el tiempo que pase?
+
+¿Te imaginas que lo que hablas con un modelo lo supieran todos los demás sin tener que explicarlo todo de nuevo?
+
+¿Te imaginas ahorrar hasta un 90% de tokens en cada consulta?
+
+**[IHMT (Infinite Hierarchical Memory Tree)](https://github.com/gonzaroman/IHMT-MEMORY)** es un sistema de memoria a largo plazo escrito en Python que hace esto posible directamente en tu ordenador:
+
+* **Arquitectura en árbol eficiente:** Organiza la información en pequeñas estructuras de texto y JSON. La IA navega solo hacia la información precisa que necesita, ahorrando hasta un 90% de tokens al no tener que leer todo el historial.
+* **Memoria única y compartida:** Conecta tus herramientas para que cualquier modelo acceda a lo que hablaste en otras sesiones o proyectos.
+* **100% Local y Privado:** Todo se guarda en tu propia máquina y puedes exportarlo fácilmente cuando quieras.
+
+Esto cambia por completo la forma de trabajar con IA y soluciona las limitaciones de los sistemas de memoria actuales.
+
+👉 **Mira el repositorio y pruébalo aquí:** [github.com/gonzaroman/IHMT-MEMORY](https://github.com/gonzaroman/IHMT-MEMORY)
+
+---
+
+
+---
+## NEW PROYECT
+
+## 🧠 IHMT: Infinite Long-Term Memory for AI
+
+Imagine if Claude, ChatGPT, or Gemini remembered everything you ever discussed with them, no matter how much time has passed.
+
+Imagine if what you shared with one model was instantly known by all the others—without ever having to explain yourself again.
+
+Imagine saving up to 90% on token usage every time you interact with AI.
+
+**[IHMT (Infinite Hierarchical Memory Tree)](https://github.com/gonzaroman/IHMT-MEMORY)** is an open-source Python system that makes this happen right on your local computer:
+
+* **Efficient Tree Architecture:** Organizes knowledge using JSON and text nodes. The AI traverses only the specific branches it needs, saving up to 90% in tokens instead of re-reading massive contexts.
+* **Unified Shared Memory:** Connect your AI setup so any model can access past conversations across different projects and sessions.
+* **100% Local & Private:** Stored entirely on your machine, fully exportable at any time.
+
+A true game-changer that goes far beyond traditional, limited memory setups.
+
+👉 **Check out the repo and try it here:** [github.com/gonzaroman/IHMT-MEMORY](https://github.com/gonzaroman/IHMT-MEMORY)
+
+---
+
+
+
+
 # 🌳 acornix
 
 **The intelligent seed for your Termux ecosystem.**
