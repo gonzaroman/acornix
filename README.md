@@ -26,7 +26,7 @@ Esto cambia por completo la forma de trabajar con IA y soluciona las limitacione
 
 
 ---
-## NEW PROYECT
+## NEW PROJECT
 
 ## 🧠 IHMT: Infinite Long-Term Memory for AI
 
