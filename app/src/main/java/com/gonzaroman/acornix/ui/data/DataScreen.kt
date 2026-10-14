@@ -48,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
@@ -154,11 +155,13 @@ fun DataScreen(nav: NavHostController, appId: String) {
                         Text(app?.name ?: appId, style = MaterialTheme.typography.titleLarge)
                         if (state != null) {
                             Text(
-                                stringResource(
-                                    R.string.data_summary,
-                                    state.summary.documents, state.summary.collections, state.summary.keys,
-                                    state.summary.files, formatBytes(state.summary.fileBytes),
-                                ),
+                                listOf(
+                                    pluralStringResource(R.plurals.data_records, state.summary.documents, state.summary.documents),
+                                    pluralStringResource(R.plurals.data_collections, state.summary.collections, state.summary.collections),
+                                    pluralStringResource(R.plurals.data_values, state.summary.keys, state.summary.keys),
+                                    pluralStringResource(R.plurals.data_files, state.summary.files, state.summary.files) +
+                                        " (${formatBytes(state.summary.fileBytes)})",
+                                ).joinToString(" · "),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -185,7 +188,7 @@ fun DataScreen(nav: NavHostController, appId: String) {
                                 Column(Modifier.weight(1f)) {
                                     Text(col.name, style = MaterialTheme.typography.titleMedium)
                                     Text(
-                                        stringResource(R.string.data_collection_line, col.count, col.fields.ifBlank { "—" }),
+                                        stringResource(R.string.data_collection_line, pluralStringResource(R.plurals.data_records, col.count, col.count), col.fields.ifBlank { "—" }),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         maxLines = 2, overflow = TextOverflow.Ellipsis,

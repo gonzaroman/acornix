@@ -61,6 +61,9 @@ class ResponseParserTest {
     fun suggestNameDropsFillerWords() {
         assertEquals("Piano Móvil", AppGenerator.suggestName("crea un piano para móvil"))
         assertEquals("Space Shooter", AppGenerator.suggestName("Make me a space shooter game"))
+        assertEquals("Habit Tracker", AppGenerator.suggestName("A habit tracker with daily streaks and a weekly chart"))
+        assertEquals("Memory Card", AppGenerator.suggestName("A memory card game with emoji pairs"))
+        assertEquals("Lista Compra", AppGenerator.suggestName("una lista de la compra con categorías"))
     }
 
     @Test

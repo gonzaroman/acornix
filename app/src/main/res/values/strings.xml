@@ -246,11 +246,10 @@
     <string name="data_title">Saved data</string>
     <string name="data_export">Export as JSON</string>
     <string name="data_clear">Delete all data</string>
-    <string name="data_summary">%1$d records · %2$d collections · %3$d values · %4$d files (%5$s)</string>
     <string name="data_explain">Stored in a private database on this phone. It is kept when the app is improved and deleted with the app.</string>
     <string name="data_empty_title">No data yet</string>
     <string name="data_empty_text">When the app saves something (tasks, games, settings…) it will appear here.</string>
-    <string name="data_collection_line">%1$d records · %2$s</string>
+    <string name="data_collection_line">%1$s · %2$s</string>
     <string name="data_keys">Saved values</string>
     <string name="data_files">Files</string>
     <string name="data_clear_title">Delete all data?</string>
@@ -330,6 +329,22 @@
     <string name="help_keys_text">Your key is encrypted with the Android Keystore and only sent to the provider you choose. Generated apps run locally on your phone.</string>
     <string name="help_origin_title">Where does it come from?</string>
     <string name="help_origin_text">Acornix was born as a terminal assistant for Termux. This app brings all of it to a modern interface, no terminal required.</string>
+    <plurals name="data_records">
+        <item quantity="one">%d record</item>
+        <item quantity="other">%d records</item>
+    </plurals>
+    <plurals name="data_collections">
+        <item quantity="one">%d collection</item>
+        <item quantity="other">%d collections</item>
+    </plurals>
+    <plurals name="data_values">
+        <item quantity="one">%d value</item>
+        <item quantity="other">%d values</item>
+    </plurals>
+    <plurals name="data_files">
+        <item quantity="one">%d file</item>
+        <item quantity="other">%d files</item>
+    </plurals>
     <plurals name="section_apps_desc">
         <item quantity="one">%d app created</item>
         <item quantity="other">%d apps created</item>

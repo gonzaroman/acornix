@@ -89,9 +89,12 @@ class AppGenerator(
                 "create", "make", "build", "a", "an", "the", "for", "app", "game", "me", "please",
                 "crea", "créame", "creame", "haz", "hazme", "un", "una", "el", "la", "de", "para", "que", "con", "juego", "aplicación", "aplicacion", "app",
             )
-            val words = idea.lowercase().split(Regex("[^\\p{L}\\p{N}]+"))
-                .filter { it.isNotBlank() && it !in stop }
-                .take(3)
+            // "a habit tracker with daily streaks" -> "Habit Tracker", not "Habit Tracker With".
+            val breaks = setOf("with", "and", "that", "which", "where", "using", "con", "y", "que", "donde", "usando")
+            val all = idea.lowercase().split(Regex("[^\\p{L}\\p{N}]+")).filter { it.isNotBlank() }
+            val cut = all.indexOfFirst { it in breaks }
+            val head = if (cut > 0 && all.take(cut).any { it !in stop }) all.take(cut) else all
+            val words = head.filter { it !in stop }.take(3)
             return words.joinToString(" ") { w -> w.replaceFirstChar { it.uppercase() } }.ifBlank { "App" }
         }
     }
