@@ -1,198 +1,255 @@
-# 🌳 acornix
+<div align="center">
 
-**The intelligent seed for your Termux ecosystem.**
+# 🌰 Acornix
 
-`acornix` is an AI-powered assistant designed to generate apps, manage plugins, and automate workflows directly from your terminal. Built with a nod to the legacy of **Acorn Computers** and the power of **ARM** architecture, it transforms your phone into a portable development powerhouse.
+### Create apps and control your phone just by asking.
+
+**Vibe coding in your pocket.** Describe an app, a game or a tool, and watch the AI write it live. Seconds later it runs full screen on your phone, saves its own data and can sit on your home screen like any other app. Or just ask the assistant to do things for you.
+
+[![Latest release](https://img.shields.io/github/v/release/gonzaroman/acornix?label=download&color=2e6b45)](https://github.com/gonzaroman/acornix/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/gonzaroman/acornix/total?color=8a5a2b)](https://github.com/gonzaroman/acornix/releases)
+![Android 8.0+](https://img.shields.io/badge/Android-8.0%2B-3ddc84?logo=android&logoColor=white)
+![Kotlin](https://img.shields.io/badge/Kotlin-Jetpack%20Compose-7f52ff?logo=kotlin&logoColor=white)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
+<a href="https://github.com/gonzaroman/acornix/releases/latest/download/acornix.apk"><b>⬇️ Download the APK</b></a>
+
+<br><br>
+
+<img src="docs/screenshots/home.jpg" width="200" alt="Home">&nbsp;
+<img src="docs/screenshots/generating.jpg" width="200" alt="Writing the app live">&nbsp;
+<img src="docs/screenshots/preview.jpg" width="200" alt="The new app, ready">&nbsp;
+<img src="docs/screenshots/assistant.jpg" width="200" alt="The assistant at work">
+
+</div>
 
 ---
 
-[Watch acornix create app Video DEMO](https://github.com/user-attachments/assets/5c12029a-2aed-4e9f-90ef-2feb5fdfcc4f)
+## What is Acornix?
 
+Acornix turns your phone into a place where software gets made. You bring an API key from your favourite AI (Claude, GPT, Gemini or any OpenAI-compatible model), and Acornix does the rest:
 
+- **Creates apps and games** from a sentence, your voice or a photo, and lets you keep improving them by asking.
+- **Runs them like real apps**: full screen, offline, on your home screen, each with its own private database.
+- **Acts as an assistant** that can open apps, search YouTube, set alarms, blink the flashlight in Morse, read and change your apps' data and, if you allow it, tap and type inside other apps for you.
+
+No terminal, no server, no account. Everything you create lives on your phone.
+
+> Acornix started as a Python tool for Termux. Version 2.0 is a full native Android app that does everything the old one did and much more. [Looking for the Termux version?](#-looking-for-the-original-termux-version)
 
 ---
 
+## ✨ What you can do
 
-## 1. Environment Setup (Android)
-Before touching the code, you need the base tools on your mobile device:
+### 🛠️ Create apps by describing them
 
-* **Install Termux:** Download it preferably from F-Droid or its official GitHub (the Google Play version is obsolete). [Termux](https://f-droid.org/es/packages/com.termux/)
-* **Install Termux:API:** Download the Termux:API extension (this allows the AI to control phone functions). [Termux:API](https://f-droid.org/es/packages/com.termux/)
+Type what you want, dictate it 🎙️ or attach a reference photo 📎 ("make an app like this"). Pick a type (game, utility, music…) or tap one of the ideas, and Acornix writes a complete, mobile-first web app **live in front of you**.
 
+When it's done you get an interactive preview, an **Open** button, an **Add to home screen** button and a suggested next improvement. Apply the suggestion or ask for your own changes ("add sound effects", "make the buttons bigger", "add a dark mode"). Every change is saved as a new version.
 
-Open Termux and update everything is up to date before you begin:
+<p align="center">
+<img src="docs/screenshots/create.jpg" width="230" alt="Describe your app">&nbsp;&nbsp;
+<img src="docs/screenshots/generating.jpg" width="230" alt="The code is written live">&nbsp;&nbsp;
+<img src="docs/screenshots/preview.jpg" width="230" alt="Preview, suggestions and improvements">
+</p>
+
+### 🧬 Functionalities: apps that use your phone
+
+Functionalities are apps that talk to your device through a built-in JavaScript bridge, `window.Acornix`. They can vibrate, switch the flashlight on, speak out loud, read the battery, send notifications, share, copy, open other apps and even **ask the AI** from inside the app. Some examples: a big SOS button, a battery dashboard, a pocket translator that speaks, a Pomodoro timer that vibrates.
+
+### 🤖 An assistant that gets things done
+
+One chat for everything. Ask in your own words and the assistant picks the right tools, showing every step it takes:
+
+- *"Create a piano and open it"*
+- *"Turn on the flashlight in SOS"* · *"Set an alarm at 7:30"* · *"Start a 10 minute timer"*
+- *"Search Nirvana videos on YouTube"* · *"Open Maps and find a pharmacy"*
+- *"Add bread to my shopping list"* · *"What's my best score in Bowling?"*
+- *"How much battery do I have?"*
+
+**Total control (optional).** Turn on the *Acornix total control* accessibility service and the assistant can also see the screen and tap, type and scroll inside other apps, for example *"open Settings and turn on dark mode"*. It only acts while a task you asked for is running. It **asks before** sending, paying, calling or deleting anything, never sees password fields, and you can stop it at any time from the notification.
+
+<p align="center">
+<img src="docs/screenshots/assistant.jpg" width="250" alt="Assistant">
+</p>
+
+### 📱 Your apps, like real apps
+
+All your creations live in **My Apps**, a launcher with live thumbnails, search and filters. Tap to open full screen; long-press for more:
+
+- **Improve with AI** or **edit the code** by hand.
+- **Versions**: every creation, improvement or edit is kept, and you can restore any of them.
+- **Add to home screen**: a real icon that opens the app in its own window, like an installed app.
+- **Data**: see, export or clear what the app saved.
+- **Share** it as a ZIP, with or without your data, or **rename** and **delete** it.
+
+<p align="center">
+<img src="docs/screenshots/apps.jpg" width="250" alt="My Apps">&nbsp;&nbsp;
+<img src="docs/screenshots/sheet.jpg" width="250" alt="App actions">
+</p>
+
+### 🗄️ A private database for every app
+
+Every app gets its own fast SQLite database (`Acornix.db`), so a to-do list keeps its tasks and a game keeps its saves and high scores. The data:
+
+- **survives improvements**, because the AI is told which collections and fields already exist;
+- can be **read and changed by the assistant** ("add eggs to my to-do list");
+- can travel inside the app's ZIP;
+- is included in backups.
+
+Each app runs on its own isolated origin, so apps never see each other's data.
+
+<p align="center">
+<img src="docs/screenshots/data.jpg" width="250" alt="The Data screen">
+</p>
+
+### ☁️ Backups and sharing
+
+- **Full backup**: one ZIP with all your apps, their versions, data and files. Save it to Google Drive or anywhere else from the system picker, and restore it on any phone.
+- **Android backup**: your apps and data are also included in your Google account backup.
+- **Import** ZIPs shared by friends, including apps made with the original Termux version of acornix.
+
+### 📋 Manual studio: no API key needed
+
+Don't have an API key? Copy a ready-made prompt, paste it into ChatGPT, Claude or Gemini on the web, then paste the answer back. Acornix checks the code, warns you if something is missing and installs the app.
+
+### 🔔 Always up to date
+
+Acornix checks GitHub for new versions. When one comes out you'll see what's new and can update with one tap, right from the app.
+
+### And more
+
+**Phone status** (battery, memory, storage), a **photo and video gallery** grouped by month, Material You colors with light and dark themes, and an interface in **English and Spanish**. Generated apps follow your phone's language too.
+
+---
+
+## 🎮 Apps included
+
+Acornix comes with eight example apps, rebuilt for 2.0. They all work offline, adapt to any screen in portrait or landscape, and save their data with `Acornix.db`.
+
+| | | | |
+|:---:|:---:|:---:|:---:|
+| <img src="docs/screenshots/app-calculator.jpg" width="170"><br>**Calculator**<br><sub>History saved, proper operator precedence</sub> | <img src="docs/screenshots/app-bmi.jpg" width="170"><br>**BMI**<br><sub>Gauge, healthy range and progress chart</sub> | <img src="docs/screenshots/app-drummer.jpg" width="170"><br>**Drummer**<br><sub>8 pads, 16-step sequencer, saved beats</sub> | <img src="docs/screenshots/app-matrix.jpg" width="170"><br>**Matrix Camera**<br><sub>Live Matrix / ASCII / halftone camera</sub> |
+| <img src="docs/screenshots/app-bowling.jpg" width="170"><br>**Bowling**<br><sub>Swipe to throw, hook spin, real scoring</sub> | <img src="docs/screenshots/app-piano.jpg" width="170"><br>**Piano**<br><sub>4 instruments, multitouch, recordings</sub> | <img src="docs/screenshots/app-castle.jpg" width="170"><br>**Castle Defense**<br><sub>Waves, bosses and an upgrade shop</sub> | <img src="docs/screenshots/app-superm.jpg" width="170"><br>**Super M**<br><sub>Platformer with endless levels</sub> |
+
+---
+
+## 📲 Install
+
+1. **Download** [`acornix.apk`](https://github.com/gonzaroman/acornix/releases/latest/download/acornix.apk) from the [latest release](https://github.com/gonzaroman/acornix/releases/latest) on your phone.
+2. **Open it.** If Android asks, allow your browser or file manager to install apps, then tap **Install**. Google Play Protect may warn you because the app doesn't come from the Play Store; tap **More details › Install anyway**.
+3. **Open Acornix** and follow the three-step welcome: choose your AI provider, paste your API key and tap **Test connection**.
+
+**Requirements:** Android 8.0 or newer, and an API key from one of these providers:
+
+| Provider | Where to get a key | Notes |
+|---|---|---|
+| **Anthropic (Claude)** | [console.anthropic.com](https://console.anthropic.com/settings/keys) | Excellent for code; uses the official Anthropic SDK |
+| **OpenAI** | [platform.openai.com](https://platform.openai.com/api-keys) | Any chat model your account can use |
+| **Google Gemini** | [aistudio.google.com](https://aistudio.google.com/apikey) | Has a free tier |
+| **OpenAI-compatible** | OpenRouter, Groq, Together, a local Ollama… | Set your own base URL |
+
+Tap **▾** next to *Model* in Settings to load the models available to your account.
+
+**Updating:** Acornix tells you when there's a new version. Tap **Update** and Android installs it over the current one, keeping all your apps and data. The first time, Android will ask you to allow Acornix to install apps.
+
+**Total control (optional):** Android *Settings › Accessibility › Acornix total control › On*. You can also get there from the Assistant or from Acornix Settings.
+
+---
+
+## 🔐 Privacy and security
+
+- **Your API key** is encrypted with the Android Keystore and only ever sent to the provider you chose.
+- **Your apps and their data** stay on your phone, except for what you send to your AI provider when you create or improve something. Acornix has no servers, accounts or analytics.
+- **Each app is sandboxed** on its own origin with its own database. The phone bridge only answers that app's own pages.
+- **The assistant asks first** before sending messages, calling, paying, buying or deleting. It never sees password fields, and a notification with a **Stop** button is shown while it works.
+
+---
+
+## 🧑‍💻 For creators: the `window.Acornix` API
+
+Every app made with Acornix can use this API, and so can your own HTML apps imported as a ZIP. All calls return Promises.
+
+```js
+// Phone
+await Acornix.vibrate(200);                 // or a pattern: [100, 50, 100]
+await Acornix.flashlight(true);
+await Acornix.speak('Hello!', 'en-US');
+await Acornix.notify('Timer', 'Time is up');
+await Acornix.toast('Saved');
+const { level, charging } = await Acornix.battery();
+const info = await Acornix.deviceInfo();
+await Acornix.share('Look what I made');
+await Acornix.openUrl('https://example.com');
+const answer = await Acornix.askAI('Give me a fun fact about acorns');
+
+// Database (private to this app)
+const tasks = Acornix.db.collection('tasks');
+const t = await tasks.add({ text: 'Buy bread', done: false });     // → {_id, _created, _updated, ...}
+await tasks.update(t._id, { done: true });
+const pending = await tasks.list({ where: { done: false }, orderBy: '_created', desc: true, limit: 50 });
+const big = await tasks.list({ where: { score: { $gt: 100 } } });  // $gt $gte $lt $lte $ne $in $contains
+await Acornix.db.set('highScore', 1200);
+const best = await Acornix.db.get('highScore');
+
+// Files (photos, drawings, exports…)
+const file = await Acornix.files.save('photo.jpg', blob);          // Blob or data URL → {name, url, size}
+document.querySelector('img').src = file.url;
+
+// Refresh when the assistant changes your data
+window.addEventListener('acornixdata', () => reload());
+```
+
+If `window.Acornix` is missing (the app was opened in a normal browser), fall back to `localStorage`. Apps generated by Acornix already do this.
+
+---
+
+## 🛠️ Build from source
+
+You need Android Studio Ladybug or newer (AGP 8.7) and the Android SDK 35.
 
 ```bash
-pkg update && pkg upgrade
+git clone https://github.com/gonzaroman/acornix.git
+cd acornix
+./gradlew assembleDebug          # app/build/outputs/apk/debug/app-debug.apk
+./gradlew testDebugUnitTest      # unit tests
 ```
+
+Release builds are signed with a keystore kept outside the repository: `-PacornixSigning=/path/to/keystore.properties`, with `storeFile`, `storePassword`, `keyAlias` and `keyPassword`. Without it, release builds are unsigned.
+
+<details>
+<summary><b>Project structure</b></summary>
+
+```
+app/src/main/java/com/gonzaroman/acornix/
+├── ai/        AI providers (Anthropic SDK, OpenAI & compatible, Gemini), streaming, tool calling
+├── core/      Prompts, response parser, app generator
+├── data/      Settings (encrypted keys), apps + versions, per-app SQLite store,
+│              ZIP import/export, full backups, sample apps, update checker
+├── device/    Phone actions (flashlight, vibration, speech, alarms, intents…), shortcuts
+├── control/   Accessibility service for "total control"
+├── agent/     Assistant tools and conversation loop
+├── web/       Full-screen app runner, per-app origins, window.Acornix bridge
+└── ui/        Jetpack Compose screens (Material 3)
+app/src/main/assets/sample_apps/   The eight example apps
+```
+
+**Tech:** Kotlin, Jetpack Compose and Material 3, OkHttp, kotlinx.serialization, DataStore, SQLite, AndroidX WebKit, Coil, and the official Anthropic Java SDK.
+
+</details>
 
 ---
 
-## 2. Initial Configuration
-Open Termux and make sure everything is updated before starting:
+## 🌳 Looking for the original Termux version?
 
-## 🚀 Quick Install
-
-Run this command in Termux to set up everything automatically (dependencies, permissions, and alias):
-
-```bash
-pkg update && pkg upgrade -y && pkg install python git termux-api binutils -y && termux-setup-storage && git clone https://github.com/gonzaroman/acornix.git && cd acornix && pip install requests python-dotenv psutil && echo "alias acornix='cd ~/acornix && python main.py'" >> ~/.bashrc && source ~/.bashrc && python main.py
-
-```
-
-
-
-Note: You'll be asked for storage permissions. Please grant them to allow acornix to save your projects.
-
-✨ Key Features
-AI App Generator: Create web apps and scripts using natural language.
-
-Plugin System: Extend acornix capabilities with modular plugins.
-
-Termux Native: Fully optimized for mobile environments and ARM processors.
-
-Zero Config: The one-liner takes care of everything, including your custom acornix command.
-
-🛠 Usage
-After installation, you can launch the system from anywhere by simply typing:
-
-```bash
-acornix
-```
-Main Menu Options:
-Generate App: Describe what you want, and acornix will build it.
-
-Manage Plugins: Install or update system extensions.
-
-Launch Server: Preview your generated apps on your local network.
-
-if you have a problem with the server, reebot the server:
-```bash
-pkill -f "python -m http.server"
-python -m http.server 8080
-```
-
-# 🌳 acornix: The AI-Powered OS for Termux
-> "Transform your mobile terminal into a neural development hub."
-<p align="center">
-<img width="401" alt="Captura de pantalla 2026-02-12 113642" src="https://github.com/user-attachments/assets/6f9498ca-f214-4751-a9da-d033bc5828ff" />
-</p>
-
-
-**acornix** isn't just a script; it's a procedural engine designed to bridge the gap between AI intelligence and mobile hardware. It allows you to orchestrate complex applications, automate local environments, and extend your terminal capabilities using natural language.
-Markdown
-> "Transform your mobile terminal into a neural development hub."
-
-**acornix** isn't just a script; it's a procedural engine designed to bridge the gap between AI intelligence and mobile hardware. It allows you to orchestrate complex applications, automate local environments, and extend your terminal capabilities using natural language.
-
-
-You can create games, applications, or in agent mode, ask it to control your phone, such as opening YouTube and searching for a Nirvana video, or ask your phone to do anything, such as sending an S.O.S. signal with the flashlight. The only limit is your imagination.
-You can create whatever you want and share it with whoever you want. The system has a simple tool for exporting and importing creations, apps, etc.
-# 🌳 acornixOS: The AI-Powered 
-> "Transform your mobile in a PC." Press and hold an app to add it to the dock.
-<p align="center">
-<img src="https://github.com/user-attachments/assets/c9f7bddf-83df-4872-b6dd-b313b4b6b688" width="400" alt="acornixOS">
-</p>
-
-<br />
-
-[Watch acornixOS Video Demo](https://github.com/user-attachments/assets/1e701c97-90d0-450a-881e-680bba5aad70)
-
-<br />
-
-
-
-### 📸 Showcase
-*Create a simple game 3d aeroplane for mobile
-
-*create a piano for mobile
-
-*create a arkanoid with tactile buttons
-
-*in mode agent: open youtube and search Nirvana videos
-
-| | |
-| :---: | :---: |
-| <img src="https://github.com/user-attachments/assets/3c93ac34-93e7-438c-8c14-f37b43ccabb2" width="300" alt="avion"> | <img src="https://github.com/user-attachments/assets/beb859cc-bf43-4861-ad6a-e8254adeb0b8" width="300" alt="piano"> |
-| <img src="https://github.com/user-attachments/assets/06667fcb-43b4-4098-839f-09383ce8aeb4" width="300" alt="arckanoid"> | <img src="https://github.com/user-attachments/assets/bca05911-68cf-4a70-be84-abc4e4fa1b23" width="300" alt="nirvana"> |
-
-
-<p align="center">
-<br> OPTION 1: Create APP <br>
-  Create an app that is a canvas for painting with your fingers on a mobile device, with color selection, brush size, and the option to erase the canvas:<br>
-<img width="401" alt="Paint" src="https://github.com/user-attachments/assets/555b114a-4acd-426c-a6ef-12f40dc9c9cd" />
-</p>
-<p align="center">
- <br> OPTION 1: Create APP <br>
-  Create a castle defense game for mobile screens, where enemies attack and I can shoot with a cannon to eliminate them. The difficulty should increase as I progress, and I should receive more powerful weapons:<br>
-<img width="401" alt="Castle" src="https://github.com/user-attachments/assets/19197abb-aafe-465d-bef1-dfe519fec31a" />
-</p>
-<p align="center">
-  <br> OPTION 2: Create FUNCTIONALITY <br>
-  Create a plugin or functionality that displays all the applications created in the my_apps folder. The style should be similar to how applications are displayed on a mobile phone:<br>
-<img width="401" alt="Library" src="https://github.com/user-attachments/assets/d78448f8-beba-4116-9162-9c5210492109" />
-</p>
-<p align="center">
-  <br> OPTION 1: Create APP <br>
-  Create a solar system simulator that shows how the planets move. Make it mobile so I can control it with my fingers:<br>
-<img width="401" alt="Solar sytem" src="https://github.com/user-attachments/assets/e3073cf5-1e1b-4a96-b82e-4d56a63c6a3a" />
-</p>
-<p align="center">
-  <br> OPTION 1: Create APP <br>
-  Create a game similar to Flappy Bird for mobile phones:<br>
-<img width="401" alt="Flappy bird" src="https://github.com/user-attachments/assets/c1fc7e28-f295-4977-bdfe-77dc7d0fbbd6" />
-</p>
-
-<p align="center">
-  <br> OPTION 2: Create FUNCTIONALITY <br>
-  Create a plugin or feature that displays a MacOS-based operating system, where I can control everything in Acornix, and where applications and plugins are displayed. Windows should be moved with my fingers; if I touch a window, it moves on top of the others. If I hold down an application, it is added to the dock. The terminal must communicate with the Termux terminal and must execute real commands, not simulate them:<br>
-<img width="401" alt="AcornixOS" src="https://github.com/user-attachments/assets/c9f7bddf-83df-4872-b6dd-b313b4b6b688" />
-</p>
-
-
-
---- 
-
-
-## 🧠 Why acornix?
-Most mobile environments are limited. **acornix** breaks those barriers by using a **Context-Aware Architecture** to turn simple text prompts into fully functional, locally-hosted software.
+Acornix began as an AI-powered Python system for Termux. That version is kept in the [`termux`](https://github.com/gonzaroman/acornix/tree/termux) branch (tag [`v1-termux`](https://github.com/gonzaroman/acornix/releases/tag/v1-termux)). Version 2.0 replaces it: no Termux, Python or local servers needed, just install the app.
 
 ---
 
-## ✨ Advanced Capabilities
+## 🤝 Contributing
 
-| Feature | Description | Technical Edge |
-| :--- | :--- | :--- |
-| **Neural Architect** | Generate high-performance web apps and Python tools from scratch. | Uses custom system prompts for ARM optimization. |
-| **Modular Core** | Hot-swappable plugin system to add new commands without restarts. | Dynamic importing via `core/` logic. |
-| **Environment Sync** | Automatic SFTP and local server management for instant previews. | Integrated `http.server` with automatic port cleanup. |
-| **Hardware Mastery** | Direct access to Termux API for hardware-level interaction. | Low-level integration with `binutils` and `psutil`. |
+Ideas, bug reports and pull requests are welcome. Open an [issue](https://github.com/gonzaroman/acornix/issues) to tell us what you built with Acornix or what you would like it to do next.
 
----
+## 📄 License
 
-## 🛠 Pro Workflow: From Idea to Execution
-Don't just run code. **Build systems.** Here is how acornix handles the lifecycle of a project:
-
-$$\text{Prompt} \xrightarrow{\text{IA Engine}} \text{Optimized Code} \xrightarrow{\text{Acornix Core}} \text{Local Deployment}$$
-
-### Example Commands:
-> *"Create a dashboard to monitor my device battery and CPU usage using a modern dark-mode UI."*
-
-1.  **Generation:** acornix builds the HTML5/CSS3/JS bundle.
-2.  **Deployment:** The system places it in `my_apps/monitor_pro`.
-3.  **Hosting:** Start the local server and access it at `localhost:8080`.
-
----
-
-## 📂 System Architecture
-The heart of **acornix** is organized for scalability:
-
-```text
-acornix/
-├── 🧠 main.py           # The Kernel: Entry point & process manager
-├── 🛠 core/              # The Brain: Neural logic and prompt engineering
-├── 🔌 plugins/          # The Limbs: Modular extensions for the system
-├── 📦 my_apps/          # The Vault: AI-generated projects & assets
-└── ⚙️ config.json       # The DNA: Secure credentials and API keys
-```
-Gonzalo Román Márquez
+[MIT](LICENSE) © Gonzalo Román Márquez

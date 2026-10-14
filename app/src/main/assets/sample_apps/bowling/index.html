@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0b1020">
+<title>Bowling</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #0b1020; color: #fff; overscroll-behavior: none; touch-action: none;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; user-select: none; -webkit-user-select: none; }
+  canvas { position: fixed; inset: 0; width: 100vw; height: 100dvh; display: block; }
+  .board { position: fixed; top: calc(env(safe-area-inset-top) + 8px); left: 50%; transform: translateX(-50%); display: grid;
+    grid-template-columns: repeat(9, 1fr) 1.45fr auto; gap: 3px; width: min(96vw, 720px); }
+  .frame { background: #ffffffe8; color: #111; border-radius: 6px; overflow: hidden; display: grid; grid-template-rows: auto auto; min-width: 0; }
+  .frame.cur { outline: 3px solid #fbbf24; }
+  .rolls { display: flex; justify-content: flex-end; font-size: clamp(9px, 2.4vmin, 13px); font-weight: 700; }
+  .rolls span { width: 1.5em; text-align: center; border-left: 1px solid #ccc; border-bottom: 1px solid #ccc; }
+  .total { text-align: center; font-weight: 800; font-size: clamp(11px, 3vmin, 16px); padding: 1px 0 2px; min-height: 1.4em; }
+  .score { background: #fbbf24; color: #2a1800; border-radius: 6px; padding: 0 8px; display: grid; place-items: center; font-weight: 900; font-size: clamp(14px, 4vmin, 22px); }
+  .msg { position: fixed; left: 0; right: 0; top: 34%; text-align: center; font-size: clamp(40px, 12vmin, 80px); font-weight: 900; pointer-events: none;
+    text-shadow: 0 6px 24px #000a; opacity: 0; transform: scale(.6); transition: .25s; }
+  .msg.show { opacity: 1; transform: scale(1); }
+  .hint { position: fixed; bottom: calc(env(safe-area-inset-bottom) + 14px); left: 0; right: 0; text-align: center; color: #fffc; font-size: 14px;
+    pointer-events: none; text-shadow: 0 2px 6px #000; }
+  .overlay { position: fixed; inset: 0; display: grid; place-items: center; background: #000b; text-align: center; padding: 24px; }
+  .overlay.hide { display: none; }
+  .overlay h1 { font-size: clamp(36px, 10vmin, 60px); margin: 0; }
+  .overlay p { color: #ccc; }
+  .overlay button { border: 0; border-radius: 16px; padding: 14px 30px; font: inherit; font-weight: 800; font-size: 18px; background: #fbbf24; color: #2a1800; margin-top: 10px; }
+  .history { margin-top: 14px; color: #aaa; font-size: 14px; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="board" id="board"></div>
+<div class="msg" id="msg"></div>
+<div class="hint" id="hint"></div>
+<div class="overlay" id="overlay"><div>
+  <h1>🎳 Bowling</h1>
+  <p id="oText"></p>
+  <button id="oBtn"></button>
+  <div class="history" id="history"></div>
+</div></div>
+<script>
+const ES = (navigator.language || '').toLowerCase().startsWith('es');
+const T = (en, es) => (ES ? es : en);
+const kv = {
+  async get(k, d) { try { if (window.Acornix) { const v = await Acornix.db.get(k); return v ?? d; } } catch (e) {} try { const v = localStorage.getItem('bowl:' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  async set(k, v) { try { if (window.Acornix) return await Acornix.db.set(k, v); } catch (e) {} try { localStorage.setItem('bowl:' + k, JSON.stringify(v)); } catch (e) {} },
+};
+function coll(name) {
+  if (window.Acornix) return Acornix.db.collection(name);
+  const key = 'bowl:' + name;
+  const read = () => { try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) { return []; } };
+  return {
+    async add(d) { const a = read(); a.push({ ...d, _created: Date.now() }); localStorage.setItem(key, JSON.stringify(a)); },
+    async list(q = {}) { let a = read(); if (q.desc) a.reverse(); if (q.limit) a = a.slice(0, q.limit); return a; },
+  };
+}
+const games = coll('games');
+const buzz = (ms) => { try { window.Acornix ? Acornix.vibrate(ms) : navigator.vibrate && navigator.vibrate(ms); } catch (e) {} };
+
+// ---------- Audio ----------
+let ac;
+function audio() { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); return ac; }
+let rollNode = null;
+function rollSound(on) {
+  try {
+    const a = audio();
+    if (on && !rollNode) {
+      const len = a.sampleRate * 2, b = a.createBuffer(1, len, a.sampleRate), d = b.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * 0.5;
+      const s = a.createBufferSource(); s.buffer = b; s.loop = true;
+      const f = a.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 220;
+      const g = a.createGain(); g.gain.value = 0.25; s.connect(f); f.connect(g); g.connect(a.destination); s.start();
+      rollNode = { s, g };
+    } else if (!on && rollNode) { rollNode.g.gain.setTargetAtTime(0, a.currentTime, 0.05); rollNode.s.stop(a.currentTime + 0.3); rollNode = null; }
+  } catch (e) {}
+}
+function clack(strength) {
+  try {
+    const a = audio(), t = a.currentTime;
+    const o = a.createOscillator(), g = a.createGain(); o.type = 'triangle';
+    o.frequency.setValueAtTime(900 + Math.random() * 500, t); o.frequency.exponentialRampToValueAtTime(300, t + 0.08);
+    g.gain.setValueAtTime(Math.min(0.35, 0.05 + strength * 0.06), t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+    o.connect(g); g.connect(a.destination); o.start(t); o.stop(t + 0.15);
+  } catch (e) {}
+}
+
+// ---------- Lane geometry (meters) ----------
+const LANE_HALF = 0.53, GUTTER = 0.12, LANE_LEN = 18.3, PIN_Z = 16.6, BALL_R = 0.11, PIN_R = 0.061;
+const PIN_SPOTS = (() => {
+  const s = 0.305, rows = [[0], [-0.5, 0.5], [-1, 0, 1], [-1.5, -0.5, 0.5, 1.5]], out = [];
+  rows.forEach((r, i) => r.forEach((x) => out.push({ x: x * s, z: PIN_Z + i * s * 0.866 })));
+  return out;
+})();
+let pins = [], ball, state = 'aim', rollTime = 0;
+
+function rackPins(standing) {
+  pins = PIN_SPOTS.map((p, i) => ({ x: p.x, z: p.z, vx: 0, vz: 0, down: false, gone: false, angle: 0, spin: 0, i }))
+    .filter((p, i) => !standing || standing.includes(i));
+}
+function resetBall() { ball = { x: 0, z: 0.4, vx: 0, vz: 0, hook: 0, gutter: false, active: false, rot: 0 }; }
+
+// ---------- Physics ----------
+function step(dt) {
+  if (ball.active) {
+    rollTime += dt;
+    if (!ball.gutter && ball.z > 5) ball.vx += ball.hook * dt;     // the ball hooks on the dry back end
+    ball.x += ball.vx * dt; ball.z += ball.vz * dt; ball.rot += ball.vz * dt * 6;
+    if (!ball.gutter && Math.abs(ball.x) > LANE_HALF) {
+      ball.gutter = true; ball.vx = 0; ball.x = Math.sign(ball.x) * (LANE_HALF + GUTTER / 2);
+      if (standingIdx().length === standingBefore) flash(T('Gutter', 'Canal'), '#94a3b8');   // only a real gutter ball
+    }
+    if (!ball.gutter) pins.forEach((p) => { if (!p.gone) collide(ball, 7, BALL_R, p, 1.5, p.down ? PIN_R * 1.6 : PIN_R); });
+    if (ball.z > LANE_LEN + 0.6) { ball.active = false; rollSound(false); }
+  }
+  pins.forEach((p, i) => {
+    if (p.gone) return;
+    p.x += p.vx * dt; p.z += p.vz * dt; p.angle += p.spin * dt;
+    const sp = Math.hypot(p.vx, p.vz);
+    if (sp > 0) { const f = Math.max(0, sp - (p.down ? 2.5 : 1.2) * dt) / sp; p.vx *= f; p.vz *= f; p.spin *= 0.98; }
+    if (Math.abs(p.x) > LANE_HALF + 0.05 || p.z > LANE_LEN + 0.4) { p.gone = true; p.down = true; }
+    for (let j = i + 1; j < pins.length; j++) {
+      const q = pins[j]; if (q.gone) continue;
+      collide(p, 1.5, p.down ? PIN_R * 1.6 : PIN_R, q, 1.5, q.down ? PIN_R * 1.6 : PIN_R);
+    }
+  });
+}
+function collide(a, ma, ra, b, mb, rb) {
+  const dx = b.x - a.x, dz = b.z - a.z, dist = Math.hypot(dx, dz), min = ra + rb;
+  if (dist >= min || dist === 0) return;
+  const nx = dx / dist, nz = dz / dist;
+  const rel = (a.vx - b.vx) * nx + (a.vz - b.vz) * nz;
+  // separate
+  const push = (min - dist) / (ma + mb);
+  a.x -= nx * push * mb; a.z -= nz * push * mb; b.x += nx * push * ma; b.z += nz * push * ma;
+  if (rel <= 0) return;
+  const e = 0.7, j = (1 + e) * rel / (1 / ma + 1 / mb);
+  a.vx -= (j / ma) * nx; a.vz -= (j / ma) * nz; b.vx += (j / mb) * nx; b.vz += (j / mb) * nz;
+  // pins scatter a bit sideways and topple when hit hard enough
+  [a, b].forEach((p) => {
+    if (p === ball || p.down === undefined) return;
+    if (!p.down && j / mb > 0.35) { p.down = true; p.spin = (Math.random() - 0.5) * 18; p.vx += (Math.random() - 0.5) * 0.8; }
+  });
+  clack(rel);
+}
+
+// ---------- Game / scoring ----------
+let rolls = [], frame = 0, rollInFrame = 0, best = 0;
+function frameScores(r) {
+  const out = []; let i = 0, total = 0;
+  for (let f = 0; f < 10; f++) {
+    if (r[i] === undefined) break;
+    if (r[i] === 10) { if (r[i + 2] === undefined) break; total += 10 + r[i + 1] + r[i + 2]; i += 1; }
+    else if (r[i + 1] === undefined) break;
+    else if (r[i] + r[i + 1] === 10) { if (r[i + 2] === undefined) break; total += 10 + r[i + 2]; i += 2; }
+    else { total += r[i] + r[i + 1]; i += 2; }
+    out.push(total);
+  }
+  return out;
+}
+// Splits the roll list into frames for the scoreboard marks.
+function frameMarks(r) {
+  const fr = []; let i = 0;
+  for (let f = 0; f < 10 && i < r.length; f++) {
+    if (f < 9) {
+      if (r[i] === 10) { fr.push(['', 'X']); i++; }
+      else { const a = r[i], b = r[i + 1]; fr.push([mark(a), b === undefined ? '' : a + b === 10 ? '/' : mark(b)]); i += 2; }
+    } else {
+      const a = r[i], b = r[i + 1], c = r[i + 2];
+      const m = [a === 10 ? 'X' : mark(a)];
+      if (b !== undefined) m.push(a === 10 ? (b === 10 ? 'X' : mark(b)) : a + b === 10 ? '/' : mark(b));
+      if (c !== undefined) m.push(c === 10 ? 'X' : (a === 10 && b !== 10 && b + c === 10) ? '/' : mark(c));
+      fr.push(m); i += 3;
+    }
+  }
+  return fr;
+}
+const mark = (n) => (n === undefined ? '' : n === 0 ? '-' : String(n));
+function renderBoard() {
+  const marks = frameMarks(rolls), totals = frameScores(rolls);
+  const el = document.getElementById('board'); el.innerHTML = '';
+  for (let f = 0; f < 10; f++) {
+    const d = document.createElement('div'); d.className = 'frame' + (f === frame && state !== 'over' ? ' cur' : '');
+    const m = marks[f] || [];
+    const slots = f < 9 ? 2 : 3;
+    d.innerHTML = `<div class="rolls">${Array.from({ length: slots }, (_, k) => `<span>${(f < 9 ? m[k] : m[k]) ?? ''}</span>`).join('')}</div><div class="total">${totals[f] ?? ''}</div>`;
+    el.appendChild(d);
+  }
+  const s = document.createElement('div'); s.className = 'score'; s.textContent = totals[totals.length - 1] ?? 0; el.appendChild(s);
+}
+const knocked = () => pins.filter((p) => p.down || p.gone).length;
+const standingIdx = () => pins.filter((p) => !p.down && !p.gone).map((p) => p.i);
+
+// Pins standing when the current roll started; a roll scores what it knocked down.
+let standingBefore = 10;
+function endRoll() {
+  state = 'counting';
+  const after = standingIdx().length;
+  const count = standingBefore - after;
+  rolls.push(count);
+  let msg = null;
+  if (after === 0 && standingBefore === 10) { msg = ['STRIKE!', '#fbbf24']; buzz(120); }
+  else if (after === 0) { msg = [T('SPARE!', '¡SPARE!'), '#34d399']; buzz(60); }
+  else if (count === 0 && !ball.gutter) msg = [T('Miss', 'Fallo'), '#94a3b8'];
+  if (msg) flash(...msg);
+  renderBoard();
+  setTimeout(() => nextRoll(after === 0), msg ? 1300 : 900);
+}
+function nextRoll(cleared) {
+  if (frame < 9) {
+    if (rollInFrame === 0 && !cleared) { rollInFrame = 1; rackPins(standingIdx()); }
+    else { frame++; rollInFrame = 0; rackPins(); if (frame === 9) frameStart10 = rolls.length; }
+  } else {
+    const r = rolls.slice(frameStart10), n = r.length;
+    const bonus = r[0] === 10 || (n >= 2 && r[0] + r[1] === 10);
+    if (n === 3 || (n === 2 && !bonus)) return finishGame();
+    if (cleared) rackPins(); else rackPins(standingIdx());
+    rollInFrame = n;
+  }
+  standingBefore = pins.length;
+  resetBall(); state = 'aim'; renderBoard();
+}
+let frameStart10 = 0;
+async function finishGame() {
+  state = 'over'; renderBoard();
+  const total = frameScores(rolls).pop() || 0;
+  const record = total > best;
+  if (record) { best = total; kv.set('best', best); }
+  try { await games.add({ score: total, strikes: rolls.filter((r) => r === 10).length }); } catch (e) {}
+  showOverlay(`${T('Final score', 'Puntuación final')}: ${total}${record ? ' · 🏆 ' + T('New record!', '¡Nuevo récord!') : ''}`, T('Play again', 'Jugar otra vez'));
+}
+function newGame() {
+  rolls = []; frame = 0; rollInFrame = 0; frameStart10 = 0;
+  rackPins(); standingBefore = 10; resetBall(); state = 'aim'; renderBoard();
+  document.getElementById('overlay').classList.add('hide');
+}
+function flash(text, color) {
+  const m = document.getElementById('msg'); m.textContent = text; m.style.color = color; m.classList.add('show');
+  clearTimeout(flash.t); flash.t = setTimeout(() => m.classList.remove('show'), 1000);
+}
+
+// ---------- Input: drag the ball to aim, swipe up to throw ----------
+let touch = null;
+const cv = document.getElementById('c');
+cv.addEventListener('pointerdown', (e) => {
+  if (state !== 'aim') return;
+  audio();
+  touch = { pts: [{ x: e.clientX, y: e.clientY, t: performance.now() }] };
+});
+cv.addEventListener('pointermove', (e) => {
+  if (!touch || state !== 'aim') return;
+  touch.pts.push({ x: e.clientX, y: e.clientY, t: performance.now() });
+  const p0 = touch.pts[0];
+  if (Math.abs(e.clientY - p0.y) < 25) {           // horizontal drag = move the ball along the foul line
+    const ppm = laneHalfPx / LANE_HALF;
+    ball.x = Math.max(-LANE_HALF + BALL_R, Math.min(LANE_HALF - BALL_R, ball.x + (e.movementX || 0) / ppm));
+  }
+});
+cv.addEventListener('pointerup', (e) => {
+  if (!touch || state !== 'aim') { touch = null; return; }
+  const pts = touch.pts; touch = null;
+  pts.push({ x: e.clientX, y: e.clientY, t: performance.now() });
+  const a = pts[0], b = pts[pts.length - 1];
+  const dy = a.y - b.y, dx = b.x - a.x;
+  if (dy < innerHeight * 0.08) return;                 // not a throw
+  // speed from the last part of the swipe
+  const k = pts.findIndex((p) => p.t >= b.t - 120);
+  const s0 = pts[Math.max(0, k - 1)];
+  const v = (s0.y - b.y) / Math.max(16, b.t - s0.t) * 1000 / innerHeight;   // screens per second
+  const mid = pts[Math.floor(pts.length / 2)];
+  const curve = (mid.x - (a.x + b.x) / 2) / innerWidth;
+  ball.vz = Math.max(4.5, Math.min(11, 3 + v * 2.2));
+  ball.vx = Math.max(-0.9, Math.min(0.9, dx / dy * ball.vz * 0.18));
+  ball.hook = Math.max(-1.6, Math.min(1.6, -curve * 9));
+  ball.active = true; state = 'rolling'; rollTime = 0; rollSound(true); buzz(20);
+});
+
+// ---------- Rendering (perspective lane) ----------
+const g = cv.getContext('2d');
+let dpr = 1, W = 0, H = 0, baseY = 0, vanishY = 0, laneHalfPx = 0, cx = 0;
+const ZC = 5;
+function resize() {
+  dpr = Math.min(devicePixelRatio || 1, 2); W = innerWidth; H = innerHeight;
+  cv.width = W * dpr; cv.height = H * dpr;
+  cx = W / 2; baseY = H - 40; vanishY = Math.max(90, H * 0.12) - H * 0.02;
+  laneHalfPx = Math.min(W * 0.36, (H - vanishY) * 0.42);
+}
+let camZ = 0;   // the camera dollies down the lane behind the ball
+const sc = (z) => ZC / (Math.max(0.05, z - camZ) + ZC);
+const proj = (x, z) => { const s = sc(z); return [cx + (x / LANE_HALF) * laneHalfPx * s, vanishY + (baseY - vanishY) * s]; };
+function quad(pts, fill) { g.beginPath(); pts.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.closePath(); g.fillStyle = fill; g.fill(); }
+
+function draw() {
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const targetCam = state === 'rolling' || state === 'counting' ? Math.min(10.5, Math.max(0, ball.z - 2.5)) : 0;
+  camZ += (targetCam - camZ) * (targetCam < camZ ? 0.08 : 0.12);
+  const bg = g.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, '#0b1020'); bg.addColorStop(1, '#1b1033');
+  g.fillStyle = bg; g.fillRect(0, 0, W, H);
+  const far = LANE_LEN + 1.2;
+  // gutters
+  const near = camZ;
+  quad([proj(-LANE_HALF - GUTTER, near), proj(-LANE_HALF - GUTTER, far), proj(LANE_HALF + GUTTER, far), proj(LANE_HALF + GUTTER, near)], '#2b2f3a');
+  // wood lane
+  const wood = g.createLinearGradient(0, vanishY, 0, baseY); wood.addColorStop(0, '#b07a43'); wood.addColorStop(1, '#e2b07a');
+  quad([proj(-LANE_HALF, near), proj(-LANE_HALF, LANE_LEN), proj(LANE_HALF, LANE_LEN), proj(LANE_HALF, near)], wood);
+  g.strokeStyle = '#00000018'; g.lineWidth = 1;
+  for (let i = -19; i <= 19; i += 2) { const [x1, y1] = proj(i / 39 * LANE_HALF * 2, near), [x2, y2] = proj(i / 39 * LANE_HALF * 2, LANE_LEN); g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); }
+  // arrows and dots
+  g.fillStyle = '#7c2d12';
+  [-3, -2, -1, 0, 1, 2, 3].forEach((k) => { const z = 4.6 + Math.abs(k) * 0.35; if (z < camZ + 0.3) return; const [x, y] = proj(k * 0.13, z), s = sc(z) * laneHalfPx * 0.05;
+    g.beginPath(); g.moveTo(x, y - s * 2); g.lineTo(x - s, y + s); g.lineTo(x + s, y + s); g.fill(); });
+  // pin deck + pit
+  quad([proj(-LANE_HALF - GUTTER, LANE_LEN), proj(-LANE_HALF - GUTTER, far), proj(LANE_HALF + GUTTER, far), proj(LANE_HALF + GUTTER, LANE_LEN)], '#0d0d12');
+  // foul line
+  const [fl1x, fl1y] = proj(-LANE_HALF, 0.3), [fl2x] = proj(LANE_HALF, 0.3);
+  if (camZ < 0.2) { g.fillStyle = '#ef4444'; g.fillRect(fl1x, fl1y, fl2x - fl1x, 3); }
+  // objects sorted far to near
+  const objs = pins.filter((p) => !p.gone || p.z < LANE_LEN + 1).map((p) => ({ z: p.z, draw: () => drawPin(p) }));
+  objs.push({ z: ball.z, draw: drawBall });
+  objs.sort((a, b) => b.z - a.z).forEach((o) => o.draw());
+  // aim guide
+  if (state === 'aim') {
+    g.setLineDash([6, 8]); g.strokeStyle = '#ffffff55'; g.lineWidth = 2;
+    const [ax, ay] = proj(ball.x, 0.6), [bx, by] = proj(ball.x, 10); g.beginPath(); g.moveTo(ax, ay); g.lineTo(bx, by); g.stroke(); g.setLineDash([]);
+  }
+}
+function drawPin(p) {
+  const [x, y] = proj(p.x, p.z), s = sc(p.z) * laneHalfPx / LANE_HALF;
+  const h = 0.38 * s, w = 0.12 * s;
+  g.save(); g.translate(x, y);
+  if (p.down) { g.rotate(p.angle || Math.PI / 2); g.translate(0, -w); }
+  g.fillStyle = '#00000033'; g.beginPath(); g.ellipse(0, 0, w * 0.8, w * 0.3, 0, 0, 7); g.fill();
+  g.fillStyle = '#f8fafc';
+  g.beginPath(); g.moveTo(-w * 0.4, 0);
+  g.bezierCurveTo(-w * 0.75, -h * 0.35, -w * 0.15, -h * 0.55, -w * 0.25, -h * 0.75);
+  g.bezierCurveTo(-w * 0.45, -h * 1.0, w * 0.45, -h * 1.0, w * 0.25, -h * 0.75);
+  g.bezierCurveTo(w * 0.15, -h * 0.55, w * 0.75, -h * 0.35, w * 0.4, 0); g.fill();
+  g.fillStyle = '#dc2626'; g.fillRect(-w * 0.24, -h * 0.68, w * 0.48, h * 0.05); g.fillRect(-w * 0.27, -h * 0.6, w * 0.54, h * 0.04);
+  g.restore();
+}
+function drawBall() {
+  if (ball.z > LANE_LEN + 0.6) return;
+  const [x, y] = proj(ball.x, ball.z), r = BALL_R * sc(ball.z) * laneHalfPx / LANE_HALF;
+  g.fillStyle = '#0006'; g.beginPath(); g.ellipse(x, y, r, r * 0.35, 0, 0, 7); g.fill();
+  const grad = g.createRadialGradient(x - r * 0.35, y - r * 1.35, r * 0.1, x, y - r, r * 1.1);
+  grad.addColorStop(0, '#93c5fd'); grad.addColorStop(0.5, '#2563eb'); grad.addColorStop(1, '#1e1b4b');
+  g.fillStyle = grad; g.beginPath(); g.arc(x, y - r, r, 0, 7); g.fill();
+  // finger holes rotate with the roll
+  g.fillStyle = '#0b1020';
+  [[0, -0.35], [-0.18, 0.05], [0.18, 0.05]].forEach(([hx, hy]) => {
+    const ry = (hy * Math.cos(ball.rot) + 0.1) * r;
+    if (Math.cos(ball.rot) > -0.2) { g.beginPath(); g.arc(x + hx * r, y - r + ry, r * 0.11, 0, 7); g.fill(); }
+  });
+}
+
+// ---------- Loop ----------
+let last = performance.now();
+function loop(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (state === 'rolling') {
+    const n = 8; for (let i = 0; i < n; i++) step(dt / n);
+    const moving = pins.some((p) => !p.gone && Math.hypot(p.vx, p.vz) > 0.05);
+    if ((!ball.active && !moving) || rollTime > 7) { rollSound(false); endRoll(); }
+  }
+  draw();
+  requestAnimationFrame(loop);
+}
+function showOverlay(text, btn) {
+  document.getElementById('oText').textContent = text;
+  const b = document.getElementById('oBtn'); b.textContent = btn; b.onclick = () => { audio(); newGame(); };
+  games.list({ orderBy: '_created', desc: true, limit: 5 }).then((l) => {
+    document.getElementById('history').textContent = (best ? `🏆 ${T('Best', 'Récord')}: ${best}` : '') +
+      (l.length ? ` · ${T('Last games', 'Últimas')}: ${l.map((x) => x.score).join(', ')}` : '');
+  }).catch(() => {});
+  document.getElementById('overlay').classList.remove('hide');
+}
+document.getElementById('hint').textContent = T('Drag sideways to aim · swipe up to throw · curve your swipe to hook', 'Arrastra de lado para apuntar · desliza hacia arriba para lanzar · curva el gesto para dar efecto');
+addEventListener('resize', resize);
+(async () => {
+  best = await kv.get('best', 0);
+  resize(); rackPins(); resetBall(); renderBoard();
+  showOverlay(T('Swipe up to roll. 10 frames, strikes and spares count double!', 'Desliza hacia arriba para lanzar. 10 tiradas: ¡los plenos y semiplenos puntúan doble!'), T('Play', 'Jugar'));
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

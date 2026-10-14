@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">Acornix</string>
+    <string name="accessibility_service_label">Acornix total control</string>
+    <string name="accessibility_service_description">Lets the Acornix assistant read the screen and tap, type and scroll in other apps when you ask it to. It only acts while an assistant task is running, and asks before sending, paying or deleting anything.</string>
+    <string name="channel_general">General</string>
+    <string name="channel_agent">Assistant at work</string>
+    <string name="assistant_too_many_steps">I stopped after too many steps. Tell me how to continue.</string>
+    <string name="assistant_stopped">Stopped.</string>
+    <string name="confirm_title">Allow this action?</string>
+    <string name="confirm_message">The assistant wants to tap “%1$s”.</string>
+    <string name="confirm_yes">Allow</string>
+    <string name="confirm_no">Cancel</string>
+    <string name="agent_working_title">Acornix is working</string>
+    <string name="agent_working_text">The assistant is carrying out your request.</string>
+    <string name="stop">Stop</string>
+    <string name="app_not_found">This app no longer exists</string>
+    <string name="tab_home">Home</string>
+    <string name="tab_apps">My Apps</string>
+    <string name="tab_assistant">Assistant</string>
+    <string name="tab_settings">Settings</string>
+    <string name="greeting_morning">Good morning 👋</string>
+    <string name="greeting_afternoon">Good afternoon 👋</string>
+    <string name="greeting_evening">Good evening 👋</string>
+    <string name="home_title">What shall we create today?</string>
+    <string name="home_configure_ai">Set up your AI to get started</string>
+    <string name="hero_title">Create an app</string>
+    <string name="hero_desc">Describe it with words, voice or a photo and watch it being written live.</string>
+    <string name="hero_button">Start</string>
+    <string name="section_feature">Functionality</string>
+    <string name="section_feature_desc">Mini-apps that use your phone</string>
+    <string name="section_control">Control phone</string>
+    <string name="section_control_desc">Ask and Acornix does it</string>
+    <string name="section_apps">My apps</string>
+    <string name="section_studio">Manual studio</string>
+    <string name="section_studio_desc">Use any AI, no API key</string>
+    <string name="home_recent">Recent</string>
+    <string name="see_all">See all</string>
+    <string name="home_tools">Tools</string>
+    <string name="tool_versions">Versions &amp; backups</string>
+    <string name="tool_versions_desc">Go back to any previous version</string>
+    <string name="tool_import_export">Backups &amp; sharing</string>
+    <string name="tool_import_export_desc">Full backup to Drive, import and export ZIP</string>
+    <string name="tool_health">Phone status</string>
+    <string name="tool_health_desc">Battery, memory and storage</string>
+    <string name="tool_gallery">Gallery</string>
+    <string name="tool_gallery_desc">Your photos and videos by month</string>
+    <string name="tool_help">Help</string>
+    <string name="tool_help_desc">How to get the most out of Acornix</string>
+    <string name="filter_all">All</string>
+    <string name="filter_apps">Apps</string>
+    <string name="filter_features">Functionalities</string>
+    <string name="filter_samples">Samples</string>
+    <string name="kind_feature">Functionality</string>
+    <string name="kind_sample">Sample</string>
+    <string name="new_app">New app</string>
+    <string name="search_apps">Search your apps</string>
+    <string name="apps_empty_title">Nothing here yet</string>
+    <string name="apps_empty_text">Create your first app in seconds.</string>
+    <string name="apps_no_results">No results</string>
+    <string name="apps_no_results_text">Try another search or filter.</string>
+    <string name="app_meta_line">v%1$d · updated %2$s</string>
+    <string name="action_open">Open</string>
+    <string name="action_improve">Improve with AI</string>
+    <string name="action_edit_code">Edit code</string>
+    <string name="action_versions">Versions</string>
+    <string name="action_pin">Add to home screen</string>
+    <string name="action_pin_short">Add to home</string>
+    <string name="action_share">Share</string>
+    <string name="action_rename">Rename</string>
+    <string name="action_delete">Delete</string>
+    <string name="pin_unsupported">Your launcher doesn\'t support pinned shortcuts</string>
+    <string name="field_name">Name</string>
+    <string name="field_emoji">Emoji</string>
+    <string name="save">Save</string>
+    <string name="saved">Saved</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete_title">Delete “%1$s”?</string>
+    <string name="delete_text">The app and all its versions will be deleted. This can\'t be undone.</string>
+    <string name="voice_prompt">What do you want?</string>
+    <string name="voice_unavailable">Voice recognition is not available on this phone</string>
+    <string name="remove">Remove</string>
+    <string name="attach_image">Attach image</string>
+    <string name="dictate">Dictate</string>
+    <string name="send">Send</string>
+    <string name="back">Back</string>
+    <string name="create_app_title">Create app</string>
+    <string name="create_feature_title">Create functionality</string>
+    <string name="improve_title">Improve %1$s</string>
+    <string name="improve_subtitle">Tell me what to change. A new version will be saved.</string>
+    <string name="create_app_intro">Describe the app or game you imagine. The more detail, the better.</string>
+    <string name="create_feature_intro">A functionality is a mini-app that can use your phone: vibration, flashlight, battery, voice, notifications and even the AI.</string>
+    <string name="field_name_optional">Name (optional)</string>
+    <string name="field_idea">What should it do?</string>
+    <string name="field_idea_hint">A space shooter with touch controls, levels and a high score…</string>
+    <string name="field_feature_hint">A big SOS button that blinks the flashlight and vibrates…</string>
+    <string name="field_change">What do you want to change?</string>
+    <string name="field_change_hint">Add sound effects and make the buttons bigger…</string>
+    <string name="attach_reference">Reference photo</string>
+    <string name="field_category">Type</string>
+    <string name="inspiration">Need ideas?</string>
+    <string name="create_button">Create with AI</string>
+    <string name="apply_change">Apply change</string>
+    <string name="gen_thinking">Thinking…</string>
+    <string name="gen_writing">Writing code…</string>
+    <string name="gen_finishing">Almost there…</string>
+    <string name="gen_size">%1$s · %2$d lines</string>
+    <string name="gen_done_version">Ready · version %1$d</string>
+    <string name="gen_truncated">The answer was cut off because it was too long. Ask for a change like “complete the missing part” or simplify the request.</string>
+    <string name="gen_failed">Something went wrong</string>
+    <string name="gen_error_no_code">The AI answered without an app. Try rephrasing the request.</string>
+    <string name="gen_error_refused">The AI declined this request.</string>
+    <string name="gen_error_generic">Unexpected error</string>
+    <string name="suggestion_title">Suggested improvement</string>
+    <string name="apply_suggestion">Apply suggestion</string>
+    <string name="apply_suggestion_short">Apply</string>
+    <string name="improve_placeholder">Ask for a change…</string>
+    <string name="edit_request">Edit request</string>
+    <string name="retry">Retry</string>
+    <string name="new_chat">New chat</string>
+    <string name="control_on_short">Total control on</string>
+    <string name="control_off_short">Direct actions only</string>
+    <string name="assistant_empty_title">How can I help?</string>
+    <string name="assistant_control_title">Tell me what to do on your phone</string>
+    <string name="assistant_empty_text">Create apps, open things, control your phone… just ask.</string>
+    <string name="assistant_placeholder">Ask Acornix…</string>
+    <string name="assistant_thinking">Thinking…</string>
+    <string name="control_banner_title">Enable Total control</string>
+    <string name="control_banner_text">So I can see the screen and tap inside other apps.</string>
+    <string name="enable">Enable</string>
+    <string name="manage">Manage</string>
+    <string name="step_create_web_app">Creating app</string>
+    <string name="step_improve_app">Improving app</string>
+    <string name="step_list_my_apps">Checking your apps</string>
+    <string name="step_open_my_app">Opening your app</string>
+    <string name="step_open_url">Opening link</string>
+    <string name="step_youtube_search">Searching YouTube</string>
+    <string name="step_web_search">Searching the web</string>
+    <string name="step_open_maps">Opening maps</string>
+    <string name="step_open_app">Opening app</string>
+    <string name="step_list_installed_apps">Listing installed apps</string>
+    <string name="step_flashlight">Flashlight</string>
+    <string name="step_flashlight_morse">Morse with flashlight</string>
+    <string name="step_vibrate">Vibrating</string>
+    <string name="step_speak">Speaking</string>
+    <string name="step_set_alarm">Setting alarm</string>
+    <string name="step_set_timer">Starting timer</string>
+    <string name="step_show_notification">Showing notification</string>
+    <string name="step_share_text">Sharing</string>
+    <string name="step_copy_to_clipboard">Copying</string>
+    <string name="step_compose_sms">Writing SMS</string>
+    <string name="step_dial">Opening dialer</string>
+    <string name="step_open_settings">Opening settings</string>
+    <string name="step_battery_status">Checking battery</string>
+    <string name="step_device_info">Checking device</string>
+    <string name="step_wait">Waiting</string>
+    <string name="step_app_data_overview">Checking the app\'s data</string>
+    <string name="step_query_app_data">Reading data</string>
+    <string name="step_add_app_data">Saving data</string>
+    <string name="step_update_app_data">Updating data</string>
+    <string name="step_delete_app_data">Deleting data</string>
+    <string name="step_read_screen">Reading the screen</string>
+    <string name="step_screenshot">Taking screenshot</string>
+    <string name="step_tap">Tapping</string>
+    <string name="step_long_press">Long-pressing</string>
+    <string name="step_type_text">Typing</string>
+    <string name="step_scroll">Scrolling</string>
+    <string name="step_go_back">Going back</string>
+    <string name="step_go_home">Going home</string>
+    <string name="step_open_recents">Opening recent apps</string>
+    <string name="step_open_notifications">Opening notifications</string>
+    <string name="settings_ai">Artificial intelligence</string>
+    <string name="settings_generated_apps">Generated apps</string>
+    <string name="settings_app_language">Language of the apps\' texts</string>
+    <string name="lang_auto">Phone</string>
+    <string name="lang_es">Español</string>
+    <string name="lang_en">English</string>
+    <string name="settings_assistant">Assistant</string>
+    <string name="settings_speak">Read replies aloud</string>
+    <string name="settings_speak_desc">The assistant answers with voice too</string>
+    <string name="settings_control">Total control</string>
+    <string name="settings_control_on">Active: the assistant can operate other apps</string>
+    <string name="settings_control_off">Off: enable “Acornix total control” in Accessibility</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="settings_dynamic_color">Material You colors</string>
+    <string name="settings_dynamic_color_desc">Use your wallpaper\'s colors</string>
+    <string name="settings_about">About</string>
+    <string name="settings_about_text">Open source on GitHub. Tap to see the project, report issues or star it.</string>
+    <string name="provider">Provider</string>
+    <string name="provider_custom">OpenAI-compatible (own URL)</string>
+    <string name="base_url">Base URL</string>
+    <string name="api_key">API key</string>
+    <string name="api_key_optional">API key (optional)</string>
+    <string name="show_key">Show key</string>
+    <string name="get_key">Get your key at %1$s ↗</string>
+    <string name="model">Model</string>
+    <string name="load_models">Load models</string>
+    <string name="models_unavailable">Couldn\'t load the list (check the key)</string>
+    <string name="testing">Testing…</string>
+    <string name="test_ok">Connection OK</string>
+    <string name="test_connection">Test connection</string>
+    <string name="onb_welcome_title">Welcome to Acornix</string>
+    <string name="onb_welcome_text">Your AI that creates apps and controls your phone.</string>
+    <string name="onb_feature_create">Create apps and games by describing them</string>
+    <string name="onb_feature_feature">Functionalities that use your phone\'s hardware</string>
+    <string name="onb_feature_control">An assistant that does things for you</string>
+    <string name="onb_feature_apps">Your apps on the home screen, like real ones</string>
+    <string name="onb_ai_title">Connect your AI</string>
+    <string name="onb_ai_text">Choose a provider and paste your API key. It\'s stored encrypted on this phone and only sent to that provider.</string>
+    <string name="onb_perm_title">Last step</string>
+    <string name="onb_perm_text">Both are optional and you can change them later in Settings.</string>
+    <string name="onb_perm_notif">Notifications</string>
+    <string name="onb_perm_notif_text">To show progress and a Stop button while the assistant works, and for your apps\' notifications.</string>
+    <string name="onb_perm_control_text">Lets the assistant see the screen and tap inside other apps (e.g. “open WhatsApp and write to Mary”). It only acts when you ask, and confirms before sending, paying or deleting.</string>
+    <string name="onb_start">Start</string>
+    <string name="onb_later">Later</string>
+    <string name="onb_finish">Let\'s go!</string>
+    <string name="edited_by_hand">Edited by hand</string>
+    <string name="unsaved_title">Unsaved changes</string>
+    <string name="unsaved_text">Do you want to save your changes?</string>
+    <string name="discard">Discard</string>
+    <string name="version_n">Version %1$d</string>
+    <string name="version_current">current</string>
+    <string name="view_code">View code</string>
+    <string name="restore">Restore</string>
+    <string name="restored">Version restored</string>
+    <string name="restore_title">Restore version %1$d?</string>
+    <string name="restore_text">The current code is kept in the history, so you can always come back.</string>
+    <string name="versions_empty">No versions yet</string>
+    <string name="versions_hub_text">Every creation, improvement or edit is saved as a version. Pick an app to travel back in time.</string>
+    <string name="import_title">Import an app</string>
+    <string name="import_text">ZIP files exported from Acornix or from the original acornix for Termux (with index.html).</string>
+    <string name="import_button">Choose ZIP</string>
+    <string name="import_done">“%1$s” imported</string>
+    <string name="import_error_zip">That file is not a valid ZIP.</string>
+    <string name="import_error_plugin">That\'s a Python plugin from acornix for Termux. Android apps need an index.html.</string>
+    <string name="import_error_index">The ZIP has no index.html.</string>
+    <string name="export_title">Export</string>
+    <string name="export_save">Save ZIP</string>
+    <string name="export_done">ZIP saved</string>
+    <string name="confirm_delete_data">The assistant wants to delete “%1$s” from %2$s.</string>
+    <string name="action_data">Data</string>
+    <string name="data_title">Saved data</string>
+    <string name="data_export">Export as JSON</string>
+    <string name="data_clear">Delete all data</string>
+    <string name="data_summary">%1$d records · %2$d collections · %3$d values · %4$d files (%5$s)</string>
+    <string name="data_explain">Stored in a private database on this phone. It is kept when the app is improved and deleted with the app.</string>
+    <string name="data_empty_title">No data yet</string>
+    <string name="data_empty_text">When the app saves something (tasks, games, settings…) it will appear here.</string>
+    <string name="data_collection_line">%1$d records · %2$s</string>
+    <string name="data_keys">Saved values</string>
+    <string name="data_files">Files</string>
+    <string name="data_clear_title">Delete all data?</string>
+    <string name="data_clear_text">The app\'s records, values and files will be deleted. The app itself stays.</string>
+    <string name="share_data_title">Share %1$s with your data?</string>
+    <string name="share_data_text">This app has saved data (lists, games, settings…). You can send it clean or with your data included.</string>
+    <string name="share_with_data">With my data</string>
+    <string name="share_without_data">Clean</string>
+    <string name="backup_title">Full backup</string>
+    <string name="backup_text">All your apps with their versions, data and files in one ZIP. Choose Google Drive in the next screen to keep it in the cloud.</string>
+    <string name="backup_create">Create backup</string>
+    <string name="backup_restore">Restore</string>
+    <string name="backup_auto">Android also backs up your apps and data automatically to your Google account (Settings › Google › Backup).</string>
+    <string name="backup_done">Backup created with %1$d apps</string>
+    <string name="backup_restore_title">Restore this backup?</string>
+    <string name="backup_restore_text">Apps in the backup will replace the ones with the same name here, including their data. Your other apps are not touched.</string>
+    <string name="backup_restored">%1$d apps restored</string>
+    <string name="help_data_title">Your apps\' data</string>
+    <string name="help_data_text">Apps save lists, games and settings in their own private database (Acornix.db). Long-press an app › Data to see or delete it. The data is kept when you improve the app, can travel inside its ZIP and is included in full backups. You can also ask the assistant: “add bread to my shopping list”.</string>
+    <string name="update_available">Acornix %1$s is available</string>
+    <string name="update_now">Update</string>
+    <string name="update_later">Later</string>
+    <string name="update_install">Install update</string>
+    <string name="update_downloading">Downloading… %1$d%%</string>
+    <string name="update_permission_hint">Allow Acornix to install apps, then come back and tap Install update.</string>
+    <string name="update_failed">The download failed. Check your connection or download it from GitHub.</string>
+    <string name="update_open_page">Open the release page</string>
+    <string name="update_check">Check for updates</string>
+    <string name="update_checking">Checking…</string>
+    <string name="update_up_to_date">You have the latest version (%1$s).</string>
+    <string name="update_check_failed">Couldn\'t check for updates. Are you online?</string>
+    <string name="health_battery">Battery</string>
+    <string name="health_battery_detail">%1$s · %2$.1f °C</string>
+    <string name="health_charging">Charging</string>
+    <string name="health_not_charging">Not charging</string>
+    <string name="health_ram">Free memory</string>
+    <string name="health_free_of">%1$s free of %2$s</string>
+    <string name="health_storage">Free storage</string>
+    <string name="health_apps_size">your apps use %1$s</string>
+    <string name="health_device">Device</string>
+    <string name="health_model">Model</string>
+    <string name="health_cpu">CPU cores</string>
+    <string name="health_screen">Screen</string>
+    <string name="health_flashlight">Flashlight</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="gallery_permission_title">See your photos</string>
+    <string name="gallery_permission_text">Acornix needs access to your photos and videos to show them by month.</string>
+    <string name="gallery_empty">No photos or videos</string>
+    <string name="studio_intro">Use ChatGPT, Claude, Gemini or any other AI without an API key: copy the prompt, paste it there, then copy the whole answer with the copy button of the code block and paste it here.</string>
+    <string name="studio_incomplete_title">The code looks incomplete</string>
+    <string name="studio_incomplete_text">Part of the file is missing (the beginning, the end or some tags). This happens when the AI\'s chat shows HTML outside a code block or splits it. Ask for it again with the copied prompt and use the copy button of the code block.</string>
+    <string name="save_anyway">Save anyway</string>
+    <string name="studio_step1">Copy the prompt</string>
+    <string name="studio_step2">Paste the answer</string>
+    <string name="studio_code">HTML code</string>
+    <string name="copy_prompt">Copy prompt</string>
+    <string name="prompt_copied">Prompt copied. Paste it in your AI.</string>
+    <string name="paste">Paste</string>
+    <string name="studio_invalid">That doesn\'t look like an HTML app.</string>
+    <string name="studio_save">Save and open</string>
+    <string name="help_create_title">Create apps</string>
+    <string name="help_create_text">Describe what you want (or dictate it, or attach a photo). Acornix writes a full web app live and you can try it straight away. Then apply the suggested improvement or ask for your own changes: every change is a new version.</string>
+    <string name="help_feature_title">Functionalities</string>
+    <string name="help_feature_text">They replace the Python plugins of the Termux version. They are apps that can use window.Acornix to vibrate, turn on the flashlight, speak, read the battery, send notifications or ask the AI.</string>
+    <string name="help_assistant_title">The assistant</string>
+    <string name="help_assistant_text">Ask for anything in natural language: “turn on the flashlight in SOS”, “search Nirvana videos on YouTube”, “set an alarm at 7”, “create a piano and open it”. You\'ll see each step it takes and can stop it at any time.</string>
+    <string name="help_control_title">Total control</string>
+    <string name="help_control_text">Enable “Acornix total control” in Android\'s Accessibility settings and the assistant will be able to read the screen and tap or type inside other apps. It asks before sending messages, calling, paying or deleting, and never sees passwords.</string>
+    <string name="help_apps_title">Your apps</string>
+    <string name="help_apps_text">Tap to open full screen, long-press for more options: improve, edit code, versions, add to the home screen, share or delete.</string>
+    <string name="help_versions_title">Versions</string>
+    <string name="help_versions_text">Nothing is ever lost: you can restore any previous version from the timeline.</string>
+    <string name="help_share_title">Share</string>
+    <string name="help_share_text">Export any app as a ZIP and send it to whoever you want. ZIPs from the original acornix are also imported.</string>
+    <string name="help_keys_title">API keys and privacy</string>
+    <string name="help_keys_text">Your key is encrypted with the Android Keystore and only sent to the provider you choose. Generated apps run locally on your phone.</string>
+    <string name="help_origin_title">Where does it come from?</string>
+    <string name="help_origin_text">Acornix was born as a terminal assistant for Termux. This app brings all of it to a modern interface, no terminal required.</string>
+    <plurals name="section_apps_desc">
+        <item quantity="one">%d app created</item>
+        <item quantity="other">%d apps created</item>
+    </plurals>
+    <plurals name="versions_count">
+        <item quantity="one">%d version</item>
+        <item quantity="other">%d versions</item>
+    </plurals>
+    <string-array name="categories">
+        <item>Game</item>
+        <item>Utility</item>
+        <item>Music</item>
+        <item>Education</item>
+        <item>Health</item>
+        <item>Creative</item>
+        <item>Productivity</item>
+    </string-array>
+    <string-array name="app_examples">
+        <item>A piano for mobile with several instruments</item>
+        <item>A 3D airplane game with touch controls</item>
+        <item>An Arkanoid with touch buttons</item>
+        <item>A to-do list with categories and reminders</item>
+        <item>A solar system simulator I can move with my fingers</item>
+        <item>A Flappy Bird style game</item>
+    </string-array>
+    <string-array name="feature_examples">
+        <item>A big SOS button that blinks the flashlight and vibrates</item>
+        <item>A battery dashboard with charts and alerts</item>
+        <item>A pocket translator that reads the result aloud</item>
+        <item>A Pomodoro timer that vibrates and notifies</item>
+        <item>An AI chat that answers out loud</item>
+    </string-array>
+    <string-array name="improve_examples">
+        <item>Make it prettier and more modern</item>
+        <item>Add sound effects</item>
+        <item>Add a dark mode</item>
+        <item>Make the buttons bigger</item>
+        <item>Fix bugs and improve performance</item>
+        <item>Save progress and high scores</item>
+    </string-array>
+    <string-array name="assistant_examples">
+        <item>Create a piano and open it</item>
+        <item>Turn on the flashlight in SOS</item>
+        <item>How much battery do I have?</item>
+        <item>Search Nirvana videos on YouTube</item>
+        <item>Add bread to my shopping list</item>
+    </string-array>
+    <string-array name="control_examples">
+        <item>Flashlight SOS</item>
+        <item>Open YouTube and search Nirvana</item>
+        <item>Open Settings and turn on dark mode</item>
+        <item>Set a 10 minute timer</item>
+        <item>Read me my latest notification</item>
+    </string-array>
+</resources>

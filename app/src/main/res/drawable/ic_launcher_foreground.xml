@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Nut -->
+    <path
+        android:fillColor="@color/icon_nut"
+        android:pathData="M34,50 L74,50 C74,66 66,78 54,82 C42,78 34,66 34,50 Z" />
+    <!-- Cap -->
+    <path
+        android:fillColor="@color/icon_cap"
+        android:pathData="M30,52 C30,40 40,33 54,33 C68,33 78,40 78,52 Z" />
+    <!-- Stem -->
+    <path
+        android:fillColor="@color/icon_cap"
+        android:pathData="M52,26 L56,26 L57,34 L51,34 Z" />
+    <!-- Spark -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M54,56 L56,62 L62,64 L56,66 L54,72 L52,66 L46,64 L52,62 Z" />
+</vector>

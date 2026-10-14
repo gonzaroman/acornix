@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0d0d12">
+<title>Piano</title>
+<style>
+  :root { --bg: #0d0d12; --bar: #16161f; --chip: #23232f; --text: #f1f1f6; --muted: #8d8da0; --glow: #ffb547; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); overflow: hidden; overscroll-behavior: none;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; user-select: none; -webkit-user-select: none; }
+  .app { height: 100dvh; display: flex; flex-direction: column;
+    padding: calc(env(safe-area-inset-top) + 8px) calc(env(safe-area-inset-right) + 8px) calc(env(safe-area-inset-bottom) + 8px) calc(env(safe-area-inset-left) + 8px); gap: 8px; }
+  .bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; background: var(--bar); border-radius: 18px; padding: 8px; }
+  .brand { font-weight: 800; letter-spacing: .02em; padding: 0 6px; font-size: 17px; }
+  .chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; flex: 1 1 auto; min-width: 0; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip, .btn { border: 0; background: var(--chip); color: var(--text); border-radius: 12px; padding: 9px 12px; font: inherit; font-size: 14px;
+    white-space: nowrap; touch-action: manipulation; }
+  .chip.on { background: var(--glow); color: #1a1205; font-weight: 700; }
+  .group { display: flex; align-items: center; gap: 6px; }
+  .oct { min-width: 54px; text-align: center; font-variant-numeric: tabular-nums; color: var(--muted); font-size: 14px; }
+  .btn:active, .chip:active { transform: scale(.95); }
+  .rec.on { background: #ef4444; animation: pulse 1s infinite; }
+  @keyframes pulse { 50% { opacity: .6; } }
+  .keyboard { position: relative; flex: 1; min-height: 0; border-radius: 16px; overflow: hidden; touch-action: none;
+    background: linear-gradient(#000, #111); box-shadow: inset 0 6px 14px #000a; }
+  .row { border-radius: 14px; overflow: hidden; background: #000; }
+  .white { position: absolute; top: 0; bottom: 0; background: linear-gradient(#fdfdfd, #e9e9ee 85%, #d7d7de);
+    border: 1px solid #b9b9c4; border-top: 0; border-radius: 0 0 10px 10px; display: flex; align-items: flex-end; justify-content: center;
+    padding-bottom: 10px; color: #8a8a99; font-size: clamp(10px, 2.2vmin, 14px); font-weight: 600; transition: background .05s; }
+  .black { position: absolute; top: 0; height: 62%; background: linear-gradient(#3a3a46, #111 70%); border-radius: 0 0 8px 8px; z-index: 2;
+    box-shadow: 0 4px 6px #000c, inset 0 -6px 0 #000; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 8px;
+    color: #9b9bab; font-size: clamp(8px, 1.8vmin, 11px); }
+  .white.down { background: linear-gradient(#fff3dc, var(--glow)); box-shadow: inset 0 0 18px #fff8; }
+  .black.down { background: linear-gradient(#5a4a2a, var(--glow)); box-shadow: inset 0 -2px 0 #000; }
+  .hideLabels .white, .hideLabels .black { color: transparent; }
+  .sheet { position: fixed; inset: auto 0 0 0; background: var(--bar); border-radius: 22px 22px 0 0; padding: 16px 16px calc(env(safe-area-inset-bottom) + 16px);
+    transform: translateY(105%); transition: transform .25s; max-height: 70dvh; overflow-y: auto; z-index: 10; max-width: 640px; margin: 0 auto; }
+  .sheet.open { transform: none; }
+  .sheet h3 { margin: 0 0 10px; display: flex; justify-content: space-between; align-items: center; }
+  .rec-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid #ffffff10; }
+  .rec-item .info { flex: 1; } .rec-item small { color: var(--muted); display: block; }
+  .empty { color: var(--muted); padding: 20px 0; text-align: center; }
+  .hint { position: absolute; inset: 0; display: grid; place-items: center; z-index: 5; background: #000a; color: #fff; font-size: 18px; font-weight: 600; text-align: center; padding: 20px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="bar">
+    <span class="brand">🎹 Piano</span>
+    <div class="chips" id="instruments"></div>
+    <div class="group">
+      <button class="btn" id="octDown">◀</button><span class="oct" id="oct"></span><button class="btn" id="octUp">▶</button>
+    </div>
+    <div class="group">
+      <button class="btn" id="labels">Aa</button>
+      <button class="btn rec" id="rec">● REC</button>
+      <button class="btn" id="recs">♫</button>
+    </div>
+  </div>
+  <div class="keyboard" id="kb"><div class="hint" id="hint"></div></div>
+</div>
+<div class="sheet" id="sheet">
+  <h3><span id="recTitle">Recordings</span><button class="btn" id="closeSheet">✕</button></h3>
+  <div id="recList"></div>
+</div>
+<script>
+const ES = (navigator.language || '').toLowerCase().startsWith('es');
+const T = (en, es) => (ES ? es : en);
+const kv = {
+  async get(k, d) { try { if (window.Acornix) { const v = await Acornix.db.get(k); return v ?? d; } } catch (e) {} try { const v = localStorage.getItem('piano:' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  async set(k, v) { try { if (window.Acornix) return await Acornix.db.set(k, v); } catch (e) {} try { localStorage.setItem('piano:' + k, JSON.stringify(v)); } catch (e) {} },
+};
+function coll(name) {
+  if (window.Acornix) return Acornix.db.collection(name);
+  const key = 'piano:' + name;
+  const read = () => { try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) { return []; } };
+  const write = (a) => localStorage.setItem(key, JSON.stringify(a));
+  return {
+    async add(d) { const a = read(); const doc = { ...d, _id: Math.random().toString(36).slice(2), _created: Date.now() }; a.push(doc); write(a); return doc; },
+    async list(q = {}) { let a = read(); if (q.desc) a.reverse(); return a; },
+    async remove(id) { write(read().filter((d) => d._id !== id)); return true; },
+  };
+}
+const recordings = coll('recordings');
+
+document.getElementById('recTitle').textContent = T('Recordings', 'Grabaciones');
+document.getElementById('hint').textContent = T('Tap to start playing 🎵', 'Toca para empezar a tocar 🎵');
+
+// ---------- Audio ----------
+let ctx, master, comp;
+function audio() {
+  if (!ctx) {
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    comp = ctx.createDynamicsCompressor();
+    master = ctx.createGain(); master.gain.value = 0.7;
+    // Small room reverb from a generated impulse response
+    const conv = ctx.createConvolver();
+    const len = ctx.sampleRate * 1.6, ir = ctx.createBuffer(2, len, ctx.sampleRate);
+    for (let ch = 0; ch < 2; ch++) { const d = ir.getChannelData(ch); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3); }
+    conv.buffer = ir;
+    const wet = ctx.createGain(); wet.gain.value = 0.18;
+    master.connect(comp); master.connect(conv); conv.connect(wet); wet.connect(comp); comp.connect(ctx.destination);
+  }
+  if (ctx.state === 'suspended') ctx.resume();
+  return ctx;
+}
+const freq = (midi) => 440 * Math.pow(2, (midi - 69) / 12);
+
+const INSTRUMENTS = {
+  piano: { name: 'Piano', color: '#ffb547' },
+  organ: { name: T('Organ', 'Órgano'), color: '#a78bfa' },
+  synth: { name: 'Synth', color: '#22d3ee' },
+  bells: { name: T('Bells', 'Campanas'), color: '#f472b6' },
+};
+let instrument = 'piano';
+
+function voice(midi, velocity = 0.9) {
+  const ac = audio(), now = ac.currentTime, f = freq(midi);
+  const out = ac.createGain(); out.gain.value = 0; out.connect(master);
+  const oscs = [];
+  const osc = (type, mult, gain, detune = 0) => {
+    const o = ac.createOscillator(); o.type = type; o.frequency.value = f * mult; o.detune.value = detune;
+    const g = ac.createGain(); g.gain.value = gain; o.connect(g); g.connect(out); o.start(now); oscs.push(o); return o;
+  };
+  let release = 0.4;
+  const v = velocity * (midi > 84 ? 0.7 : 1);
+  if (instrument === 'piano') {
+    const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.setValueAtTime(Math.min(9000, f * 9), now); lp.frequency.exponentialRampToValueAtTime(Math.max(400, f * 2), now + 1.6);
+    out.disconnect(); out.connect(lp); lp.connect(master);
+    osc('triangle', 1, 0.6); osc('sine', 2, 0.25, 3); osc('sine', 3, 0.08, -4); osc('square', 1, 0.04, 7);
+    out.gain.setValueAtTime(0, now); out.gain.linearRampToValueAtTime(0.5 * v, now + 0.005);
+    out.gain.exponentialRampToValueAtTime(0.18 * v, now + 0.35); out.gain.exponentialRampToValueAtTime(0.02, now + 4.5);
+    release = 0.35;
+  } else if (instrument === 'organ') {
+    [1, 2, 3, 4, 6].forEach((m, i) => osc('sine', m, [0.5, 0.3, 0.18, 0.12, 0.06][i]));
+    out.gain.setValueAtTime(0, now); out.gain.linearRampToValueAtTime(0.3 * v, now + 0.03);
+    release = 0.12;
+  } else if (instrument === 'synth') {
+    const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = 6;
+    lp.frequency.setValueAtTime(f * 10, now); lp.frequency.exponentialRampToValueAtTime(f * 2.5, now + 0.4);
+    out.disconnect(); out.connect(lp); lp.connect(master);
+    osc('sawtooth', 1, 0.35, -7); osc('sawtooth', 1, 0.35, 7); osc('square', 0.5, 0.15);
+    out.gain.setValueAtTime(0, now); out.gain.linearRampToValueAtTime(0.32 * v, now + 0.02); out.gain.linearRampToValueAtTime(0.24 * v, now + 0.3);
+    release = 0.3;
+  } else {
+    osc('sine', 1, 0.6); osc('sine', 2.76, 0.25); osc('sine', 5.4, 0.12); osc('sine', 8.93, 0.05);
+    out.gain.setValueAtTime(0, now); out.gain.linearRampToValueAtTime(0.45 * v, now + 0.004); out.gain.exponentialRampToValueAtTime(0.01, now + 3.5);
+    release = 1.2;
+  }
+  return {
+    stop() {
+      const t = ac.currentTime;
+      out.gain.cancelScheduledValues(t); out.gain.setValueAtTime(Math.max(out.gain.value, 0.0001), t);
+      out.gain.exponentialRampToValueAtTime(0.0001, t + release);
+      oscs.forEach((o) => o.stop(t + release + 0.05));
+      setTimeout(() => out.disconnect(), (release + 0.2) * 1000);
+    },
+  };
+}
+
+// ---------- Keyboard layout ----------
+const NAMES_EN = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const NAMES_ES = ['Do', 'Do#', 'Re', 'Re#', 'Mi', 'Fa', 'Fa#', 'Sol', 'Sol#', 'La', 'La#', 'Si'];
+const isBlack = (m) => [1, 3, 6, 8, 10].includes(m % 12);
+let octave = 4;
+const kb = document.getElementById('kb');
+const keyEls = new Map();
+
+function build() {
+  kb.querySelectorAll('.row').forEach((e) => e.remove());
+  keyEls.clear();
+  // Tall screens get two stacked keyboards (upper one an octave higher), like an organ.
+  const rows = kb.clientHeight > kb.clientWidth * 1.15 ? 2 : 1;
+  const gap = 10;
+  const rowH = (kb.clientHeight - gap * (rows - 1)) / rows;
+  const w = kb.clientWidth;
+  const whiteCount = Math.max(7, Math.min(28, Math.round(w / (rows === 1 ? 56 : 48))));
+  const whiteW = w / whiteCount;
+  for (let r = 0; r < rows; r++) {
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.style.cssText = `position:absolute;left:0;right:0;top:${(rows - 1 - r) * (rowH + gap)}px;height:${rowH}px;`;
+    kb.appendChild(row);
+    let midi = 12 * (octave + 1 + r), x = 0, placed = 0;
+    while (placed < whiteCount) {
+      const name = (ES ? NAMES_ES : NAMES_EN)[midi % 12];
+      const el = document.createElement('div');
+      el.dataset.midi = midi;
+      if (!isBlack(midi)) {
+        el.className = 'white'; el.style.left = x + 'px'; el.style.width = whiteW + 'px';
+        el.textContent = midi % 12 === 0 ? name + Math.floor(midi / 12 - 1) : name;
+        x += whiteW; placed++;
+      } else {
+        el.className = 'black'; el.style.width = whiteW * 0.62 + 'px'; el.style.left = (x - whiteW * 0.31) + 'px';
+      }
+      row.appendChild(el);
+      if (!keyEls.has(midi)) keyEls.set(midi, []);
+      keyEls.get(midi).push(el);
+      midi++;
+    }
+  }
+  document.getElementById('oct').textContent = 'Oct ' + octave;
+}
+const mark = (midi, on) => (keyEls.get(midi) || []).forEach((el) => el.classList.toggle('down', on));
+
+// ---------- Touch handling (multi-touch + glissando) ----------
+const active = new Map(); // pointerId -> {midi, voice}
+function keyAt(x, y) {
+  const els = document.elementsFromPoint(x, y);
+  const k = els.find((e) => e.classList && (e.classList.contains('black') || e.classList.contains('white')));
+  return k ? +k.dataset.midi : null;
+}
+function noteOn(midi, pointer) {
+  const v = voice(midi);
+  mark(midi, true);
+  active.set(pointer, { midi, voice: v });
+  if (recording) recEvents.push({ t: performance.now() - recStart, m: midi, on: 1, i: instrument });
+}
+function noteOff(pointer) {
+  const a = active.get(pointer); if (!a) return;
+  a.voice.stop();
+  if (![...active.values()].some((o) => o !== a && o.midi === a.midi)) mark(a.midi, false);
+  active.delete(pointer);
+  if (recording) recEvents.push({ t: performance.now() - recStart, m: a.midi, on: 0 });
+}
+kb.addEventListener('pointerdown', (e) => {
+  e.preventDefault(); document.getElementById('hint').style.display = 'none'; audio();
+  kb.setPointerCapture(e.pointerId);
+  const m = keyAt(e.clientX, e.clientY); if (m != null) noteOn(m, e.pointerId);
+});
+kb.addEventListener('pointermove', (e) => {
+  if (!active.has(e.pointerId)) return;
+  const m = keyAt(e.clientX, e.clientY);
+  if (m != null && m !== active.get(e.pointerId).midi) { noteOff(e.pointerId); noteOn(m, e.pointerId); }
+});
+['pointerup', 'pointercancel', 'lostpointercapture'].forEach((ev) => kb.addEventListener(ev, (e) => noteOff(e.pointerId)));
+
+// ---------- Controls ----------
+const instEl = document.getElementById('instruments');
+function renderInstruments() {
+  instEl.innerHTML = '';
+  Object.entries(INSTRUMENTS).forEach(([id, inst]) => {
+    const b = document.createElement('button');
+    b.className = 'chip' + (id === instrument ? ' on' : ''); b.textContent = inst.name;
+    b.onclick = () => { instrument = id; document.documentElement.style.setProperty('--glow', inst.color); renderInstruments(); kv.set('settings', { instrument, octave, labels }); };
+    instEl.appendChild(b);
+  });
+  document.documentElement.style.setProperty('--glow', INSTRUMENTS[instrument].color);
+}
+let labels = true;
+document.getElementById('labels').onclick = () => { labels = !labels; kb.classList.toggle('hideLabels', !labels); kv.set('settings', { instrument, octave, labels }); };
+document.getElementById('octDown').onclick = () => { if (octave > 1) { octave--; build(); kv.set('settings', { instrument, octave, labels }); } };
+document.getElementById('octUp').onclick = () => { if (octave < 6) { octave++; build(); kv.set('settings', { instrument, octave, labels }); } };
+
+// ---------- Recording ----------
+let recording = false, recStart = 0, recEvents = [];
+const recBtn = document.getElementById('rec');
+recBtn.onclick = async () => {
+  if (!recording) {
+    recording = true; recEvents = []; recStart = performance.now();
+    recBtn.classList.add('on'); recBtn.textContent = '■ ' + T('STOP', 'PARAR');
+  } else {
+    recording = false; recBtn.classList.remove('on'); recBtn.textContent = '● REC';
+    if (recEvents.some((e) => e.on)) {
+      const n = recEvents.filter((e) => e.on).length;
+      const duration = recEvents[recEvents.length - 1].t;
+      try { await recordings.add({ name: `${T('Take', 'Toma')} ${new Date().toLocaleTimeString(ES ? 'es-ES' : 'en-US', { hour: '2-digit', minute: '2-digit' })}`, events: recEvents, notes: n, duration, instrument }); } catch (e) {}
+      openSheet();
+    }
+  }
+};
+let playing = [];
+function play(rec) {
+  stopPlayback();
+  const prev = instrument;
+  const voices = new Map();
+  rec.events.forEach((ev) => {
+    playing.push(setTimeout(() => {
+      if (ev.on) {
+        instrument = ev.i || rec.instrument || 'piano';
+        voices.set(ev.m, voice(ev.m)); mark(ev.m, true);
+        instrument = prev;
+      } else { voices.get(ev.m)?.stop(); voices.delete(ev.m); mark(ev.m, false); }
+    }, ev.t));
+  });
+  playing.push(setTimeout(() => { voices.forEach((v) => v.stop()); kb.querySelectorAll('.down').forEach((el) => el.classList.remove('down')); }, rec.duration + 200));
+}
+function stopPlayback() { playing.forEach(clearTimeout); playing = []; }
+async function openSheet() {
+  const list = document.getElementById('recList');
+  let items = [];
+  try { items = await recordings.list({ orderBy: '_created', desc: true }); } catch (e) {}
+  list.innerHTML = items.length ? '' : `<div class="empty">${T('Press ● REC, play something and stop to save it.', 'Pulsa ● REC, toca algo y para para guardarlo.')}</div>`;
+  items.forEach((r) => {
+    const row = document.createElement('div'); row.className = 'rec-item';
+    row.innerHTML = `<button class="btn">▶</button><div class="info"></div><button class="btn">✕</button>`;
+    row.querySelector('.info').innerHTML = `<b></b><small>${r.notes} ${T('notes', 'notas')} · ${(r.duration / 1000).toFixed(1)} s · ${INSTRUMENTS[r.instrument]?.name || ''}</small>`;
+    row.querySelector('b').textContent = r.name;
+    const [playBtn, delBtn] = row.querySelectorAll('button');
+    playBtn.onclick = () => { audio(); document.getElementById('sheet').classList.remove('open'); play(r); };
+    delBtn.onclick = async () => { try { await recordings.remove(r._id); } catch (e) {} openSheet(); };
+    list.appendChild(row);
+  });
+  document.getElementById('sheet').classList.add('open');
+}
+document.getElementById('recs').onclick = openSheet;
+document.getElementById('closeSheet').onclick = () => document.getElementById('sheet').classList.remove('open');
+
+window.addEventListener('resize', () => build());
+(async () => {
+  const s = await kv.get('settings', null);
+  if (s) { instrument = INSTRUMENTS[s.instrument] ? s.instrument : 'piano'; octave = s.octave || 4; labels = s.labels !== false; }
+  kb.classList.toggle('hideLabels', !labels);
+  renderInstruments(); build();
+})();
+</script>
+</body>
+</html>

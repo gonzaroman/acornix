@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+: same content for the Google account backup and for device-to-device transfer. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <include domain="file" path="my_apps/" />
+        <include domain="file" path="app_data/" />
+        <include domain="database" path="app_data.db" />
+        <include domain="sharedpref" path="samples.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="file" path="my_apps/" />
+        <include domain="file" path="app_data/" />
+        <include domain="database" path="app_data.db" />
+        <include domain="sharedpref" path="samples.xml" />
+    </device-transfer>
+</data-extraction-rules>

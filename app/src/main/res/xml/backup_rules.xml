@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android Auto Backup (Google account) up to Android 11: apps, their data and files.
+     Settings are left out on purpose: the API key is encrypted with a device-bound key. -->
+<full-backup-content>
+    <include domain="file" path="my_apps/" />
+    <include domain="file" path="app_data/" />
+    <include domain="database" path="app_data.db" />
+    <include domain="sharedpref" path="samples.xml" />
+</full-backup-content>

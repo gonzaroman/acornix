@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0e1320">
+<title>BMI</title>
+<style>
+  :root { --bg: #0e1320; --card: #161d2e; --card2: #1e2740; --text: #eef2fb; --muted: #8b95ad; --accent: #6ee7b7;
+    --under: #60a5fa; --normal: #34d399; --over: #fbbf24; --obese: #f87171; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; background: radial-gradient(1200px 600px at 80% -10%, #1d2b52 0%, var(--bg) 60%); color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  body { overflow-x: hidden; }
+  .app { min-height: 100dvh; max-width: 1000px; margin: 0 auto; display: grid; gap: 14px; align-content: start;
+    padding: calc(env(safe-area-inset-top) + 14px) calc(env(safe-area-inset-right) + 14px) calc(env(safe-area-inset-bottom) + 20px) calc(env(safe-area-inset-left) + 14px); }
+  @media (min-width: 760px), (orientation: landscape) and (min-width: 600px) {
+    .app { grid-template-columns: 1fr 1fr; align-items: start; }
+    header { grid-column: 1 / -1; }
+  }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  h1 { font-size: 24px; margin: 0; }
+  h1 small { display: block; font-size: 13px; color: var(--muted); font-weight: 400; margin-top: 2px; }
+  .seg { display: flex; background: var(--card); border-radius: 999px; padding: 4px; }
+  .seg button { border: 0; background: none; color: var(--muted); padding: 8px 14px; border-radius: 999px; font: inherit; font-size: 14px; }
+  .seg button.on { background: var(--card2); color: var(--text); }
+  .card { background: var(--card); border-radius: 22px; padding: 16px; }
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+  .field .row { display: flex; align-items: center; justify-content: space-between; }
+  .label { color: var(--muted); font-size: 14px; }
+  .value { font-size: 30px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .value small { font-size: 15px; color: var(--muted); font-weight: 500; margin-left: 4px; }
+  .stepper { display: flex; gap: 8px; }
+  .stepper button { width: 42px; height: 42px; border-radius: 14px; border: 0; background: var(--card2); color: var(--text); font-size: 22px; }
+  .stepper button:active { transform: scale(.94); }
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 34px; background: transparent; margin-top: 6px; }
+  input[type=range]::-webkit-slider-runnable-track { height: 8px; border-radius: 8px; background: linear-gradient(90deg, var(--accent) var(--p, 50%), #2a3550 var(--p, 50%)); }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 28px; height: 28px; border-radius: 50%; background: #fff; margin-top: -10px; box-shadow: 0 2px 10px #0008; }
+  .gauge { display: grid; place-items: center; }
+  .gauge svg { width: min(100%, 360px); height: auto; overflow: visible; }
+  .bmi { text-align: center; margin-top: -8px; }
+  .bmi .num { font-size: clamp(44px, 12vw, 64px); font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+  .bmi .cat { display: inline-block; margin-top: 8px; padding: 6px 14px; border-radius: 999px; font-weight: 700; font-size: 15px; }
+  .tip { color: var(--muted); text-align: center; font-size: 14px; margin: 12px 4px 0; line-height: 1.45; }
+  .save { width: 100%; margin-top: 14px; border: 0; border-radius: 16px; padding: 15px; font: inherit; font-weight: 700; font-size: 16px;
+    background: linear-gradient(135deg, #34d399, #3b82f6); color: #06111f; }
+  .save:active { transform: scale(.98); }
+  .hist h2 { font-size: 17px; margin: 0 0 10px; display: flex; justify-content: space-between; }
+  .hist h2 span { color: var(--muted); font-weight: 400; font-size: 14px; }
+  .chart { width: 100%; height: 110px; display: block; }
+  .entries { list-style: none; padding: 0; margin: 10px 0 0; }
+  .entries li { display: flex; align-items: center; gap: 10px; padding: 10px 2px; border-top: 1px solid #ffffff0d; }
+  .entries .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+  .entries .main { flex: 1; min-width: 0; }
+  .entries .main b { font-variant-numeric: tabular-nums; }
+  .entries .date { color: var(--muted); font-size: 13px; }
+  .entries button { border: 0; background: none; color: var(--muted); font-size: 18px; width: 36px; height: 36px; }
+  .empty { color: var(--muted); font-size: 14px; text-align: center; padding: 18px 0 6px; }
+  .toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 24px); transform: translate(-50%, 30px); opacity: 0;
+    background: #fff; color: #111; padding: 10px 18px; border-radius: 999px; font-weight: 600; transition: .25s; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1 id="title">BMI<small id="subtitle">Body mass index</small></h1>
+    <div class="seg" id="units"><button data-u="metric" class="on">cm · kg</button><button data-u="imperial">ft · lb</button></div>
+  </header>
+
+  <section class="card">
+    <div class="field">
+      <div class="row"><span class="label" id="lHeight">Height</span>
+        <div class="stepper"><button data-f="h" data-d="-1">−</button><button data-f="h" data-d="1">+</button></div></div>
+      <div class="value" id="vHeight"></div>
+      <input type="range" id="height">
+    </div>
+    <div class="field">
+      <div class="row"><span class="label" id="lWeight">Weight</span>
+        <div class="stepper"><button data-f="w" data-d="-1">−</button><button data-f="w" data-d="1">+</button></div></div>
+      <div class="value" id="vWeight"></div>
+      <input type="range" id="weight">
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="gauge">
+      <svg viewBox="0 0 300 170" id="gauge">
+        <g id="arcs"></g>
+        <g id="needle" style="transition: transform .6s cubic-bezier(.3,1.4,.5,1); transform-origin: 150px 150px;">
+          <line x1="150" y1="150" x2="150" y2="42" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+          <circle cx="150" cy="150" r="11" fill="#fff"/>
+        </g>
+      </svg>
+    </div>
+    <div class="bmi"><div class="num" id="bmi">0</div><div class="cat" id="cat"></div></div>
+    <p class="tip" id="tip"></p>
+    <button class="save" id="save">Save measurement</button>
+  </section>
+
+  <section class="card hist">
+    <h2><b id="histTitle">Progress</b><span id="histCount"></span></h2>
+    <svg class="chart" id="chart" viewBox="0 0 300 110" preserveAspectRatio="none"></svg>
+    <ul class="entries" id="entries"></ul>
+  </section>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const ES = (navigator.language || '').toLowerCase().startsWith('es');
+const T = (en, es) => (ES ? es : en);
+const buzz = (ms) => { try { window.Acornix ? Acornix.vibrate(ms) : navigator.vibrate && navigator.vibrate(ms); } catch (e) {} };
+const kv = {
+  async get(k, d) { try { if (window.Acornix) { const v = await Acornix.db.get(k); return v ?? d; } } catch (e) {} try { const v = localStorage.getItem('bmi:' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  async set(k, v) { try { if (window.Acornix) return await Acornix.db.set(k, v); } catch (e) {} try { localStorage.setItem('bmi:' + k, JSON.stringify(v)); } catch (e) {} },
+};
+function coll(name) {
+  if (window.Acornix) return Acornix.db.collection(name);
+  const key = 'bmi:' + name;
+  const read = () => { try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) { return []; } };
+  const write = (a) => localStorage.setItem(key, JSON.stringify(a));
+  return {
+    async add(d) { const a = read(); const doc = { ...d, _id: Math.random().toString(36).slice(2), _created: Date.now() }; a.push(doc); write(a); return doc; },
+    async list(q = {}) { let a = read(); if (q.desc) a.reverse(); if (q.limit) a = a.slice(0, q.limit); return a; },
+    async remove(id) { write(read().filter((d) => d._id !== id)); return true; },
+  };
+}
+const measurements = coll('measurements');
+
+// ----- i18n -----
+document.getElementById('title').firstChild.textContent = T('BMI', 'IMC');
+document.getElementById('subtitle').textContent = T('Body mass index', 'Índice de masa corporal');
+document.getElementById('lHeight').textContent = T('Height', 'Altura');
+document.getElementById('lWeight').textContent = T('Weight', 'Peso');
+document.getElementById('save').textContent = T('Save measurement', 'Guardar medición');
+document.getElementById('histTitle').textContent = T('Progress', 'Evolución');
+
+const CATS = [
+  { max: 18.5, color: 'var(--under)', name: T('Underweight', 'Bajo peso'), tip: T('A little below the healthy range. A balanced diet with enough calories and protein helps.', 'Un poco por debajo del rango saludable. Una dieta equilibrada con suficientes calorías y proteína ayuda.') },
+  { max: 25, color: 'var(--normal)', name: T('Healthy', 'Saludable'), tip: T('Great! You are within the healthy range. Keep moving and eating well.', '¡Genial! Estás en el rango saludable. Sigue moviéndote y comiendo bien.') },
+  { max: 30, color: 'var(--over)', name: T('Overweight', 'Sobrepeso'), tip: T('Slightly above the healthy range. Small daily habits make a big difference.', 'Algo por encima del rango saludable. Pequeños hábitos diarios marcan una gran diferencia.') },
+  { max: Infinity, color: 'var(--obese)', name: T('Obesity', 'Obesidad'), tip: T('Above the healthy range. A health professional can help you with a plan that fits you.', 'Por encima del rango saludable. Un profesional sanitario puede ayudarte con un plan a tu medida.') },
+];
+const category = (bmi) => CATS.find((c) => bmi < c.max);
+
+// ----- state (always stored in metric) -----
+let unit = 'metric';
+let heightCm = 172, weightKg = 70;
+const hEl = document.getElementById('height'), wEl = document.getElementById('weight');
+
+function configureSliders() {
+  if (unit === 'metric') {
+    Object.assign(hEl, { min: 100, max: 220, step: 1 }); hEl.value = heightCm;
+    Object.assign(wEl, { min: 30, max: 200, step: 0.5 }); wEl.value = weightKg;
+  } else {
+    Object.assign(hEl, { min: 39, max: 87, step: 1 }); hEl.value = Math.round(heightCm / 2.54);
+    Object.assign(wEl, { min: 66, max: 440, step: 1 }); wEl.value = Math.round(weightKg * 2.20462);
+  }
+}
+function readSliders() {
+  if (unit === 'metric') { heightCm = +hEl.value; weightKg = +wEl.value; }
+  else { heightCm = +hEl.value * 2.54; weightKg = +wEl.value / 2.20462; }
+}
+const fmt = (n, d = 1) => n.toLocaleString(ES ? 'es-ES' : 'en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+function heightText() {
+  if (unit === 'metric') return `${Math.round(heightCm)}<small>cm</small>`;
+  const inches = Math.round(heightCm / 2.54);
+  return `${Math.floor(inches / 12)}<small>ft</small> ${inches % 12}<small>in</small>`;
+}
+function weightText() {
+  return unit === 'metric' ? `${fmt(weightKg)}<small>kg</small>` : `${Math.round(weightKg * 2.20462)}<small>lb</small>`;
+}
+function weightUnit(kg) { return unit === 'metric' ? `${fmt(kg)} kg` : `${Math.round(kg * 2.20462)} lb`; }
+
+// ----- gauge -----
+const G_MIN = 12, G_MAX = 40;
+const angleFor = (bmi) => -90 + (Math.min(Math.max(bmi, G_MIN), G_MAX) - G_MIN) / (G_MAX - G_MIN) * 180;
+function polar(a, r) { const rad = (a - 90) * Math.PI / 180; return [150 + r * Math.cos(rad), 150 + r * Math.sin(rad)]; }
+function drawArcs() {
+  const ranges = [[G_MIN, 18.5, 'var(--under)'], [18.5, 25, 'var(--normal)'], [25, 30, 'var(--over)'], [30, G_MAX, 'var(--obese)']];
+  document.getElementById('arcs').innerHTML = ranges.map(([a, b, c]) => {
+    const [x1, y1] = polar(angleFor(a) + 1, 120), [x2, y2] = polar(angleFor(b) - 1, 120);
+    return `<path d="M${x1},${y1} A120,120 0 0 1 ${x2},${y2}" stroke="${c}" stroke-width="22" fill="none" stroke-linecap="round"/>`;
+  }).join('') + [18.5, 25, 30].map((v) => {
+    const [x, y] = polar(angleFor(v), 92);
+    return `<text x="${x}" y="${y}" fill="#8b95ad" font-size="12" text-anchor="middle" dominant-baseline="middle">${fmt(v, v % 1 ? 1 : 0)}</text>`;
+  }).join('');
+}
+
+function update(save = true) {
+  readSliders();
+  document.getElementById('vHeight').innerHTML = heightText();
+  document.getElementById('vWeight').innerHTML = weightText();
+  [hEl, wEl].forEach((el) => el.style.setProperty('--p', ((el.value - el.min) / (el.max - el.min) * 100) + '%'));
+  const m = heightCm / 100;
+  const bmi = weightKg / (m * m);
+  const c = category(bmi);
+  document.getElementById('bmi').textContent = fmt(bmi);
+  const cat = document.getElementById('cat');
+  cat.textContent = c.name; cat.style.background = c.color; cat.style.color = '#0b1020';
+  document.getElementById('needle').style.transform = `rotate(${angleFor(bmi)}deg)`;
+  const lo = 18.5 * m * m, hi = 24.9 * m * m;
+  document.getElementById('tip').textContent = `${c.tip} ${T('Healthy weight for your height', 'Peso saludable para tu altura')}: ${weightUnit(lo)} – ${weightUnit(hi)}.`;
+  if (save) kv.set('last', { heightCm, weightKg, unit });
+  return bmi;
+}
+
+hEl.addEventListener('input', () => update());
+wEl.addEventListener('input', () => update());
+document.querySelectorAll('.stepper button').forEach((b) => {
+  b.addEventListener('click', () => {
+    const el = b.dataset.f === 'h' ? hEl : wEl;
+    el.value = Math.min(+el.max, Math.max(+el.min, +el.value + (+b.dataset.d) * (+el.step)));
+    buzz(8); update();
+  });
+});
+document.querySelectorAll('#units button').forEach((b) => {
+  b.addEventListener('click', () => {
+    unit = b.dataset.u;
+    document.querySelectorAll('#units button').forEach((x) => x.classList.toggle('on', x === b));
+    configureSliders(); update(); renderHistory();
+  });
+});
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+document.getElementById('save').addEventListener('click', async () => {
+  const bmi = update();
+  buzz(20);
+  try { await measurements.add({ bmi: +bmi.toFixed(2), weightKg: +weightKg.toFixed(2), heightCm: Math.round(heightCm) }); } catch (e) {}
+  toast(T('Saved ✓', 'Guardado ✓'));
+  renderHistory();
+});
+
+async function renderHistory() {
+  let items = [];
+  try { items = await measurements.list({ orderBy: '_created', desc: true, limit: 60 }); } catch (e) {}
+  document.getElementById('histCount').textContent = items.length ? `${items.length} ${T('saved', 'guardadas')}` : '';
+  const list = document.getElementById('entries');
+  list.innerHTML = '';
+  if (!items.length) list.innerHTML = `<div class="empty">${T('Save measurements to see your progress here.', 'Guarda mediciones para ver aquí tu evolución.')}</div>`;
+  items.forEach((it) => {
+    const c = category(it.bmi);
+    const li = document.createElement('li');
+    const d = new Date(it._created);
+    li.innerHTML = `<span class="dot" style="background:${c.color}"></span><div class="main"><b>${fmt(it.bmi)}</b> · ${weightUnit(it.weightKg)}<div class="date">${d.toLocaleDateString(ES ? 'es-ES' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' })} · ${c.name}</div></div><button aria-label="delete">✕</button>`;
+    li.querySelector('button').onclick = async () => { try { await measurements.remove(it._id); } catch (e) {} renderHistory(); };
+    list.appendChild(li);
+  });
+  drawChart(items.slice().reverse());
+}
+
+function drawChart(items) {
+  const svg = document.getElementById('chart');
+  if (items.length < 2) { svg.style.display = 'none'; return; }
+  svg.style.display = 'block';
+  const vals = items.map((i) => i.weightKg);
+  const min = Math.min(...vals) - 1, max = Math.max(...vals) + 1;
+  const pts = items.map((it, i) => [10 + i * (280 / (items.length - 1)), 100 - (it.weightKg - min) / (max - min) * 85]);
+  const line = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+  svg.innerHTML = `<defs><linearGradient id="fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34d399" stop-opacity=".35"/><stop offset="1" stop-color="#34d399" stop-opacity="0"/></linearGradient></defs>
+    <path d="${line} L${pts[pts.length - 1][0]},110 L${pts[0][0]},110 Z" fill="url(#fill)"/>
+    <path d="${line}" fill="none" stroke="#34d399" stroke-width="3" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+    ${pts.map((p) => `<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="#fff"/>`).join('')}`;
+}
+
+(async () => {
+  const last = await kv.get('last', null);
+  if (last) { heightCm = last.heightCm; weightKg = last.weightKg; unit = last.unit || 'metric'; }
+  document.querySelectorAll('#units button').forEach((x) => x.classList.toggle('on', x.dataset.u === unit));
+  drawArcs(); configureSliders(); update(false); renderHistory();
+})();
+window.addEventListener('acornixdata', renderHistory);
+</script>
+</body>
+</html>

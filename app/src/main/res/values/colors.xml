@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background">#FFFBF7F2</color>
+    <color name="icon_background">#FF2E5E3A</color>
+    <color name="icon_cap">#FF6B3F1F</color>
+    <color name="icon_nut">#FFD9A55B</color>
+</resources>
