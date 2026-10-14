@@ -120,6 +120,12 @@ Acornix checks GitHub for new versions. When one comes out you'll see what's new
 
 **Phone status** (battery, memory, storage), a **photo and video gallery** grouped by month, Material You colors with light and dark themes, and an interface in **English and Spanish**. Generated apps follow your phone's language too.
 
+<p align="center">
+<img src="docs/screenshots/home-dark.jpg" width="230" alt="Home in dark mode">&nbsp;&nbsp;
+<img src="docs/screenshots/settings-dark.jpg" width="230" alt="Settings in dark mode">
+<br><sub>Dark mode too</sub>
+</p>
+
 ---
 
 ## 🎮 Apps included
