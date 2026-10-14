@@ -110,6 +110,7 @@
     <string name="gen_failed">Something went wrong</string>
     <string name="gen_error_no_code">The AI answered without an app. Try rephrasing the request.</string>
     <string name="gen_error_refused">The AI declined this request.</string>
+    <string name="error_not_configured">No AI provider set up yet. Add your API key in Settings.</string>
     <string name="gen_error_generic">Unexpected error</string>
     <string name="suggestion_title">Suggested improvement</string>
     <string name="apply_suggestion">Apply suggestion</string>

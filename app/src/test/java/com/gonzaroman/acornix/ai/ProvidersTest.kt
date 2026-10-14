@@ -75,6 +75,25 @@ class ProvidersTest {
     }
 
     @Test
+    fun openAiRetriesToolsWithoutReasoningWhenTheModelAsks() = runTest {
+        server.enqueue(MockResponse().setResponseCode(400).setBody("""
+            {"error":{"message":"Function tools with reasoning_effort are not supported for gpt-6-luna in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'."}}
+        """.trimIndent()))
+        server.enqueue(MockResponse().setBody("""{"choices":[{"finish_reason":"stop","message":{"role":"assistant","content":"On"}}]}"""))
+        server.enqueue(MockResponse().setBody("""{"choices":[{"finish_reason":"stop","message":{"role":"assistant","content":"Off"}}]}"""))
+
+        val session = OpenAiProvider("k", "gpt-6-luna", server.url("/v1").toString()).newAgentSession("sys", listOf(weatherTool))
+        assertEquals("On", session.send("flashlight on").text)
+        assertEquals("Off", session.send("flashlight off").text)
+
+        fun effort() = AiJson.parseToJsonElement(server.takeRequest().body.readUtf8()).jsonObject["reasoning_effort"]?.jsonPrimitive?.content
+        assertEquals(null, effort())
+        assertEquals("none", effort())
+        assertEquals("none", effort()) // remembered: no failed call on the next turn
+        assertEquals(3, server.requestCount)
+    }
+
+    @Test
     fun httpErrorsAreReadable() = runTest {
         server.enqueue(MockResponse().setResponseCode(401).setBody("""{"error":{"message":"Invalid key"}}"""))
         val e = runCatching { OpenAiProvider("k", "m", server.url("/v1").toString()).streamText("s", "p") }.exceptionOrNull()

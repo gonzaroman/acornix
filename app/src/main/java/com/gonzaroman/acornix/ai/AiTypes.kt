@@ -52,7 +52,10 @@ data class AgentReply(
 /** Result of a streamed text generation. */
 data class TextResult(val text: String, val truncated: Boolean, val refused: Boolean = false)
 
-class AiException(message: String, cause: Throwable? = null) : Exception(message, cause)
+open class AiException(message: String, cause: Throwable? = null) : Exception(message, cause)
+
+/** No usable provider yet; the UI shows its own translated message for this one. */
+class ProviderNotConfiguredException : AiException("AI provider not configured. Add your API key in Settings.")
 
 interface AiProvider {
     /** Streams a single-turn completion; [onDelta] receives text chunks as they arrive. */

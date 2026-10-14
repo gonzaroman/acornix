@@ -109,6 +109,7 @@
     <string name="gen_failed">Algo ha fallado</string>
     <string name="gen_error_no_code">La IA respondió sin una app. Prueba a reformular la petición.</string>
     <string name="gen_error_refused">La IA ha rechazado esta petición.</string>
+    <string name="error_not_configured">Aún no has configurado un proveedor de IA. Añade tu API key en Ajustes.</string>
     <string name="gen_error_generic">Error inesperado</string>
     <string name="suggestion_title">Mejora sugerida</string>
     <string name="apply_suggestion">Aplicar sugerencia</string>

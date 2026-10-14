@@ -10,6 +10,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.gonzaroman.acornix.AcornixApplication
 import com.gonzaroman.acornix.MainActivity
 import com.gonzaroman.acornix.R
+import com.gonzaroman.acornix.ui.errorMessage
 import com.gonzaroman.acornix.ai.AgentReply
 import com.gonzaroman.acornix.ai.AgentSession
 import com.gonzaroman.acornix.ai.AiException
@@ -161,11 +162,11 @@ class AssistantController(
         } catch (e: AiException) {
             session = null
             markRunningStepsFailed()
-            add(ChatItem.Error(nextKey(), e.message ?: "Error"))
+            add(ChatItem.Error(nextKey(), errorMessage(context, e)))
         } catch (e: Exception) {
             session = null
             markRunningStepsFailed()
-            add(ChatItem.Error(nextKey(), e.message ?: e.javaClass.simpleName))
+            add(ChatItem.Error(nextKey(), errorMessage(context, e)))
         } finally {
             confirmDeferred?.cancel()
             _state.update { it.copy(running = false, pendingConfirm = null) }

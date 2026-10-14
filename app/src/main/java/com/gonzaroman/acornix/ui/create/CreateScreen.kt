@@ -87,7 +87,7 @@ import com.gonzaroman.acornix.container
 import com.gonzaroman.acornix.data.AppMeta
 import com.gonzaroman.acornix.device.ShortcutHelper
 import com.gonzaroman.acornix.ui.components.AppIcon
-import com.gonzaroman.acornix.ui.generationErrorMessage
+import com.gonzaroman.acornix.ui.errorMessage
 import com.gonzaroman.acornix.ui.components.AttachmentRow
 import com.gonzaroman.acornix.ui.components.PromptBar
 import com.gonzaroman.acornix.ui.components.formatBytes
@@ -358,7 +358,7 @@ private fun FailedContent(state: CreateUi.Failed, onRetry: () -> Unit, onEdit: (
         Text(stringResource(R.string.gen_failed), style = MaterialTheme.typography.titleLarge)
         Spacer(Modifier.height(8.dp))
         val context = LocalContext.current
-        Text(state.error?.let { generationErrorMessage(context, it) } ?: state.message, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(state.error?.let { errorMessage(context, it) } ?: state.message, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(Modifier.height(20.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             OutlinedButton(onClick = onEdit) { Text(stringResource(R.string.edit_request)) }

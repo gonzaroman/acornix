@@ -23,6 +23,7 @@ class OpenAiProvider(
 ) : AiProvider {
 
     private val base = baseUrl.trim().trimEnd('/')
+    private val noReasoningKey = "$base|$model"
 
     private val headers: Map<String, String>
         get() = if (apiKey.isBlank()) emptyMap() else mapOf("Authorization" to "Bearer $apiKey")
@@ -117,12 +118,20 @@ class OpenAiProvider(
         }
 
         private suspend fun complete(): AgentReply {
-            val body = buildJsonObject {
+            fun body(noReasoning: Boolean) = buildJsonObject {
                 put("model", model)
                 put("messages", JsonArray(messages))
                 if (toolsJson.isNotEmpty()) put("tools", toolsJson)
+                if (noReasoning) put("reasoning_effort", "none")
             }
-            val res = http.postJson("$base/chat/completions", body, headers)
+            val res = try {
+                http.postJson("$base/chat/completions", body(noReasoningKey in toolsNeedNoReasoning), headers)
+            } catch (e: AiException) {
+                // Some reasoning models (gpt-6-luna) only take tools on this endpoint with reasoning off.
+                if (toolsJson.isEmpty() || noReasoningKey in toolsNeedNoReasoning || !e.asksForNoReasoning()) throw e
+                toolsNeedNoReasoning += noReasoningKey
+                http.postJson("$base/chat/completions", body(true), headers)
+            }
             val choice = (res["choices"] as? JsonArray)?.firstOrNull() as? JsonObject
                 ?: throw AiException("Empty response from the model")
             val message = choice["message"] as? JsonObject ?: throw AiException("Empty response from the model")
@@ -141,6 +150,14 @@ class OpenAiProvider(
 
     companion object {
         const val DEFAULT_BASE_URL = "https://api.openai.com/v1"
+
+        /** Models that rejected tools while reasoning; remembered so later turns skip the failed call. */
+        private val toolsNeedNoReasoning: MutableSet<String> = java.util.Collections.synchronizedSet(mutableSetOf())
+
+        private fun AiException.asksForNoReasoning(): Boolean {
+            val m = message.orEmpty()
+            return m.startsWith("HTTP 400") && m.contains("reasoning_effort") && m.contains("'none'")
+        }
     }
 }
 

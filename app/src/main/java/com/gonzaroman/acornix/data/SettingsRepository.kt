@@ -9,11 +9,11 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.gonzaroman.acornix.ai.AiException
 import com.gonzaroman.acornix.ai.AiProvider
 import com.gonzaroman.acornix.ai.AnthropicProvider
 import com.gonzaroman.acornix.ai.GeminiProvider
 import com.gonzaroman.acornix.ai.OpenAiProvider
+import com.gonzaroman.acornix.ai.ProviderNotConfiguredException
 import com.gonzaroman.acornix.ai.ProviderType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -113,7 +113,7 @@ class SettingsRepository(private val context: Context) {
 
     companion object {
         fun createProvider(c: ProviderConfig): AiProvider {
-            if (!c.isUsable) throw AiException("AI provider not configured. Add your API key in Settings.")
+            if (!c.isUsable) throw ProviderNotConfiguredException()
             return when (c.type) {
                 ProviderType.ANTHROPIC -> AnthropicProvider(c.apiKey, c.model)
                 ProviderType.OPENAI -> OpenAiProvider(c.apiKey, c.model)

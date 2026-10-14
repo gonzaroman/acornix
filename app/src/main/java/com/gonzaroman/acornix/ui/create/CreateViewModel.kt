@@ -20,7 +20,7 @@ sealed interface CreateUi {
     data object Form : CreateUi
     data class Generating(val chars: Int = 0, val code: String = "", val codeFinished: Boolean = false) : CreateUi
     data class Done(val app: AppMeta, val suggestion: String?, val truncated: Boolean) : CreateUi
-    data class Failed(val message: String, val error: GenerationException? = null) : CreateUi
+    data class Failed(val message: String, val error: Exception? = null) : CreateUi
 }
 
 class CreateViewModel(
@@ -95,7 +95,7 @@ class CreateViewModel(
             } catch (e: GenerationException) {
                 _ui.value = CreateUi.Failed(e.message ?: "Error", e)
             } catch (e: AiException) {
-                _ui.value = CreateUi.Failed(e.message ?: "Error")
+                _ui.value = CreateUi.Failed(e.message ?: "Error", e)
             } catch (e: Exception) {
                 _ui.value = CreateUi.Failed(e.message ?: e.javaClass.simpleName)
             }
