@@ -7,7 +7,6 @@
 **Vibe coding in your pocket.** Describe an app, a game or a tool, and watch the AI write it live. Seconds later it runs full screen on your phone, saves its own data and can sit on your home screen like any other app. Or just ask the assistant to do things for you.
 
 [![Latest release](https://img.shields.io/github/v/release/gonzaroman/acornix?label=download&color=2e6b45)](https://github.com/gonzaroman/acornix/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/gonzaroman/acornix/total?color=8a5a2b)](https://github.com/gonzaroman/acornix/releases)
 ![Android 8.0+](https://img.shields.io/badge/Android-8.0%2B-3ddc84?logo=android&logoColor=white)
 ![Kotlin](https://img.shields.io/badge/Kotlin-Jetpack%20Compose-7f52ff?logo=kotlin&logoColor=white)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
