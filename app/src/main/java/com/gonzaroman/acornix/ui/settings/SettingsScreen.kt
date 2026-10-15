@@ -51,15 +51,15 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -70,6 +70,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.gonzaroman.acornix.ui.components.rememberControlState
+import com.gonzaroman.acornix.ui.components.openAppSettings
+import com.gonzaroman.acornix.ui.components.openAccessibilitySettings
+import com.gonzaroman.acornix.ui.components.manufacturerName
+import com.gonzaroman.acornix.ui.components.closesBackgroundApps
+import com.gonzaroman.acornix.ui.components.ControlState
 import com.gonzaroman.acornix.BuildConfig
 import com.gonzaroman.acornix.R
 import com.gonzaroman.acornix.ai.ProviderType
@@ -79,7 +85,6 @@ import com.gonzaroman.acornix.data.ProviderConfig
 import com.gonzaroman.acornix.data.Settings as AppSettings
 import com.gonzaroman.acornix.data.SettingsRepository
 import com.gonzaroman.acornix.data.ThemeMode
-import com.gonzaroman.acornix.ui.assistant.rememberControlEnabled
 import com.gonzaroman.acornix.ui.components.SectionTitle
 import com.gonzaroman.acornix.ui.components.UpdateCard
 import com.gonzaroman.acornix.data.UpdateInfo
@@ -93,7 +98,8 @@ fun SettingsScreen(nav: NavHostController) {
     val settings by repo.settings.collectAsState(initial = null)
     val scope = rememberCoroutineScope()
     val s = settings ?: return
-    val controlEnabled by rememberControlEnabled()
+    val controlState by rememberControlState()
+    val controlEnabled = controlState == ControlState.ON
 
     Column(
         Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars).verticalScroll(rememberScrollState()).padding(20.dp),
@@ -129,20 +135,45 @@ fun SettingsScreen(nav: NavHostController) {
             }
             ListItem(
                 headlineContent = { Text(stringResource(R.string.settings_control)) },
-                supportingContent = { Text(stringResource(if (controlEnabled) R.string.settings_control_on else R.string.settings_control_off)) },
+                supportingContent = {
+                    Text(
+                        stringResource(
+                            when (controlState) {
+                                ControlState.ON -> R.string.settings_control_on
+                                ControlState.STALLED -> R.string.settings_control_stalled
+                                ControlState.OFF -> R.string.settings_control_off
+                            },
+                        ),
+                    )
+                },
                 leadingContent = {
                     Icon(
                         if (controlEnabled) Icons.Rounded.CheckCircle else Icons.Rounded.Error, null,
-                        tint = if (controlEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        tint = when (controlState) {
+                            ControlState.ON -> MaterialTheme.colorScheme.primary
+                            ControlState.STALLED -> MaterialTheme.colorScheme.error
+                            ControlState.OFF -> MaterialTheme.colorScheme.onSurfaceVariant
+                        },
                     )
                 },
                 trailingContent = {
-                    TextButton(onClick = {
-                        context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-                    }) { Text(stringResource(if (controlEnabled) R.string.manage else R.string.enable)) }
+                    TextButton(onClick = { openAccessibilitySettings(context) }) {
+                        Text(stringResource(if (controlEnabled) R.string.manage else R.string.enable))
+                    }
                 },
                 colors = ListItemDefaults.colors(containerColor = Color.Transparent),
             )
+            if (!controlEnabled && closesBackgroundApps()) {
+                Text(
+                    stringResource(R.string.control_oem_tip, manufacturerName()),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+                TextButton(onClick = { openAppSettings(context) }, modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)) {
+                    Text(stringResource(R.string.control_app_settings))
+                }
+            }
         }
 
         SectionTitle(stringResource(R.string.settings_appearance))

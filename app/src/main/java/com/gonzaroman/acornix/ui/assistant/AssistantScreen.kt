@@ -1,7 +1,5 @@
 package com.gonzaroman.acornix.ui.assistant
 
-import android.content.Intent
-import android.provider.Settings
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -45,16 +43,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.State
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -64,15 +59,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.LifecycleEventObserver
 import com.gonzaroman.acornix.R
 import com.gonzaroman.acornix.agent.ChatItem
 import com.gonzaroman.acornix.agent.StepStatus
 import com.gonzaroman.acornix.container
-import com.gonzaroman.acornix.control.AcornixAccessibilityService
 import com.gonzaroman.acornix.ui.ExternalRequest
+import com.gonzaroman.acornix.ui.components.ControlState
+import com.gonzaroman.acornix.ui.components.closesBackgroundApps
+import com.gonzaroman.acornix.ui.components.manufacturerName
+import com.gonzaroman.acornix.ui.components.openAccessibilitySettings
+import com.gonzaroman.acornix.ui.components.openAppSettings
+import com.gonzaroman.acornix.ui.components.rememberControlState
 import com.gonzaroman.acornix.ui.components.AppIcon
 import com.gonzaroman.acornix.ui.components.ImageUtils
 import com.gonzaroman.acornix.ui.components.PromptBar
@@ -94,7 +91,8 @@ fun AssistantScreen(
     val attachments = rememberAttachments()
     var input by rememberSaveable { mutableStateOf("") }
     val listState = rememberLazyListState()
-    val controlEnabled by rememberControlEnabled()
+    val controlState by rememberControlState()
+    val controlEnabled = controlState == ControlState.ON
 
     // Text or images shared from other apps land in the prompt bar.
     LaunchedEffect(external) {
@@ -118,7 +116,13 @@ fun AssistantScreen(
             Column(Modifier.weight(1f)) {
                 Text(stringResource(R.string.tab_assistant), style = MaterialTheme.typography.headlineMedium)
                 Text(
-                    stringResource(if (controlEnabled) R.string.control_on_short else R.string.control_off_short),
+                    stringResource(
+                        when (controlState) {
+                            ControlState.ON -> R.string.control_on_short
+                            ControlState.STALLED -> R.string.control_stalled_title
+                            ControlState.OFF -> R.string.control_off_short
+                        },
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     color = if (controlEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -132,8 +136,8 @@ fun AssistantScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            if (!controlEnabled && (controlMode || state.items.isEmpty())) {
-                item { ControlBanner() }
+            if (controlState == ControlState.STALLED || (!controlEnabled && (controlMode || state.items.isEmpty()))) {
+                item { ControlBanner(controlState) }
             }
             if (state.items.isEmpty()) {
                 item {
@@ -197,40 +201,45 @@ fun AssistantScreen(
     }
 }
 
-/** Re-checks the accessibility service every time the screen resumes. */
 @Composable
-fun rememberControlEnabled(): State<Boolean> {
-    val owner = LocalLifecycleOwner.current
-    val state = remember { mutableStateOf(AcornixAccessibilityService.instance != null) }
-    DisposableEffect(owner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) state.value = AcornixAccessibilityService.instance != null
-        }
-        owner.lifecycle.addObserver(observer)
-        onDispose { owner.lifecycle.removeObserver(observer) }
-    }
-    return state
-}
-
-@Composable
-fun ControlBanner(modifier: Modifier = Modifier) {
+fun ControlBanner(controlState: ControlState, modifier: Modifier = Modifier) {
     val context = LocalContext.current
+    val stalled = controlState == ControlState.STALLED
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+        colors = CardDefaults.cardColors(
+            containerColor = if (stalled) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.secondaryContainer,
+        ),
         shape = MaterialTheme.shapes.large,
     ) {
-        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Rounded.TouchApp, null)
-            Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f)) {
-                Text(stringResource(R.string.control_banner_title), style = MaterialTheme.typography.titleSmall)
-                Text(stringResource(R.string.control_banner_text), style = MaterialTheme.typography.bodySmall)
+        Column(Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(if (stalled) Icons.Rounded.Error else Icons.Rounded.TouchApp, null)
+                Spacer(Modifier.width(12.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        stringResource(if (stalled) R.string.control_stalled_title else R.string.control_banner_title),
+                        style = MaterialTheme.typography.titleSmall,
+                    )
+                    Text(
+                        stringResource(if (stalled) R.string.control_stalled_text else R.string.control_banner_text),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
             }
-            Spacer(Modifier.width(8.dp))
-            FilledTonalButton(onClick = {
-                context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-            }) { Text(stringResource(R.string.enable)) }
+            if (closesBackgroundApps()) {
+                Spacer(Modifier.height(8.dp))
+                Text(stringResource(R.string.control_oem_tip, manufacturerName()), style = MaterialTheme.typography.bodySmall)
+            }
+            Spacer(Modifier.height(8.dp))
+            Row(Modifier.align(Alignment.End), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (closesBackgroundApps()) {
+                    TextButton(onClick = { openAppSettings(context) }) { Text(stringResource(R.string.control_app_settings)) }
+                }
+                FilledTonalButton(onClick = { openAccessibilitySettings(context) }) {
+                    Text(stringResource(if (stalled) R.string.control_open_accessibility else R.string.enable))
+                }
+            }
         }
     }
 }

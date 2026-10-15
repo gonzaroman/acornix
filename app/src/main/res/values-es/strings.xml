@@ -127,6 +127,12 @@
     <string name="assistant_thinking">Pensando…</string>
     <string name="control_banner_title">Activa el Control total</string>
     <string name="control_banner_text">Para que pueda ver la pantalla y pulsar dentro de otras apps.</string>
+    <string name="control_stalled_title">Control total detenido</string>
+    <string name="control_stalled_text">Android lo tiene activado, pero no está funcionando (Acornix se cerró o falló). Desactívalo y vuelve a activarlo en Accesibilidad.</string>
+    <string name="settings_control_stalled">Activado pero detenido: desactívalo y vuelve a activarlo en Accesibilidad</string>
+    <string name="control_oem_tip">En los móviles %1$s, activa también «Inicio automático» y pon el ahorro de batería en «Sin restricciones» para Acornix, y no la cierres desde recientes. Si no, el sistema apaga el Control total.</string>
+    <string name="control_app_settings">Ajustes de la app</string>
+    <string name="control_open_accessibility">Accesibilidad</string>
     <string name="enable">Activar</string>
     <string name="manage">Gestionar</string>
     <string name="step_create_web_app">Creando app</string>

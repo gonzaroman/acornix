@@ -128,6 +128,12 @@
     <string name="assistant_thinking">Thinking…</string>
     <string name="control_banner_title">Enable Total control</string>
     <string name="control_banner_text">So I can see the screen and tap inside other apps.</string>
+    <string name="control_stalled_title">Total control stopped</string>
+    <string name="control_stalled_text">Android has it switched on, but it isn\'t running (Acornix was closed or crashed). Turn it off and on again in Accessibility.</string>
+    <string name="settings_control_stalled">Switched on but stopped: turn it off and on again in Accessibility</string>
+    <string name="control_oem_tip">On %1$s phones, also turn on “Autostart” and set battery saver to “No restrictions” for Acornix, and don\'t close it from recent apps. Otherwise the system switches Total control off.</string>
+    <string name="control_app_settings">App settings</string>
+    <string name="control_open_accessibility">Accessibility</string>
     <string name="enable">Enable</string>
     <string name="manage">Manage</string>
     <string name="step_create_web_app">Creating app</string>

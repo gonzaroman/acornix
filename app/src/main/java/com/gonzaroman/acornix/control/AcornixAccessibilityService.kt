@@ -29,6 +29,9 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
@@ -45,10 +48,12 @@ class AcornixAccessibilityService : AccessibilityService() {
 
     override fun onServiceConnected() {
         instance = this
+        _connected.value = true
     }
 
     override fun onDestroy() {
         instance = null
+        _connected.value = false
         super.onDestroy()
     }
 
@@ -367,8 +372,16 @@ class AcornixAccessibilityService : AccessibilityService() {
         var instance: AcornixAccessibilityService? = null
             private set
 
+        private val _connected = MutableStateFlow(false)
+
+        /** True while Android has the service running (not just switched on in settings). */
+        val connected: StateFlow<Boolean> = _connected.asStateFlow()
+
+        fun componentName(context: Context) = ComponentName(context, AcornixAccessibilityService::class.java)
+
+        /** Switched on in Accessibility settings; it may still not be running (see [connected]). */
         fun isEnabled(context: Context): Boolean {
-            val expected = ComponentName(context, AcornixAccessibilityService::class.java).flattenToString()
+            val expected = componentName(context).flattenToString()
             val enabled = Settings.Secure.getString(context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES).orEmpty()
             return enabled.split(':').any { it.equals(expected, ignoreCase = true) }
         }

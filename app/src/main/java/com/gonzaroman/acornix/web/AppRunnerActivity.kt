@@ -26,6 +26,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.gonzaroman.acornix.R
 import com.gonzaroman.acornix.container
@@ -42,6 +43,9 @@ class AppRunnerActivity : ComponentActivity() {
     private var pendingPermission: PermissionRequest? = null
     private var fileCallback: ValueCallback<Array<Uri>>? = null
     private var thumbnailTaken = false
+    private var thumbnailScheduled = false
+    private val handler = Handler(Looper.getMainLooper())
+    private val thumbnailTask = Runnable { takeThumbnail() }
 
     private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
         grantPending()
@@ -96,14 +100,24 @@ class AppRunnerActivity : ComponentActivity() {
     override fun onPause() {
         super.onPause()
         if (::webView.isInitialized) webView.onPause()
+        // Leaving before the thumbnail is taken: the window loses its surface, so try again on return.
+        if (thumbnailScheduled) {
+            handler.removeCallbacks(thumbnailTask)
+            thumbnailScheduled = false
+            thumbnailTaken = false
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        if (::webView.isInitialized) webView.onResume()
+        if (::webView.isInitialized) {
+            webView.onResume()
+            if (webView.progress == 100) scheduleThumbnail()
+        }
     }
 
     override fun onDestroy() {
+        handler.removeCallbacks(thumbnailTask)
         if (::webView.isInitialized) {
             (webView.parent as? ViewGroup)?.removeView(webView)
             webView.destroy()
@@ -116,15 +130,27 @@ class AppRunnerActivity : ComponentActivity() {
     private fun scheduleThumbnail() {
         if (thumbnailTaken) return
         thumbnailTaken = true
-        Handler(Looper.getMainLooper()).postDelayed({
-            if (isFinishing || isDestroyed || webView.width == 0) return@postDelayed
-            val bitmap = Bitmap.createBitmap(webView.width, webView.height, Bitmap.Config.ARGB_8888)
-            val location = IntArray(2).also { webView.getLocationInWindow(it) }
-            val rect = android.graphics.Rect(location[0], location[1], location[0] + webView.width, location[1] + webView.height)
+        thumbnailScheduled = true
+        handler.postDelayed(thumbnailTask, 2500)
+    }
+
+    private fun takeThumbnail() {
+        thumbnailScheduled = false
+        if (isFinishing || isDestroyed || webView.width == 0 || !lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+            thumbnailTaken = false
+            return
+        }
+        val bitmap = Bitmap.createBitmap(webView.width, webView.height, Bitmap.Config.ARGB_8888)
+        val location = IntArray(2).also { webView.getLocationInWindow(it) }
+        val rect = android.graphics.Rect(location[0], location[1], location[0] + webView.width, location[1] + webView.height)
+        try {
             PixelCopy.request(window, rect, bitmap, { result ->
                 if (result == PixelCopy.SUCCESS) saveThumbnail(bitmap)
-            }, Handler(Looper.getMainLooper()))
-        }, 2500)
+            }, handler)
+        } catch (e: IllegalArgumentException) {
+            // "Window doesn't have a backing surface": a missing thumbnail must never crash Acornix.
+            thumbnailTaken = false
+        }
     }
 
     private fun saveThumbnail(bitmap: Bitmap) {
