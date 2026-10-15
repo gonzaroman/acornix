@@ -309,7 +309,10 @@ fun AttachmentRow(attachments: AttachmentState, modifier: Modifier = Modifier) {
     }
 }
 
-/** Text field with photo, microphone and send/stop buttons, used by the assistant and the creator. */
+/**
+ * Text field with photo, microphone and send/stop buttons, used by the assistant and the creator.
+ * With [sendAfterVoice], dictated text is sent as soon as the user stops talking.
+ */
 @Composable
 fun PromptBar(
     value: String,
@@ -321,8 +324,12 @@ fun PromptBar(
     running: Boolean = false,
     onStop: () -> Unit = {},
     enabled: Boolean = true,
+    sendAfterVoice: Boolean = false,
 ) {
-    val voice = rememberVoiceInput { spoken -> onValueChange(if (value.isBlank()) spoken else "$value $spoken") }
+    val voice = rememberVoiceInput { spoken ->
+        onValueChange(if (value.isBlank()) spoken else "$value $spoken")
+        if (sendAfterVoice && spoken.isNotBlank()) onSend()
+    }
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(28.dp),

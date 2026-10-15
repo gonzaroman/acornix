@@ -186,6 +186,7 @@ fun AssistantScreen(
             attachments = attachments,
             running = state.running,
             onStop = assistant::stop,
+            sendAfterVoice = true,
             modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
         )
     }
