@@ -38,6 +38,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.gonzaroman.acornix.ui.tools.ControlHelpScreen
 import com.gonzaroman.acornix.R
 import com.gonzaroman.acornix.ui.apps.AppsScreen
 import com.gonzaroman.acornix.ui.assistant.AssistantScreen
@@ -68,6 +69,7 @@ object Routes {
     const val HEALTH = "health"
     const val GALLERY = "gallery"
     const val HELP = "help"
+    const val CONTROL_HELP = "control_help"
     const val STUDIO = "studio"
     const val ONBOARDING = "onboarding"
     const val DATA = "data/{id}"
@@ -142,7 +144,10 @@ fun AcornixApp(
                 popExitTransition = { fadeOut() + slideOutHorizontally { it / 12 } },
             ) {
                 composable(Routes.ONBOARDING) {
-                    OnboardingScreen(onDone = { nav.popBackStack(Routes.HOME, inclusive = false) })
+                    OnboardingScreen(
+                        onDone = { nav.popBackStack(Routes.HOME, inclusive = false) },
+                        onControlHelp = { nav.navigate(Routes.CONTROL_HELP) },
+                    )
                 }
                 composable(Routes.HOME) { HomeScreen(nav) }
                 composable(Routes.APPS) { AppsScreen(nav) }
@@ -155,6 +160,7 @@ fun AcornixApp(
                         external = external,
                         onExternalConsumed = onExternalConsumed,
                         onOpenSettings = { nav.navigateTab(Routes.SETTINGS) },
+                        onOpenControlHelp = { nav.navigate(Routes.CONTROL_HELP) },
                     )
                 }
                 composable(Routes.SETTINGS) { SettingsScreen(nav) }
@@ -179,6 +185,7 @@ fun AcornixApp(
                 composable(Routes.HEALTH) { HealthScreen(nav) }
                 composable(Routes.GALLERY) { GalleryScreen(nav) }
                 composable(Routes.HELP) { HelpScreen(nav) }
+                composable(Routes.CONTROL_HELP) { ControlHelpScreen(nav) }
                 composable(Routes.STUDIO) { StudioScreen(nav) }
             }
         }

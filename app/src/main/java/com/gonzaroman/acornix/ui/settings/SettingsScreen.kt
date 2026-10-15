@@ -70,8 +70,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.compose.material.icons.automirrored.rounded.HelpOutline
+import com.gonzaroman.acornix.ui.Routes
 import com.gonzaroman.acornix.ui.components.rememberControlState
-import com.gonzaroman.acornix.ui.components.openAppSettings
 import com.gonzaroman.acornix.ui.components.openAccessibilitySettings
 import com.gonzaroman.acornix.ui.components.manufacturerName
 import com.gonzaroman.acornix.ui.components.closesBackgroundApps
@@ -170,9 +171,11 @@ fun SettingsScreen(nav: NavHostController) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 16.dp),
                 )
-                TextButton(onClick = { openAppSettings(context) }, modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)) {
-                    Text(stringResource(R.string.control_app_settings))
-                }
+            }
+            TextButton(onClick = { nav.navigate(Routes.CONTROL_HELP) }, modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)) {
+                Icon(Icons.AutoMirrored.Rounded.HelpOutline, null, Modifier.size(18.dp))
+                Spacer(Modifier.width(6.dp))
+                Text(stringResource(R.string.control_help))
             }
         }
 

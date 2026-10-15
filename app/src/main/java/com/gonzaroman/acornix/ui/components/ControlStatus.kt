@@ -82,3 +82,10 @@ fun openAppSettings(context: Context) {
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
     )
 }
+
+/** Xiaomi's "Background autostart" list; other phones get Acornix's settings page instead. */
+fun openAutostartSettings(context: Context) {
+    runCatching {
+        context.startActivity(Intent("miui.intent.action.OP_AUTO_START").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    }.onFailure { openAppSettings(context) }
+}

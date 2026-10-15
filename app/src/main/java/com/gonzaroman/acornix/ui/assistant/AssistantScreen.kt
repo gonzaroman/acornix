@@ -68,7 +68,6 @@ import com.gonzaroman.acornix.ui.components.ControlState
 import com.gonzaroman.acornix.ui.components.closesBackgroundApps
 import com.gonzaroman.acornix.ui.components.manufacturerName
 import com.gonzaroman.acornix.ui.components.openAccessibilitySettings
-import com.gonzaroman.acornix.ui.components.openAppSettings
 import com.gonzaroman.acornix.ui.components.rememberControlState
 import com.gonzaroman.acornix.ui.components.AppIcon
 import com.gonzaroman.acornix.ui.components.ImageUtils
@@ -84,6 +83,7 @@ fun AssistantScreen(
     external: ExternalRequest?,
     onExternalConsumed: () -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenControlHelp: () -> Unit,
 ) {
     val context = LocalContext.current
     val assistant = context.container.assistant
@@ -137,7 +137,7 @@ fun AssistantScreen(
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             if (controlState == ControlState.STALLED || (!controlEnabled && (controlMode || state.items.isEmpty()))) {
-                item { ControlBanner(controlState) }
+                item { ControlBanner(controlState, onHelp = onOpenControlHelp) }
             }
             if (state.items.isEmpty()) {
                 item {
@@ -203,7 +203,7 @@ fun AssistantScreen(
 }
 
 @Composable
-fun ControlBanner(controlState: ControlState, modifier: Modifier = Modifier) {
+fun ControlBanner(controlState: ControlState, onHelp: () -> Unit, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val stalled = controlState == ControlState.STALLED
     Card(
@@ -234,9 +234,7 @@ fun ControlBanner(controlState: ControlState, modifier: Modifier = Modifier) {
             }
             Spacer(Modifier.height(8.dp))
             Row(Modifier.align(Alignment.End), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (closesBackgroundApps()) {
-                    TextButton(onClick = { openAppSettings(context) }) { Text(stringResource(R.string.control_app_settings)) }
-                }
+                TextButton(onClick = onHelp) { Text(stringResource(R.string.control_help)) }
                 FilledTonalButton(onClick = { openAccessibilitySettings(context) }) {
                     Text(stringResource(if (stalled) R.string.control_open_accessibility else R.string.enable))
                 }

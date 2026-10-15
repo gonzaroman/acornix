@@ -2,7 +2,6 @@ package com.gonzaroman.acornix.ui.tools
 
 import android.content.ClipboardManager
 import android.content.Context
-import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -68,6 +67,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.gonzaroman.acornix.ui.Routes
 import com.gonzaroman.acornix.R
 import com.gonzaroman.acornix.container
 import com.gonzaroman.acornix.core.Prompts
@@ -370,6 +370,11 @@ fun HelpScreen(nav: NavHostController) {
                         Text("$emoji ${stringResource(texts.first)}", style = MaterialTheme.typography.titleMedium)
                         Spacer(Modifier.height(6.dp))
                         Text(stringResource(texts.second), style = MaterialTheme.typography.bodyMedium)
+                        if (texts.first == R.string.help_control_title) {
+                            TextButton(onClick = { nav.navigate(Routes.CONTROL_HELP) }, contentPadding = PaddingValues(0.dp)) {
+                                Text(stringResource(R.string.control_help) + " →")
+                            }
+                        }
                     }
                 }
             }

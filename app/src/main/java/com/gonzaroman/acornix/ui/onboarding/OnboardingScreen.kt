@@ -55,7 +55,7 @@ import com.gonzaroman.acornix.ui.settings.ProviderEditor
 import kotlinx.coroutines.launch
 
 @Composable
-fun OnboardingScreen(onDone: () -> Unit) {
+fun OnboardingScreen(onDone: () -> Unit, onControlHelp: () -> Unit) {
     val context = LocalContext.current
     val repo = context.container.settings
     val settings by repo.settings.collectAsState(initial = null)
@@ -86,7 +86,7 @@ fun OnboardingScreen(onDone: () -> Unit) {
                             }
                         }
                     }
-                    else -> PermissionsPage()
+                    else -> PermissionsPage(onControlHelp)
                 }
             }
         }
@@ -143,7 +143,7 @@ private fun Feature(emoji: String, text: String) {
 }
 
 @Composable
-private fun PermissionsPage() {
+private fun PermissionsPage(onControlHelp: () -> Unit) {
     val context = LocalContext.current
     var notificationsAsked by remember { mutableStateOf(false) }
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { notificationsAsked = true }
@@ -168,6 +168,7 @@ private fun PermissionsPage() {
     ) {
         openAccessibilitySettings(context)
     }
+    TextButton(onClick = onControlHelp) { Text(stringResource(R.string.control_help)) }
 }
 
 @Composable
