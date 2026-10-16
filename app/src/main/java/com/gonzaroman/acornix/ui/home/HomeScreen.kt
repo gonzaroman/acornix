@@ -25,7 +25,7 @@ import androidx.compose.material.icons.automirrored.rounded.HelpOutline
 import androidx.compose.material.icons.rounded.BatteryChargingFull
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.Inventory2
-import androidx.compose.material.icons.rounded.PhotoLibrary
+import androidx.compose.material.icons.rounded.DesktopWindows
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
@@ -63,6 +63,7 @@ import com.gonzaroman.acornix.ui.components.AppCard
 import com.gonzaroman.acornix.ui.components.SectionTitle
 import com.gonzaroman.acornix.ui.components.UpdateCard
 import com.gonzaroman.acornix.ui.navigateTab
+import com.gonzaroman.acornix.web.AcornixOsActivity
 import com.gonzaroman.acornix.web.AppLauncher
 import java.util.Calendar
 
@@ -149,13 +150,13 @@ fun HomeScreen(nav: NavHostController) {
                 shape = MaterialTheme.shapes.large,
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
             ) {
+                ToolRow(Icons.Rounded.DesktopWindows, stringResource(R.string.tool_os), stringResource(R.string.tool_os_desc)) { AcornixOsActivity.open(context) }
+                HorizontalDivider(Modifier.padding(start = 56.dp))
                 ToolRow(Icons.Rounded.History, stringResource(R.string.tool_versions), stringResource(R.string.tool_versions_desc)) { nav.navigate(Routes.VERSIONS_HUB) }
                 HorizontalDivider(Modifier.padding(start = 56.dp))
                 ToolRow(Icons.Rounded.Inventory2, stringResource(R.string.tool_import_export), stringResource(R.string.tool_import_export_desc)) { nav.navigate(Routes.IMPORT_EXPORT) }
                 HorizontalDivider(Modifier.padding(start = 56.dp))
                 ToolRow(Icons.Rounded.BatteryChargingFull, stringResource(R.string.tool_health), stringResource(R.string.tool_health_desc)) { nav.navigate(Routes.HEALTH) }
-                HorizontalDivider(Modifier.padding(start = 56.dp))
-                ToolRow(Icons.Rounded.PhotoLibrary, stringResource(R.string.tool_gallery), stringResource(R.string.tool_gallery_desc)) { nav.navigate(Routes.GALLERY) }
                 HorizontalDivider(Modifier.padding(start = 56.dp))
                 ToolRow(Icons.AutoMirrored.Rounded.HelpOutline, stringResource(R.string.tool_help), stringResource(R.string.tool_help_desc)) { nav.navigate(Routes.HELP) }
             }

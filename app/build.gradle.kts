@@ -15,8 +15,8 @@ android {
         applicationId = "com.gonzaroman.acornix"
         minSdk = 26
         targetSdk = 35
-        versionCode = 25
-        versionName = "2.0.5"
+        versionCode = 26
+        versionName = "2.0.9-beta"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -92,7 +92,6 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.anthropic.java)
     implementation(libs.coil.compose)
-    implementation(libs.coil.video)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.junit)

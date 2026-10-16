@@ -45,6 +45,7 @@ class MainActivity : ComponentActivity() {
                         startOnboarding = !s.onboardingDone,
                         external = external,
                         onExternalConsumed = { external = null },
+                        onReturnToOs = { moveTaskToBack(true) },
                     )
                 }
             }
@@ -60,6 +61,7 @@ class MainActivity : ComponentActivity() {
         intent ?: return
         when (intent.action) {
             ACTION_OPEN_ASSISTANT -> external = ExternalRequest(openAssistant = true)
+            ACTION_OPEN_SCREEN -> external = ExternalRequest(screen = intent.getStringExtra(EXTRA_SCREEN), fromOs = true)
             Intent.ACTION_SEND -> {
                 val text = intent.getStringExtra(Intent.EXTRA_TEXT)
                 val image = if (Build.VERSION.SDK_INT >= 33) {
@@ -86,5 +88,13 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         const val ACTION_OPEN_ASSISTANT = "com.gonzaroman.acornix.OPEN_ASSISTANT"
+
+        /** Opens one screen for AcornixOS; Back on that screen returns to the desktop. */
+        const val ACTION_OPEN_SCREEN = "com.gonzaroman.acornix.OPEN_SCREEN"
+        const val EXTRA_SCREEN = "screen"
+        const val SCREEN_CREATE = "create"
+        const val SCREEN_ASSISTANT = "assistant"
+        const val SCREEN_SETTINGS = "settings"
+        const val SCREEN_APPS = "apps"
     }
 }

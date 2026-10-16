@@ -14,6 +14,7 @@ import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import com.gonzaroman.acornix.data.AppMeta
 import com.gonzaroman.acornix.data.AppRepository
+import com.gonzaroman.acornix.web.AcornixOsActivity
 import com.gonzaroman.acornix.web.AppLauncher
 import kotlin.math.abs
 
@@ -29,6 +30,25 @@ object ShortcutHelper {
             .setLongLabel(app.name)
             .setIcon(IconCompat.createWithAdaptiveBitmap(iconBitmap(app, repo)))
             .setIntent(AppLauncher.intent(context, app.id))
+            .build()
+        return ShortcutManagerCompat.requestPinShortcut(context, info, null)
+    }
+
+    /** AcornixOS on the home screen, so a tablet can open straight into the desktop. */
+    fun pinOs(context: Context): Boolean {
+        if (!isSupported(context)) return false
+        val size = 432
+        val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        canvas.drawRect(0f, 0f, size.toFloat(), size.toFloat(), Paint().apply {
+            shader = LinearGradient(0f, 0f, size.toFloat(), size.toFloat(), Color.parseColor("#6A1B9A"), Color.parseColor("#FF6E7F"), Shader.TileMode.CLAMP)
+        })
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = 170f; textAlign = Paint.Align.CENTER }
+        canvas.drawText("🍏", size / 2f, size / 2f - (paint.descent() + paint.ascent()) / 2, paint)
+        val info = ShortcutInfoCompat.Builder(context, "acornix_os")
+            .setShortLabel("AcornixOS")
+            .setIcon(IconCompat.createWithAdaptiveBitmap(bitmap))
+            .setIntent(AcornixOsActivity.intent(context))
             .build()
         return ShortcutManagerCompat.requestPinShortcut(context, info, null)
     }

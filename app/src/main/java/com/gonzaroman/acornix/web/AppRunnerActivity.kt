@@ -1,28 +1,17 @@
 package com.gonzaroman.acornix.web
 
-import android.Manifest
 import android.app.ActivityManager
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.PixelCopy
 import android.view.ViewGroup
-import android.webkit.ConsoleMessage
-import android.webkit.GeolocationPermissions
-import android.webkit.PermissionRequest
-import android.webkit.ValueCallback
-import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -40,21 +29,12 @@ class AppRunnerActivity : ComponentActivity() {
 
     private lateinit var webView: WebView
     private var appId: String = ""
-    private var pendingPermission: PermissionRequest? = null
-    private var fileCallback: ValueCallback<Array<Uri>>? = null
     private var thumbnailTaken = false
     private var thumbnailScheduled = false
     private val handler = Handler(Looper.getMainLooper())
     private val thumbnailTask = Runnable { takeThumbnail() }
 
-    private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-        grantPending()
-    }
-
-    private val fileChooser = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        fileCallback?.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(result.resultCode, result.data))
-        fileCallback = null
-    }
+    private val webAccess = WebAccess(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,7 +55,7 @@ class AppRunnerActivity : ComponentActivity() {
         }
 
         webView = WebView(this)
-        webView.webChromeClient = RunnerChromeClient()
+        webView.webChromeClient = webAccess.chromeClient()
         AcornixWebView.configure(webView, this, lifecycleScope, appId) { scheduleThumbnail() }
         setContentView(FrameLayout(this).apply {
             setBackgroundColor(0xFF000000.toInt())
@@ -160,57 +140,6 @@ class AppRunnerActivity : ComponentActivity() {
             val small = Bitmap.createScaledBitmap(bitmap, 360, (bitmap.height * scale).toInt().coerceAtLeast(1), true)
             runCatching { target.outputStream().use { small.compress(Bitmap.CompressFormat.JPEG, 75, it) } }
             withContext(Dispatchers.Main) { container.apps.refresh() }
-        }
-    }
-
-    private fun grantPending() {
-        val request = pendingPermission ?: return
-        pendingPermission = null
-        val granted = request.resources.filter { res ->
-            requiredPermission(res)?.let { hasPermission(it) } ?: false
-        }
-        if (granted.isEmpty()) request.deny() else request.grant(granted.toTypedArray())
-    }
-
-    private fun requiredPermission(resource: String): String? = when (resource) {
-        PermissionRequest.RESOURCE_VIDEO_CAPTURE -> Manifest.permission.CAMERA
-        PermissionRequest.RESOURCE_AUDIO_CAPTURE -> Manifest.permission.RECORD_AUDIO
-        else -> null
-    }
-
-    private fun hasPermission(p: String) = ContextCompat.checkSelfPermission(this, p) == PackageManager.PERMISSION_GRANTED
-
-    private inner class RunnerChromeClient : WebChromeClient() {
-        override fun onPermissionRequest(request: PermissionRequest) {
-            runOnUiThread {
-                val needed = request.resources.mapNotNull { requiredPermission(it) }
-                pendingPermission?.deny()
-                pendingPermission = request
-                val missing = needed.filterNot { hasPermission(it) }
-                if (missing.isEmpty()) grantPending() else permissionLauncher.launch(missing.toTypedArray())
-            }
-        }
-
-        override fun onPermissionRequestCanceled(request: PermissionRequest) {
-            if (pendingPermission == request) pendingPermission = null
-        }
-
-        override fun onShowFileChooser(view: WebView, callback: ValueCallback<Array<Uri>>, params: FileChooserParams): Boolean {
-            fileCallback?.onReceiveValue(null)
-            fileCallback = callback
-            return runCatching { fileChooser.launch(params.createIntent()); true }.getOrElse {
-                fileCallback = null
-                false
-            }
-        }
-
-        override fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback) {
-            callback.invoke(origin, false, false)
-        }
-
-        override fun onConsoleMessage(message: ConsoleMessage): Boolean {
-            Log.d("AcornixApp", "${message.message()} (${message.lineNumber()})")
-            return true
         }
     }
 }
