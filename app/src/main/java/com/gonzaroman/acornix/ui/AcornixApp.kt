@@ -27,9 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -42,7 +39,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.gonzaroman.acornix.ui.tools.ControlHelpScreen
-import com.gonzaroman.acornix.MainActivity
 import com.gonzaroman.acornix.R
 import com.gonzaroman.acornix.ui.apps.AppsScreen
 import com.gonzaroman.acornix.ui.assistant.AssistantScreen
@@ -94,21 +90,13 @@ private val TABS = listOf(
 )
 
 /** Things other apps hand to Acornix (share sheet, notification taps). */
-data class ExternalRequest(
-    val openAssistant: Boolean = false,
-    val sharedText: String? = null,
-    val sharedImage: Uri? = null,
-    /** A screen asked for by AcornixOS ([MainActivity.SCREEN_CREATE]...). */
-    val screen: String? = null,
-    val fromOs: Boolean = false,
-)
+data class ExternalRequest(val openAssistant: Boolean = false, val sharedText: String? = null, val sharedImage: Uri? = null)
 
 @Composable
 fun AcornixApp(
     startOnboarding: Boolean,
     external: ExternalRequest?,
     onExternalConsumed: () -> Unit,
-    onReturnToOs: () -> Unit = {},
 ) {
     val nav = rememberNavController()
     val backStack by nav.currentBackStackEntryAsState()
@@ -123,28 +111,6 @@ fun AcornixApp(
     LaunchedEffect(external) {
         if (external != null && (external.openAssistant || external.sharedText != null || external.sharedImage != null)) {
             nav.navigate(Routes.assistant()) { launchSingleTop = true }
-        }
-    }
-
-    // Screens opened from AcornixOS go back to the desktop instead of staying on Home.
-    var returnToOsFrom by rememberSaveable { mutableStateOf<String?>(null) }
-    LaunchedEffect(external) {
-        val screen = external?.screen ?: return@LaunchedEffect
-        when (screen) {
-            MainActivity.SCREEN_CREATE -> nav.navigate(Routes.create()) { launchSingleTop = true }
-            MainActivity.SCREEN_ASSISTANT -> nav.navigateTab(Routes.assistant())
-            MainActivity.SCREEN_SETTINGS -> nav.navigateTab(Routes.SETTINGS)
-            MainActivity.SCREEN_APPS -> nav.navigateTab(Routes.APPS)
-        }
-        returnToOsFrom = if (external.fromOs) nav.currentBackStackEntry?.destination?.route else null
-        onExternalConsumed()
-    }
-    // Leaving that screen (Back, or the Home tab) lands on Home: hand the user back to the desktop.
-    // Done on the route instead of a BackHandler, which NavHost's own handler outranks after a resume.
-    LaunchedEffect(route) {
-        if (returnToOsFrom != null && route == Routes.HOME) {
-            returnToOsFrom = null
-            onReturnToOs()
         }
     }
 

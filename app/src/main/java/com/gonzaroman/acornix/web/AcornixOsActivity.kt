@@ -18,7 +18,6 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
-import com.gonzaroman.acornix.MainActivity
 import com.gonzaroman.acornix.R
 import com.gonzaroman.acornix.container
 import com.gonzaroman.acornix.data.AppMeta
@@ -29,7 +28,6 @@ import com.gonzaroman.acornix.ui.os.DesktopScreen
 import com.gonzaroman.acornix.ui.os.DesktopState
 import com.gonzaroman.acornix.ui.os.OsPrefs
 import com.gonzaroman.acornix.ui.os.OsWindow
-import com.gonzaroman.acornix.ui.os.SystemApp
 import com.gonzaroman.acornix.ui.os.WALLPAPER_COUNT
 import com.gonzaroman.acornix.ui.theme.AcornixTheme
 import kotlinx.coroutines.CoroutineScope
@@ -160,15 +158,6 @@ class AcornixOsActivity : ComponentActivity(), DesktopActions {
         win.x = w * if (tablet) 0.04f + step * 0.04f else 0.04f
         win.y = h * if (tablet) 0.03f + step * 0.035f else 0.04f + step * 0.03f
         win.maximized = !tablet
-    }
-
-    override fun openSystem(app: SystemApp) {
-        startActivity(
-            Intent(this, MainActivity::class.java)
-                .setAction(MainActivity.ACTION_OPEN_SCREEN)
-                .putExtra(MainActivity.EXTRA_SCREEN, app.screen)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-        )
     }
 
     override fun focus(window: OsWindow) {

@@ -94,7 +94,7 @@ Open **AcornixOS** from Tools and your apps become a desktop, inspired by macOS:
 
 - **Windows** you can drag, resize, minimize and maximize, with the classic red, yellow and green buttons. Touch one and it comes to the front.
 - A **Dock** with your favourite apps and the ones you have open. Long-press to add or remove.
-- A **Launchpad** with every app and a search box, plus shortcuts to create a new app, the assistant and settings.
+- A **Launchpad** with all your apps and a search box.
 - **Wallpapers** to choose from, and a menu bar with the time and battery.
 - On a **tablet** you get several apps side by side, like a real computer. On a phone, windows open full size.
 

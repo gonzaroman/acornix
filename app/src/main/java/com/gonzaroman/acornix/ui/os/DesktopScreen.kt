@@ -103,7 +103,6 @@ class DesktopState(
 
 interface DesktopActions {
     fun openApp(app: AppMeta)
-    fun openSystem(app: SystemApp)
     fun focus(window: OsWindow)
     fun close(window: OsWindow)
     fun minimize(window: OsWindow)
@@ -384,18 +383,15 @@ private fun Dock(state: DesktopState, actions: DesktopActions, modifier: Modifie
             onLongClick = null,
         )
         state.dock.forEach { key ->
-            val system = SystemApp.fromKey(key)
-            val app = if (system == null) state.apps.firstOrNull { appKey(it.id) == key } else null
-            if (system == null && app == null) return@forEach
-            val label = system?.let { stringResource(it.label) } ?: app!!.name
+            val app = state.apps.firstOrNull { appKey(it.id) == key } ?: return@forEach
             DockIcon(
-                emoji = system?.emoji ?: app!!.emoji,
-                background = if (system != null) Brush.linearGradient(listOf(Color(0xFF2B2B2E), Color(0xFF1C1C1E))) else appGradient(app!!.id),
-                running = app != null && app.id in openIds,
-                onClick = { if (system != null) actions.openSystem(system) else actions.openApp(app!!) },
+                emoji = app.emoji,
+                background = appGradient(app.id),
+                running = app.id in openIds,
+                onClick = { actions.openApp(app) },
                 onLongClick = {
                     haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                    actions.removeFromDock(key, label)
+                    actions.removeFromDock(key, app.name)
                 },
             )
         }
@@ -440,25 +436,14 @@ private fun DockIcon(emoji: String, background: Brush, running: Boolean, onClick
 
 // --- Launchpad -------------------------------------------------------------------------------
 
-private sealed interface LaunchItem {
-    val key: String
-    data class System(val app: SystemApp) : LaunchItem { override val key get() = app.key }
-    data class App(val app: AppMeta) : LaunchItem { override val key get() = appKey(app.id) }
-}
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun Launchpad(state: DesktopState, actions: DesktopActions) {
     var query by remember { mutableStateOf("") }
     val haptics = LocalHapticFeedback.current
-    val systemLabels = SystemApp.entries.associateWith { stringResource(it.label) }
     val items = remember(state.apps, query) {
         val q = query.trim().lowercase()
-        val sys = SystemApp.entries.filter { q.isEmpty() || systemLabels.getValue(it).lowercase().contains(q) }.map { LaunchItem.System(it) }
-        val apps = state.apps.sortedBy { it.name.lowercase() }
-            .filter { q.isEmpty() || it.name.lowercase().contains(q) }
-            .map { LaunchItem.App(it) }
-        sys + apps
+        state.apps.sortedBy { it.name.lowercase() }.filter { q.isEmpty() || it.name.lowercase().contains(q) }
     }
     Column(
         Modifier
@@ -501,25 +486,18 @@ private fun Launchpad(state: DesktopState, actions: DesktopActions) {
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = 20.dp),
         ) {
-            items(items, key = { it.key }) { item ->
-                val label = when (item) {
-                    is LaunchItem.System -> systemLabels.getValue(item.app)
-                    is LaunchItem.App -> item.app.name
-                }
+            items(items, key = { it.id }) { app ->
                 Column(
                     Modifier
                         .clip(RoundedCornerShape(12.dp))
                         .combinedClickable(
                             onClick = {
                                 actions.launchpad(false)
-                                when (item) {
-                                    is LaunchItem.System -> actions.openSystem(item.app)
-                                    is LaunchItem.App -> actions.openApp(item.app)
-                                }
+                                actions.openApp(app)
                             },
                             onLongClick = {
                                 haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                                actions.addToDock(item.key, label)
+                                actions.addToDock(appKey(app.id), app.name)
                             },
                         )
                         .padding(6.dp),
@@ -530,24 +508,13 @@ private fun Launchpad(state: DesktopState, actions: DesktopActions) {
                             .size(62.dp)
                             .shadow(8.dp, RoundedCornerShape(16.dp))
                             .clip(RoundedCornerShape(16.dp))
-                            .background(
-                                when (item) {
-                                    is LaunchItem.System -> Brush.linearGradient(listOf(Color(0xFF2B2B2E), Color(0xFF1C1C1E)))
-                                    is LaunchItem.App -> appGradient(item.app.id)
-                                },
-                            ),
+                            .background(appGradient(app.id)),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Text(
-                            when (item) {
-                                is LaunchItem.System -> item.app.emoji
-                                is LaunchItem.App -> item.app.emoji
-                            },
-                            fontSize = 30.sp,
-                        )
+                        Text(app.emoji, fontSize = 30.sp)
                     }
                     Spacer(Modifier.height(6.dp))
-                    Text(label, color = Color.White, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
+                    Text(app.name, color = Color.White, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
                 }
             }
         }

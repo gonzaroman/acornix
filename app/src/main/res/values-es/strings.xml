@@ -40,10 +40,6 @@
     <string name="tool_os_desc">Tu móvil como un ordenador: ventanas, Dock y Launchpad</string>
     <string name="os_search">Buscar apps</string>
     <string name="os_launchpad">Launchpad</string>
-    <string name="os_new_app">Nueva app</string>
-    <string name="os_assistant">Asistente</string>
-    <string name="os_my_apps">Mis apps</string>
-    <string name="os_settings">Ajustes</string>
     <string name="os_wallpaper">Fondo</string>
     <string name="os_pin">Añadir a la pantalla de inicio</string>
     <string name="os_pin_unsupported">Tu launcher no admite accesos directos</string>
@@ -52,7 +48,7 @@
     <string name="os_dock_already">%1$s ya está en el Dock</string>
     <string name="os_desktop_hint">Toca 🚀 para ver todas tus apps</string>
     <string name="os_hint">Mantén pulsado un icono para añadirlo al Dock</string>
-    <string name="os_empty">Todavía no hay apps. Toca ✨ Nueva app para crear una.</string>
+    <string name="os_empty">Todavía no hay apps. Crea una en Acornix y aparecerá aquí.</string>
     <string name="os_close">Cerrar</string>
     <string name="os_minimize">Minimizar</string>
     <string name="os_maximize">Maximizar</string>

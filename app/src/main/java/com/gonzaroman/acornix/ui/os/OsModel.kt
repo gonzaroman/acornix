@@ -1,26 +1,11 @@
 package com.gonzaroman.acornix.ui.os
 
 import android.content.Context
-import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.gonzaroman.acornix.MainActivity
-import com.gonzaroman.acornix.R
 import com.gonzaroman.acornix.data.AppMeta
-
-/** Built-in entries of the desktop: they open Acornix's own screens. */
-enum class SystemApp(val key: String, val emoji: String, @StringRes val label: Int, val screen: String) {
-    CREATE("sys:create", "✨", R.string.os_new_app, MainActivity.SCREEN_CREATE),
-    ASSISTANT("sys:assistant", "🤖", R.string.os_assistant, MainActivity.SCREEN_ASSISTANT),
-    APPS("sys:apps", "📱", R.string.os_my_apps, MainActivity.SCREEN_APPS),
-    SETTINGS("sys:settings", "⚙️", R.string.os_settings, MainActivity.SCREEN_SETTINGS);
-
-    companion object {
-        fun fromKey(key: String) = entries.firstOrNull { it.key == key }
-    }
-}
 
 fun appKey(appId: String) = "app:$appId"
 
@@ -44,10 +29,10 @@ class OsPrefs(context: Context) {
 
     fun dock(apps: List<AppMeta>): List<String> {
         val saved = prefs.getString(KEY_DOCK, null)
-        if (saved != null) return saved.split('\n').filter { it.isNotBlank() }
-        // First time: the essentials plus the two most recently opened apps.
-        val recent = apps.sortedByDescending { maxOf(it.lastOpenedAt, it.updatedAt) }.take(2).map { appKey(it.id) }
-        return listOf(SystemApp.CREATE.key, SystemApp.ASSISTANT.key) + recent
+        // Only apps live in the Dock (early betas also pinned shortcuts to Acornix's screens).
+        if (saved != null) return saved.split('\n').filter { it.startsWith("app:") }
+        // First time: the four most recently used apps.
+        return apps.sortedByDescending { maxOf(it.lastOpenedAt, it.updatedAt) }.take(4).map { appKey(it.id) }
     }
 
     fun saveDock(keys: List<String>) = prefs.edit().putString(KEY_DOCK, keys.joinToString("\n")).apply()
