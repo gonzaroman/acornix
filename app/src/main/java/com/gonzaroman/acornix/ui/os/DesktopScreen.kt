@@ -43,8 +43,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.CloseFullscreen
+import androidx.compose.material.icons.rounded.OpenInFull
+import androidx.compose.material.icons.rounded.Remove
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -65,6 +71,7 @@ import androidx.compose.ui.zIndex
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
@@ -295,14 +302,18 @@ private fun AppWindow(win: OsWindow, app: AppMeta?, areaW: Float, areaH: Float, 
                             win.y = (win.y + drag.y).coerceIn(0f, areaH - headerPx)
                         }
                     }
-                    .padding(horizontal = 12.dp),
+                    .padding(horizontal = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                TrafficLight(Color(0xFFFF5F56), stringResource(R.string.os_close)) { actions.close(win) }
-                Spacer(Modifier.width(8.dp))
-                TrafficLight(Color(0xFFFFBD2E), stringResource(R.string.os_minimize)) { actions.minimize(win) }
-                Spacer(Modifier.width(8.dp))
-                TrafficLight(Color(0xFF27C93F), stringResource(R.string.os_maximize)) { win.maximized = !win.maximized }
+                TrafficLight(Color(0xFFFF5F56), Icons.Rounded.Close, stringResource(R.string.os_close)) { actions.close(win) }
+                Spacer(Modifier.width(4.dp))
+                TrafficLight(Color(0xFFFFBD2E), Icons.Rounded.Remove, stringResource(R.string.os_minimize)) { actions.minimize(win) }
+                Spacer(Modifier.width(4.dp))
+                TrafficLight(
+                    Color(0xFF27C93F),
+                    if (win.maximized) Icons.Rounded.CloseFullscreen else Icons.Rounded.OpenInFull,
+                    stringResource(if (win.maximized) R.string.os_restore else R.string.os_maximize),
+                ) { win.maximized = !win.maximized }
                 Text(
                     listOfNotNull(app?.emoji, app?.name ?: win.appId).joinToString(" "),
                     color = Color(0xFF333333),
@@ -311,7 +322,7 @@ private fun AppWindow(win: OsWindow, app: AppMeta?, areaW: Float, areaH: Float, 
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.weight(1f).padding(end = 52.dp),
+                    modifier = Modifier.weight(1f).padding(end = 92.dp),
                 )
             }
             AndroidView(
@@ -343,13 +354,16 @@ private fun AppWindow(win: OsWindow, app: AppMeta?, areaW: Float, areaH: Float, 
 }
 
 @Composable
-private fun TrafficLight(color: Color, label: String, onClick: () -> Unit) {
-    // A 14dp dot with a bigger invisible touch area.
+private fun TrafficLight(color: Color, icon: ImageVector, label: String, onClick: () -> Unit) {
+    // A colored dot with its symbol always visible (macOS only shows it on hover, and phones have no
+    // hover), inside a bigger invisible touch area.
     Box(
-        Modifier.size(26.dp).clip(CircleShape).clickable(onClickLabel = label, onClick = onClick),
+        Modifier.size(28.dp).clip(CircleShape).clickable(onClickLabel = label, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
-        Box(Modifier.size(14.dp).clip(CircleShape).background(color))
+        Box(Modifier.size(18.dp).clip(CircleShape).background(color), contentAlignment = Alignment.Center) {
+            Icon(icon, contentDescription = label, tint = Color.Black.copy(alpha = 0.6f), modifier = Modifier.size(12.dp))
+        }
     }
 }
 

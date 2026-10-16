@@ -52,6 +52,7 @@
     <string name="os_empty">No apps yet. Create one in Acornix and it will show up here.</string>
     <string name="os_close">Close</string>
     <string name="os_minimize">Minimize</string>
+    <string name="os_restore">Restore size</string>
     <string name="os_maximize">Maximize</string>
     <string name="tool_versions">Versions &amp; backups</string>
     <string name="tool_versions_desc">Go back to any previous version</string>
