@@ -61,6 +61,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -151,7 +152,7 @@ fun DesktopScreen(state: DesktopState, actions: DesktopActions) {
                             }
                         }
                     }
-                    Dock(state, actions, Modifier.align(Alignment.BottomCenter))
+                    Dock(state, actions, Modifier.align(Alignment.BottomCenter).zIndex(Float.MAX_VALUE))
                 }
             }
         }
@@ -237,7 +238,7 @@ private fun MenuBar(state: DesktopState, actions: DesktopActions) {
                 DropdownMenuItem(text = { Text("🚀  " + stringResource(R.string.os_launchpad)) }, onClick = { menu = false; actions.launchpad(true) })
                 DropdownMenuItem(text = { Text("🖼️  " + stringResource(R.string.os_wallpaper)) }, onClick = { menu = false; actions.nextWallpaper() })
                 DropdownMenuItem(text = { Text("📌  " + stringResource(R.string.os_pin)) }, onClick = { menu = false; actions.pinToHome() })
-                DropdownMenuItem(text = { Text("⏻  " + stringResource(R.string.os_close)) }, onClick = { menu = false; actions.exit() })
+                DropdownMenuItem(text = { Text("✖️  " + stringResource(R.string.os_close)) }, onClick = { menu = false; actions.exit() })
             }
         }
         Spacer(Modifier.weight(1f))
@@ -264,6 +265,7 @@ private fun AppWindow(win: OsWindow, app: AppMeta?, areaW: Float, areaH: Float, 
 
     Box(
         Modifier
+            .zIndex(win.z)
             .offset { IntOffset(x.roundToInt(), y.roundToInt()) }
             .size(with(density) { w.toDp() }, with(density) { h.toDp() })
             .shadow(24.dp, WINDOW_SHAPE)

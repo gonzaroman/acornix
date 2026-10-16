@@ -31,6 +31,7 @@ Acornix turns your phone into a place where software gets made. You bring an API
 - **Creates apps and games** from a sentence, your voice or a photo, and lets you keep improving them by asking.
 - **Runs them like real apps**: full screen, offline, on your home screen, each with its own private database.
 - **Acts as an assistant** that can open apps, search YouTube, set alarms, blink the flashlight in Morse, read and change your apps' data and, if you allow it, tap and type inside other apps for you.
+- **Turns your phone or tablet into a desktop** with **AcornixOS**: windows, a Dock and a Launchpad, like a little Mac in your pocket.
 
 No terminal, no server, no account. Everything you create lives on your phone.
 
@@ -87,6 +88,26 @@ All your creations live in **My Apps**, a launcher with live thumbnails, search 
 <img src="docs/screenshots/sheet.jpg" width="250" alt="App actions">
 </p>
 
+### 🖥️ AcornixOS: your phone as a computer
+
+Open **AcornixOS** from Tools and your apps become a desktop, inspired by macOS:
+
+- **Windows** you can drag, resize, minimize and maximize, with the classic red, yellow and green buttons. Touch one and it comes to the front.
+- A **Dock** with your favourite apps and the ones you have open. Long-press to add or remove.
+- A **Launchpad** with every app and a search box, plus shortcuts to create a new app, the assistant and settings.
+- **Wallpapers** to choose from, and a menu bar with the time and battery.
+- On a **tablet** you get several apps side by side, like a real computer. On a phone, windows open full size.
+
+Every window is the real app, with its own data, camera and files. Add AcornixOS to your home screen and it opens like any other app.
+
+<p align="center">
+<img src="docs/screenshots/os-tablet.jpg" width="760" alt="AcornixOS on a tablet with several windows">
+</p>
+<p align="center">
+<img src="docs/screenshots/os-phone.jpg" width="230" alt="An app in a window on a phone">&nbsp;&nbsp;
+<img src="docs/screenshots/os-launchpad.jpg" width="230" alt="The Launchpad">
+</p>
+
 ### 🗄️ A private database for every app
 
 Every app gets its own fast SQLite database (`Acornix.db`), so a to-do list keeps its tasks and a game keeps its saves and high scores. The data:
@@ -118,7 +139,7 @@ Acornix checks GitHub for new versions. When one comes out you'll see what's new
 
 ### And more
 
-**Phone status** (battery, memory, storage), a **photo and video gallery** grouped by month, Material You colors with light and dark themes, and an interface in **English and Spanish**. Generated apps follow your phone's language too.
+**Phone status** (battery, memory, storage), Material You colors with light and dark themes, and an interface in **English and Spanish**. Generated apps follow your phone's language too.
 
 <p align="center">
 <img src="docs/screenshots/home-dark.jpg" width="230" alt="Home in dark mode">&nbsp;&nbsp;

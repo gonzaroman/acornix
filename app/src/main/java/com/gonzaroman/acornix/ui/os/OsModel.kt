@@ -32,6 +32,10 @@ class OsWindow(val id: Int, val appId: String) {
     var height by mutableFloatStateOf(0f)
     var maximized by mutableStateOf(false)
     var minimized by mutableStateOf(false)
+
+    /** Stacking order. Raising a window changes this instead of reordering the list, which would
+     *  move the window in the composition and cancel a drag that has just started on it. */
+    var z by mutableFloatStateOf(0f)
 }
 
 /** Dock contents and wallpaper, remembered between sessions. */

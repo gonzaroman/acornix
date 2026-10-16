@@ -56,6 +56,7 @@ class AcornixOsActivity : ComponentActivity(), DesktopActions {
     private val webViews = mutableMapOf<Int, WebView>()
     private val scopes = mutableMapOf<Int, CoroutineScope>()
     private var nextId = 0
+    private var topZ = 0f
     private var areaW = 0f
     private var areaH = 0f
 
@@ -90,7 +91,7 @@ class AcornixOsActivity : ComponentActivity(), DesktopActions {
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                val top = windows.lastOrNull { !it.minimized }
+                val top = windows.filter { !it.minimized }.maxByOrNull { it.z }
                 when {
                     launchpadOpen -> launchpad(false)
                     top != null && webViews[top.id]?.canGoBack() == true -> webViews[top.id]?.goBack()
@@ -141,6 +142,7 @@ class AcornixOsActivity : ComponentActivity(), DesktopActions {
     override fun openApp(app: AppMeta) {
         windows.firstOrNull { it.appId == app.id }?.let { focus(it); return }
         val win = OsWindow(nextId++, app.id)
+        win.z = ++topZ
         place(win)
         windows += win
         lifecycleScope.launch { container.apps.markOpened(app.id) }
@@ -171,11 +173,7 @@ class AcornixOsActivity : ComponentActivity(), DesktopActions {
 
     override fun focus(window: OsWindow) {
         window.minimized = false
-        val index = windows.indexOf(window)
-        if (index >= 0 && index != windows.lastIndex) {
-            windows.removeAt(index)
-            windows += window
-        }
+        if (windows.any { it !== window && it.z >= window.z }) window.z = ++topZ
     }
 
     override fun close(window: OsWindow) {
