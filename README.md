@@ -1,5 +1,8 @@
 # 🌳 acornix
 
+> [!NOTE]
+> **This is the original Termux version (legacy).** Acornix is now a native Android app: no Termux, Python or server needed. Get it from the [latest release](https://github.com/gonzaroman/acornix/releases/latest) or see the [`main`](https://github.com/gonzaroman/acornix) branch.
+
 **The intelligent seed for your Termux ecosystem.**
 
 `acornix` is an AI-powered assistant designed to generate apps, manage plugins, and automate workflows directly from your terminal. Built with a nod to the legacy of **Acorn Computers** and the power of **ARM** architecture, it transforms your phone into a portable development powerhouse.
@@ -17,7 +20,7 @@
 Before touching the code, you need the base tools on your mobile device:
 
 * **Install Termux:** Download it preferably from F-Droid or its official GitHub (the Google Play version is obsolete). [Termux](https://f-droid.org/es/packages/com.termux/)
-* **Install Termux:API:** Download the Termux:API extension (this allows the AI to control phone functions). [Termux:API](https://f-droid.org/es/packages/com.termux/)
+* **Install Termux:API:** Download the Termux:API extension (this allows the AI to control phone functions). [Termux:API](https://f-droid.org/packages/com.termux.api/)
 
 
 Open Termux and update everything is up to date before you begin:
@@ -36,13 +39,22 @@ Open Termux and make sure everything is updated before starting:
 Run this command in Termux to set up everything automatically (dependencies, permissions, and alias):
 
 ```bash
-pkg update && pkg upgrade -y && pkg install python git termux-api binutils -y && termux-setup-storage && git clone https://github.com/gonzaroman/acornix.git && cd acornix && pip install requests python-dotenv psutil && echo "alias acornix='cd ~/acornix && python main.py'" >> ~/.bashrc && source ~/.bashrc && python main.py
+pkg update && pkg upgrade -y && pkg install python git termux-api binutils -y && termux-setup-storage && git clone -b termux --single-branch https://github.com/gonzaroman/acornix.git && cd acornix && pip install requests python-dotenv psutil && echo "alias acornix='cd ~/acornix && python main.py'" >> ~/.bashrc && source ~/.bashrc && python main.py
 
 ```
 
 
 
 Note: You'll be asked for storage permissions. Please grant them to allow acornix to save your projects.
+
+> [!IMPORTANT]
+> The command above clones the `termux` branch. The default branch (`main`) now holds the Android app, so a plain `git clone` won't include `main.py`.
+>
+> **Already installed?** If you cloned acornix before version 2.0, a `git pull` on `main` will bring the Android app instead. Switch your copy to the `termux` branch:
+>
+> ```bash
+> cd ~/acornix && git fetch origin termux && git checkout -B termux origin/termux
+> ```
 
 ✨ Key Features
 AI App Generator: Create web apps and scripts using natural language.
