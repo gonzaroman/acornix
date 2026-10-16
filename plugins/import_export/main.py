@@ -2,7 +2,8 @@ import os
 import zipfile
 import http.server
 import socketserver
-import cgi
+from email import policy
+from email.parser import BytesParser
 import json
 import threading
 import shutil
@@ -11,6 +12,19 @@ from urllib.parse import urlparse, parse_qs
 # Configuration for the main menu
 config = {"label": "Smart Import-Export Hub", "icon": "📦"}
 PORT = 8081
+
+def read_uploaded_file(handler, field="file"):
+    """Returns (filename, bytes) of a multipart/form-data upload (the cgi module is gone since Python 3.13)."""
+    length = int(handler.headers.get('Content-Length', 0))
+    body = handler.rfile.read(length)
+    head = f"Content-Type: {handler.headers.get('Content-Type', '')}\r\n\r\n".encode()
+    message = BytesParser(policy=policy.HTTP).parsebytes(head + body)
+    if not message.is_multipart():
+        return None, None
+    for part in message.iter_parts():
+        if part.get_param('name', header='content-disposition') == field:
+            return part.get_filename(), part.get_payload(decode=True)
+    return None, None
 
 def detect_and_validate_zip(zip_path):
     """
@@ -109,13 +123,12 @@ class ManagementHandler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
         if self.path == '/import':
             try:
-                form = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST'})
-                
-                if 'file' not in form or not form['file'].filename:
+                filename, data = read_uploaded_file(self)
+
+                if not filename:
                     return self._send_alert("Please select a file.", is_error=True)
 
-                file_item = form['file']
-                filename = file_item.filename
+                filename = os.path.basename(filename)
 
                 if not filename.lower().endswith('.zip'):
                     return self._send_alert(f"File '{filename}' is not a ZIP archive.", is_error=True)
@@ -124,7 +137,7 @@ class ManagementHandler(http.server.SimpleHTTPRequestHandler):
                 os.makedirs("temp_imports", exist_ok=True)
                 temp_zip = os.path.join("temp_imports", filename)
                 with open(temp_zip, 'wb') as f:
-                    f.write(file_item.file.read())
+                    f.write(data)
 
                 # Smart Auto-Detection of content type
                 target_folder, error_msg = detect_and_validate_zip(temp_zip)

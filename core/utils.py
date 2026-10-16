@@ -6,6 +6,7 @@ import subprocess
 import socket
 import time
 from dotenv import load_dotenv
+from core import ai
 
 # API Configuration
 load_dotenv()
@@ -18,62 +19,22 @@ def is_server_active():
 
 def ask_ai(prompt, system_prompt):
     """
-    Sends a prompt to the configured AI provider and returns the response.
+    Sends a prompt to the active AI provider (see core/ai.py) and returns the response,
+    or None after printing a readable error.
     """
-    config_file = "config.json"
-    if not os.path.exists(config_file):
-        print("\n❌ Error: config.json not found.")
+    progress = ai.Progress()
+    try:
+        return ai.generate(prompt, system_prompt, on_text=progress)
+    except ai.AIError as e:
+        progress.done()
+        print(f"❌ AI error: {e}")
         return None
-    
-    with open(config_file, "r") as f:
-        settings = json.load(f)
-
-    provider = settings.get("active_provider", "openai")
-    api_key = settings.get("api_keys", {}).get(provider)
-    model = settings.get("models", {}).get(provider)
-    
-    if not api_key or not model:
-        print(f"\n❌ Error: Missing configuration for {provider}")
+    except KeyboardInterrupt:
+        progress.done()
+        print("⏹️ Cancelled.")
         return None
-
-    # --- OpenAI Provider ---
-    if provider == "openai":
-        url = "https://api.openai.com/v1/chat/completions"
-        headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
-        data = {
-            "model": model, 
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt}
-            ]
-        }
-        try:
-            res = requests.post(url, headers=headers, json=data, timeout=120).json()
-            return res['choices'][0]['message']['content']
-        except Exception as e:
-            print(f"❌ OpenAI API Error: {e}")
-            return None
-
-    # --- Anthropic Provider ---
-    elif provider == "anthropic":
-        url = "https://api.anthropic.com/v1/messages"
-        headers = {
-            "x-api-key": api_key,
-            "anthropic-version": "2023-06-01",
-            "content-type": "application/json"
-        }
-        data = {
-            "model": model,
-            "max_tokens": 4096,
-            "system": system_prompt,
-            "messages": [{"role": "user", "content": prompt}]
-        }
-        try:
-            res = requests.post(url, headers=headers, json=data, timeout=120).json()
-            return res['content'][0]['text']
-        except Exception as e:
-            print(f"❌ Anthropic API Error: {e}")
-            return None
+    finally:
+        progress.done()
 
 def process_and_execute(ai_text, filename="generated_app.html"):
     """
@@ -144,8 +105,8 @@ def process_and_execute(ai_text, filename="generated_app.html"):
         improvement_prompt = (
             f"Current code:\n\n{code_block}\n\n"
             f"Requested change: {improvement}. "
-            f"Return the full updated code within ---CODIGO--- and a new ---SUGERENCIA---."
+            f"Return the full updated code within ---CODIGO--- and a new ---SUGERENCIA--- with the next idea."
         )
         
-        new_res = ask_ai(improvement_prompt, "You are an expert developer. Return ONLY ---CODIGO--- and ---SUGERENCIA---.")
+        new_res = ask_ai(improvement_prompt, "You are an expert developer. Keep everything that already works.\n" + ai.OUTPUT_FORMAT)
         process_and_execute(new_res, filename)

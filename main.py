@@ -1,6 +1,7 @@
 import os
 import importlib.util
 import sys
+import threading
 
 def load_plugins():
     """
@@ -50,6 +51,31 @@ def load_plugins():
     # Default alphabetical sort by label for the 'Others' category
     return sorted(loaded_plugins, key=lambda x: x.config.get("label", "").lower())
 
+def ai_status():
+    """One line with the active AI, or a hint to configure one."""
+    try:
+        from core import ai
+        settings = ai.load_settings()
+        provider = settings["active_provider"]
+        if not ai.is_configured(settings):
+            return " 🤖 AI: not configured → open ⚙️ Global Settings Hub"
+        return f" 🤖 AI: {ai.PROVIDERS[provider]['label']} · {settings['models'][provider]}"
+    except Exception as e:
+        return f" 🤖 AI: settings error ({e})"
+
+UPDATE_CHECK = {"available": False}
+
+def start_update_check(plugins):
+    """Checks GitHub for a new version in the background, once per session (silent when offline)."""
+    updater = next((p for p in plugins if p.config.get("label") == "Update acornix"), None)
+    if updater is None:
+        return None
+    def check():
+        UPDATE_CHECK["available"] = updater.update_available()
+    thread = threading.Thread(target=check, daemon=True)
+    thread.start()
+    return thread
+
 def main_menu():
     """
     Displays the categorized main menu and handles user selection.
@@ -73,12 +99,17 @@ def main_menu():
         ],
         "⚙️ SETTINGS": [
             "Global Settings Hub",                      
-            "System Health"
+            "System Health",
+            "Update acornix"
         ],
         "ℹ️ HELP": [
             "Help"
         ]
     }
+
+    check_thread = start_update_check(load_plugins())
+    if check_thread:
+        check_thread.join(timeout=2)  # Usually enough to show the notice on the first screen.
 
     while True:
         os.system('clear')
@@ -87,6 +118,9 @@ def main_menu():
         print("==========================================")
         print("      🚀 ACORNIX          ")
         print("==========================================")
+        print(ai_status())
+        if UPDATE_CHECK["available"]:
+            print(" 🆕 Update available → 🔄 Update acornix (in ⚙️ SETTINGS)")
         
         mapping = {}
         current_idx = 1

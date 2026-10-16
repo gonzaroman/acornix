@@ -39,13 +39,15 @@ Open Termux and make sure everything is updated before starting:
 Run this command in Termux to set up everything automatically (dependencies, permissions, and alias):
 
 ```bash
-pkg update && pkg upgrade -y && pkg install python git termux-api binutils -y && termux-setup-storage && git clone -b termux --single-branch https://github.com/gonzaroman/acornix.git && cd acornix && pip install requests python-dotenv psutil && echo "alias acornix='cd ~/acornix && python main.py'" >> ~/.bashrc && source ~/.bashrc && python main.py
+pkg update && pkg upgrade -y && pkg install python python-psutil git termux-api binutils -y && termux-setup-storage && git clone -b termux --single-branch https://github.com/gonzaroman/acornix.git && cd acornix && pip install requests python-dotenv && echo "alias acornix='cd ~/acornix && python main.py'" >> ~/.bashrc && source ~/.bashrc && python main.py
 
 ```
 
 
 
 Note: You'll be asked for storage permissions. Please grant them to allow acornix to save your projects.
+
+Note: During the upgrade Termux may ask what to do with some configuration files (`openssl.cnf`, `sources.list`, `bash.bashrc`...). Just press **Enter** to keep the default.
 
 > [!IMPORTANT]
 > The command above clones the `termux` branch. The default branch (`main`) now holds the Android app, so a plain `git clone` won't include `main.py`.
@@ -55,6 +57,8 @@ Note: You'll be asked for storage permissions. Please grant them to allow acorni
 > ```bash
 > cd ~/acornix && git fetch origin termux && git checkout -B termux origin/termux
 > ```
+>
+> From then on, use **🔄 Update acornix** in the menu to get new versions.
 
 ✨ Key Features
 AI App Generator: Create web apps and scripts using natural language.
@@ -71,6 +75,25 @@ After installation, you can launch the system from anywhere by simply typing:
 ```bash
 acornix
 ```
+
+### 🤖 Choose your AI
+
+Open **⚙️ Global Settings Hub** from the main menu and pick **1) Guided Configuration**: choose a provider, paste your API key (it stays hidden) and pick a model from the list your key can use. Type part of a name (e.g. `luna`) to filter the list. The main menu always shows the active AI.
+
+| Provider | Default model | Get a key |
+| :--- | :--- | :--- |
+| OpenAI (GPT) | `gpt-6-luna` | [platform.openai.com](https://platform.openai.com/api-keys) |
+| Anthropic (Claude) | `claude-opus-5-5` | [console.anthropic.com](https://console.anthropic.com/settings/keys) |
+| Google Gemini | `gemini-2.5-flash` | [aistudio.google.com](https://aistudio.google.com/apikey) |
+| OpenAI-compatible | any | OpenRouter, Groq, DeepSeek, Mistral, or a local Ollama / LM Studio (no key needed) |
+
+You can switch provider or model at any time and use **📡 Test Connection** to check it works. Answers stream live, so you can see the AI thinking and writing.
+
+### 🔄 Updating
+
+When a new version is out, the main menu shows **🆕 Update available**. Open **🔄 Update acornix** (in ⚙️ SETTINGS): it lists what's new and updates with one confirmation, then restarts.
+
+Your own apps and plugins are never deleted, and your settings (provider, API keys, models) are kept. The bundled sample apps and system files get the new version. Before updating, a ZIP with your `my_apps/`, `plugins/` and `config.json` is saved in `backups/updates/`, just in case.
 Main Menu Options:
 Generate App: Describe what you want, and acornix will build it.
 

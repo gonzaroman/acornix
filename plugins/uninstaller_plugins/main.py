@@ -18,7 +18,8 @@ PROTECTED = {
     "time_machine",
     "uninstaller_plugins",
     "__init__.py",
-    "help"
+    "help",
+    "updater"
 }
 
 def _get_plugins():

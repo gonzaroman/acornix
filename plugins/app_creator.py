@@ -2,6 +2,7 @@ import os
 import shutil
 import datetime
 import json
+from core import ai
 from core.utils import ask_ai, process_and_execute
 
 # Plugin Configuration
@@ -70,9 +71,9 @@ def run():
             # Optimized prompt for initial creation
             sys_prompt = (
                 "You are an Expert Web Developer Assistant. "
-                "Strictly follow this format: ---CODIGO--- and ---SUGERENCIA---. "
-                "Use HTML/JS/CSS to build high-quality Single Page Applications (SPA). "
-                "All UI text and comments MUST be in English."
+                "Build a high-quality, mobile-first Single Page Application in ONE self-contained "
+                "index.html (inline CSS and JS, touch-friendly, works in portrait). "
+                "All UI text and comments MUST be in English.\n" + ai.OUTPUT_FORMAT
             )
             
             print(f"\n🧠 Programming '{name}' from scratch...")

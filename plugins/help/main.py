@@ -131,7 +131,7 @@ HTML_CONTENT = """<!DOCTYPE html>
 
       <section id="aistudio" class="section">
         <h2>🤖 AI Studio (Create without API)</h2>
-        <p>Don't have an OpenAI or Anthropic API key? No problem. The <strong>AI Studio</strong> lets you create apps and plugins by acting as a bridge between Acornix and free external AIs like ChatGPT or Claude.</p>
+        <p>Don't have an API key (OpenAI, Anthropic, Gemini...)? No problem. The <strong>AI Studio</strong> lets you create apps and plugins by acting as a bridge between Acornix and free external AIs like ChatGPT or Claude.</p>
         
         <div class="card">
           <h3>How it works:</h3>
@@ -226,6 +226,11 @@ cat main.py plugins/*.py > totalcode.txt</code></pre>
             <li><b>Open URL:</b> <code>termux-open-url http://localhost:8080</code></li>
             <li><b>Stop execution:</b> Press <code>CTRL + C</code> in the terminal to force-stop a stuck plugin.</li>
           </ul>
+        </div>
+
+        <div class="card">
+          <h3>🔄 Updating Acornix</h3>
+          <p>When the main menu shows <b>🆕 Update available</b>, open <b>🔄 Update acornix</b> in ⚙️ SETTINGS. Your own apps, plugins and settings are kept; the sample apps and system files get the new version. A backup ZIP is saved first in <code>backups/updates/</code>.</p>
         </div>
       </section>
 

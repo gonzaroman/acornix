@@ -25,9 +25,12 @@ def run():
     sys_prompt = (
         "You are an Expert Termux System Agent. "
         "Your goal is to fulfill the user's request by writing a Python script. "
+        "acornix saves your script and runs it right away inside Termux, where the termux-api "
+        "commands (termux-battery-status, termux-torch, termux-vibrate, termux-open-url...) are available. "
+        "Print clear, friendly results for the user. "
         "Strictly follow this format: "
         "1. Start with ---CODIGO--- followed by the raw Python code. "
-        "2. End with ---SUGERENCIA--- followed by a brief explanation or next step. "
+        "2. End with ---SUGERENCIA--- followed by one short sentence proposing a useful follow-up task. "
         "All code, comments, and messages MUST be in English."
     )
     
