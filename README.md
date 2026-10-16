@@ -96,7 +96,7 @@ Open **AcornixOS** from Tools and your apps become a desktop, inspired by macOS:
 - A **Dock** with your favourite apps and the ones you have open. Long-press to add or remove.
 - A **Launchpad** with all your apps and a search box.
 - **Wallpapers** to choose from, and a menu bar with the time and battery.
-- On a **tablet** you get several apps side by side, like a real computer. On a phone, windows open full size.
+- Apps open in a **window**; tap the green button (or double-tap the title) to make one full size. On a **tablet** you get several apps side by side, like a real computer.
 
 Every window is the real app, with its own data, camera and files. Add AcornixOS to your home screen and it opens like any other app.
 

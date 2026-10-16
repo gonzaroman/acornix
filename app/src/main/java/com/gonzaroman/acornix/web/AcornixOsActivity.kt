@@ -146,18 +146,17 @@ class AcornixOsActivity : ComponentActivity(), DesktopActions {
         lifecycleScope.launch { container.apps.markOpened(app.id) }
     }
 
-    /** Phones get a maximized window; tablets a cascade of floating windows, like the Termux version. */
+    /** Apps open in a floating window, cascaded; the green button (or a double tap on the title) maximizes. */
     private fun place(win: OsWindow) {
         val w = areaW.takeIf { it > 0 } ?: resources.displayMetrics.widthPixels.toFloat()
         val h = areaH.takeIf { it > 0 } ?: resources.displayMetrics.heightPixels * 0.8f
         val tablet = w / resources.displayMetrics.density >= 600
         val step = windows.size % 5
-        // On phones the window starts maximized; this is the size it takes when un-maximized.
         win.width = w * if (tablet) 0.7f else 0.92f
         win.height = h * if (tablet) 0.8f else 0.75f
         win.x = w * if (tablet) 0.04f + step * 0.04f else 0.04f
         win.y = h * if (tablet) 0.03f + step * 0.035f else 0.04f + step * 0.03f
-        win.maximized = !tablet
+        win.maximized = false
     }
 
     override fun focus(window: OsWindow) {
