@@ -48,6 +48,7 @@ import com.gonzaroman.acornix.ui.editor.EditorScreen
 import com.gonzaroman.acornix.ui.home.HomeScreen
 import com.gonzaroman.acornix.ui.onboarding.OnboardingScreen
 import com.gonzaroman.acornix.ui.settings.SettingsScreen
+import com.gonzaroman.acornix.ui.share.ShareCardScreen
 import com.gonzaroman.acornix.ui.tools.HealthScreen
 import com.gonzaroman.acornix.ui.tools.HelpScreen
 import com.gonzaroman.acornix.ui.tools.ImportExportScreen
@@ -71,6 +72,7 @@ object Routes {
     const val STUDIO = "studio"
     const val ONBOARDING = "onboarding"
     const val DATA = "data/{id}"
+    const val SHARE = "share/{id}"
 
     fun assistant(control: Boolean = false) = "assistant?control=$control"
     fun create(feature: Boolean = false) = "create?kind=${if (feature) "feature" else "app"}"
@@ -78,6 +80,7 @@ object Routes {
     fun editor(appId: String) = "editor/${Uri.encode(appId)}"
     fun versions(appId: String) = "versions/${Uri.encode(appId)}"
     fun data(appId: String) = "data/${Uri.encode(appId)}"
+    fun share(appId: String) = "share/${Uri.encode(appId)}"
 }
 
 private data class Tab(val route: String, val base: String, val label: Int, val icon: ImageVector, val selectedIcon: ImageVector)
@@ -179,6 +182,7 @@ fun AcornixApp(
                 composable(Routes.VERSIONS) { entry -> VersionsScreen(nav, entry.arguments?.getString("id").orEmpty()) }
                 composable(Routes.VERSIONS_HUB) { VersionsHubScreen(nav) }
                 composable(Routes.DATA) { entry -> DataScreen(nav, entry.arguments?.getString("id").orEmpty()) }
+                composable(Routes.SHARE) { entry -> ShareCardScreen(nav, entry.arguments?.getString("id").orEmpty()) }
                 composable(Routes.IMPORT_EXPORT) { ImportExportScreen(nav) }
                 composable(Routes.HEALTH) { HealthScreen(nav) }
                 composable(Routes.HELP) { HelpScreen(nav) }

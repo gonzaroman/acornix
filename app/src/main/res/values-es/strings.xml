@@ -79,8 +79,8 @@
     <string name="action_edit_code">Editar código</string>
     <string name="action_versions">Versiones</string>
     <string name="action_pin">Anclar al escritorio</string>
-    <string name="action_pin_short">Al escritorio</string>
-    <string name="action_share">Compartir</string>
+    <string name="action_pin_short">Al inicio</string>
+    <string name="action_share">Enviar la app (ZIP)</string>
     <string name="action_rename">Renombrar</string>
     <string name="action_delete">Borrar</string>
     <string name="pin_unsupported">Tu launcher no admite accesos directos anclados</string>
@@ -439,4 +439,34 @@
         <item>Pon un temporizador de 10 minutos</item>
         <item>Léeme mi última notificación</item>
     </string-array>
+    <!-- Tarjeta para compartir y apoyo -->
+    <string name="action_share_social">Compartir en redes</string>
+    <string name="share_card_title">Compartir en redes</string>
+    <string name="share_card_hint">Esta es la imagen que se enviará. La app de dentro funciona: puedes jugar con ella antes de compartir.</string>
+    <string name="share_show_prompt">Mostrar lo que pedí</string>
+    <string name="share_prompt_label">Lo que pedí</string>
+    <string name="share_show_app">Mostrar la app</string>
+    <string name="share_card_button">Compartir</string>
+    <string name="share_card_failed">No se ha podido crear la imagen. Inténtalo de nuevo.</string>
+    <string name="share_card_brand">Hecho con Acornix</string>
+    <plurals name="share_card_changes">
+        <item quantity="one">+ %d cambio, solo pidiéndolo</item>
+        <item quantity="other">+ %d cambios, solo pidiéndolo</item>
+    </plurals>
+    <string name="share_card_built">Creado con IA, en el móvil</string>
+    <string name="share_card_text_seconds">He creado «%1$s» en mi móvil en %2$d segundos, solo pidiéndoselo a la IA 🌰 Hecho con Acornix, gratis y de código abierto: https://github.com/gonzaroman/acornix</string>
+    <string name="share_card_text">He creado «%1$s» en mi móvil solo pidiéndoselo a la IA 🌰 Hecho con Acornix, gratis y de código abierto: https://github.com/gonzaroman/acornix</string>
+    <string name="star_title">¿Te gusta Acornix?</string>
+    <string name="star_text">Una ⭐ en GitHub ayuda a que más gente lo descubra. Es gratis y solo cuesta un toque.</string>
+    <string name="star_yes">⭐ Abrir GitHub</string>
+    <string name="star_later">Ahora no</string>
+    <string name="support_title">Apoya Acornix</string>
+    <string name="support_star">Dale una estrella en GitHub</string>
+    <string name="support_star_desc">Ayuda a que más gente descubra Acornix</string>
+    <string name="support_share">Comparte Acornix</string>
+    <string name="support_share_desc">Envía el enlace a un amigo o publícalo</string>
+    <string name="support_share_text">Mira Acornix: describes una app o un juego y la IA te lo crea en el móvil en segundos. Gratis y de código abierto 🌰 https://github.com/gonzaroman/acornix</string>
+    <string name="share_card_seconds">%d s</string>
+    <string name="share_card_seconds_label">en crearla con IA, en el móvil</string>
+    <string name="share_card_asked">Lo que pedí:</string>
 </resources>

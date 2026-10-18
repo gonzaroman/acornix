@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Archive
 import androidx.compose.material.icons.automirrored.rounded.AddToHomeScreen
 import androidx.compose.material.icons.rounded.AutoFixHigh
 import androidx.compose.material.icons.rounded.Code
@@ -150,6 +151,7 @@ fun AppsScreen(nav: NavHostController) {
                     app = app,
                     onClick = { AppLauncher.open(context, app.id) },
                     onLongClick = { selected = app },
+                    onShare = { nav.navigate(Routes.share(app.id)) },
                     modifier = Modifier.animateItem(),
                 )
             }
@@ -193,7 +195,8 @@ fun AppActionsSheet(app: AppMeta, nav: NavHostController, onDismiss: () -> Unit)
             if (!ok) Toast.makeText(context, R.string.pin_unsupported, Toast.LENGTH_SHORT).show()
             onDismiss()
         }
-        SheetAction(Icons.Rounded.Share, stringResource(R.string.action_share)) {
+        SheetAction(Icons.Rounded.Share, stringResource(R.string.action_share_social)) { onDismiss(); nav.navigate(Routes.share(app.id)) }
+        SheetAction(Icons.Rounded.Archive, stringResource(R.string.action_share)) {
             scope.launch {
                 if (c.data.hasData(app.id)) askData = true else { shareAppZip(context, app, false); onDismiss() }
             }

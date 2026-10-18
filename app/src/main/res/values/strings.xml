@@ -81,7 +81,7 @@
     <string name="action_versions">Versions</string>
     <string name="action_pin">Add to home screen</string>
     <string name="action_pin_short">Add to home</string>
-    <string name="action_share">Share</string>
+    <string name="action_share">Send the app (ZIP)</string>
     <string name="action_rename">Rename</string>
     <string name="action_delete">Delete</string>
     <string name="pin_unsupported">Your launcher doesn\'t support pinned shortcuts</string>
@@ -440,4 +440,34 @@
         <item>Set a 10 minute timer</item>
         <item>Read me my latest notification</item>
     </string-array>
+    <!-- Share card and support -->
+    <string name="action_share_social">Share on social media</string>
+    <string name="share_card_title">Share on social media</string>
+    <string name="share_card_hint">This is the image that will be sent. The app inside is live: you can play with it before sharing.</string>
+    <string name="share_show_prompt">Show what I asked for</string>
+    <string name="share_prompt_label">What I asked for</string>
+    <string name="share_show_app">Show the app</string>
+    <string name="share_card_button">Share</string>
+    <string name="share_card_failed">Couldn\'t create the image. Try again.</string>
+    <string name="share_card_brand">Made with Acornix</string>
+    <plurals name="share_card_changes">
+        <item quantity="one">+ %d change, just by asking</item>
+        <item quantity="other">+ %d changes, just by asking</item>
+    </plurals>
+    <string name="share_card_built">Created with AI, on a phone</string>
+    <string name="share_card_text_seconds">I made “%1$s” on my phone in %2$d seconds, just by asking an AI 🌰 Made with Acornix, free and open source: https://github.com/gonzaroman/acornix</string>
+    <string name="share_card_text">I made “%1$s” on my phone just by asking an AI 🌰 Made with Acornix, free and open source: https://github.com/gonzaroman/acornix</string>
+    <string name="star_title">Do you like Acornix?</string>
+    <string name="star_text">A ⭐ on GitHub helps more people discover it. It\'s free and takes one tap.</string>
+    <string name="star_yes">⭐ Open GitHub</string>
+    <string name="star_later">Not now</string>
+    <string name="support_title">Support Acornix</string>
+    <string name="support_star">Give it a star on GitHub</string>
+    <string name="support_star_desc">It helps more people discover Acornix</string>
+    <string name="support_share">Share Acornix</string>
+    <string name="support_share_desc">Send the link to a friend or post it</string>
+    <string name="support_share_text">Look at Acornix: you describe an app or a game and the AI builds it on your phone in seconds. Free and open source 🌰 https://github.com/gonzaroman/acornix</string>
+    <string name="share_card_seconds">%d s</string>
+    <string name="share_card_seconds_label">to create it with AI, on a phone</string>
+    <string name="share_card_asked">What I asked for:</string>
 </resources>

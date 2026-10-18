@@ -51,6 +51,7 @@ class AppGenerator(
             sys to Prompts.createPrompt(request.idea, request.category, hasImage)
         }
 
+        val startedAt = System.currentTimeMillis()
         val buffer = StringBuilder()
         var lastEmit = 0
         val result = try {
@@ -77,7 +78,8 @@ class AppGenerator(
             repo.update(existing.id, code, request.idea)
         } else {
             val name = request.name.ifBlank { suggestName(request.idea) }
-            repo.create(name, code, request.kind, description = request.idea, note = request.idea)
+            val seconds = ((System.currentTimeMillis() - startedAt) / 1000).toInt().coerceAtLeast(1)
+            repo.create(name, code, request.kind, description = request.idea, note = request.idea, buildSeconds = seconds)
         }
         return GenerationResult(app, parsed.suggestion, result.truncated)
     }

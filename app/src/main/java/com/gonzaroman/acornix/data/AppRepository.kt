@@ -28,6 +28,8 @@ data class AppMeta(
     val updatedAt: Long = 0,
     val lastOpenedAt: Long = 0,
     val versionCount: Int = 1,
+    /** How long the AI took to write the first version, for the share card. 0 = unknown. */
+    val buildSeconds: Int = 0,
 )
 
 @Serializable
@@ -82,6 +84,7 @@ class AppRepository(
         description: String = "",
         emoji: String? = null,
         note: String = "Created",
+        buildSeconds: Int = 0,
     ): AppMeta = mutex.withLock {
         withContext(Dispatchers.IO) {
             val id = uniqueId(name)
@@ -96,6 +99,7 @@ class AppRepository(
                 emoji = emoji ?: guessEmoji("$name $description", kind),
                 kind = kind,
                 description = description.take(500),
+                buildSeconds = buildSeconds,
             )
             writeMeta(meta)
             saveVersion(id, code, note)

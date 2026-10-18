@@ -163,7 +163,8 @@ class UpdateChecker(
                 val y = b.getOrElse(i) { 0 }
                 if (x != y) return x > y
             }
-            return false
+            // Same numbers: the final release is newer than its beta ("2.2.0" > "2.2.0-beta1").
+            return !remote.contains('-') && current.contains('-')
         }
     }
 }

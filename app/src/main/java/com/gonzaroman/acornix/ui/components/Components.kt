@@ -37,6 +37,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material.icons.automirrored.rounded.Send
 import androidx.compose.material.icons.rounded.AddPhotoAlternate
 import androidx.compose.material.icons.rounded.Close
@@ -111,7 +112,7 @@ fun AppIcon(app: AppMeta, size: Dp = 56.dp, modifier: Modifier = Modifier) {
 /** Big card for the launcher grid: thumbnail (or emoji art) plus name. */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun AppCard(app: AppMeta, onClick: () -> Unit, onLongClick: () -> Unit, modifier: Modifier = Modifier) {
+fun AppCard(app: AppMeta, onClick: () -> Unit, onLongClick: () -> Unit, modifier: Modifier = Modifier, onShare: (() -> Unit)? = null) {
     val context = LocalContext.current
     val thumb = remember(app.id, app.updatedAt, app.lastOpenedAt) {
         context.container.apps.thumbnailFile(app.id).takeIf { it.exists() }?.let { it to it.lastModified() }
@@ -156,10 +157,18 @@ fun AppCard(app: AppMeta, onClick: () -> Unit, onLongClick: () -> Unit, modifier
                 }
             }
         }
-        Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            Modifier.padding(start = 12.dp, end = if (onShare != null) 2.dp else 12.dp, top = if (onShare != null) 0.dp else 10.dp, bottom = if (onShare != null) 0.dp else 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Text(app.emoji, fontSize = 16.sp)
             Spacer(Modifier.width(6.dp))
-            Text(app.name, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(app.name, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+            if (onShare != null) {
+                IconButton(onClick = onShare) {
+                    Icon(Icons.Rounded.Share, stringResource(R.string.action_share_social), Modifier.size(20.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
         }
     }
 }

@@ -69,6 +69,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.compose.material.icons.automirrored.rounded.HelpOutline
 import com.gonzaroman.acornix.ui.Routes
@@ -88,6 +89,8 @@ import com.gonzaroman.acornix.data.SettingsRepository
 import com.gonzaroman.acornix.data.ThemeMode
 import com.gonzaroman.acornix.ui.components.SectionTitle
 import com.gonzaroman.acornix.ui.components.UpdateCard
+import com.gonzaroman.acornix.ui.share.openGitHub
+import com.gonzaroman.acornix.ui.share.shareAcornixLink
 import com.gonzaroman.acornix.data.UpdateInfo
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
@@ -198,6 +201,24 @@ fun SettingsScreen(nav: NavHostController) {
                     scope.launch { repo.setDynamicColor(it) }
                 }
             }
+        }
+
+        SectionTitle(stringResource(R.string.support_title))
+        SettingsCard {
+            ListItem(
+                leadingContent = { Text("⭐", fontSize = 22.sp) },
+                headlineContent = { Text(stringResource(R.string.support_star)) },
+                supportingContent = { Text(stringResource(R.string.support_star_desc)) },
+                modifier = Modifier.clickable { openGitHub(context) },
+                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+            )
+            ListItem(
+                leadingContent = { Text("📣", fontSize = 22.sp) },
+                headlineContent = { Text(stringResource(R.string.support_share)) },
+                supportingContent = { Text(stringResource(R.string.support_share_desc)) },
+                modifier = Modifier.clickable { shareAcornixLink(context) },
+                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+            )
         }
 
         SectionTitle(stringResource(R.string.settings_about))

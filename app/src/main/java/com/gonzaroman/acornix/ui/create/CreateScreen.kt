@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -85,6 +86,12 @@ import androidx.navigation.NavHostController
 import com.gonzaroman.acornix.R
 import com.gonzaroman.acornix.container
 import com.gonzaroman.acornix.data.AppMeta
+import com.gonzaroman.acornix.data.AppKind
+import com.gonzaroman.acornix.ui.share.StarDialog
+import com.gonzaroman.acornix.ui.share.SupportPrefs
+import kotlinx.coroutines.delay
+import com.gonzaroman.acornix.ui.Routes
+import androidx.compose.material.icons.rounded.Share
 import com.gonzaroman.acornix.device.ShortcutHelper
 import com.gonzaroman.acornix.ui.components.AppIcon
 import com.gonzaroman.acornix.ui.errorMessage
@@ -129,7 +136,7 @@ fun CreateScreen(nav: NavHostController, feature: Boolean, improveAppId: String?
             when (state) {
                 is CreateUi.Form -> FormContent(vm, feature)
                 is CreateUi.Generating -> GeneratingContent(state, onCancel = vm::cancel)
-                is CreateUi.Done -> DoneContent(state, vm)
+                is CreateUi.Done -> DoneContent(state, vm, onShare = { nav.navigate(Routes.share(it.id)) })
                 is CreateUi.Failed -> FailedContent(state, onRetry = vm::retry, onEdit = vm::backToForm)
             }
         }
@@ -278,10 +285,21 @@ private fun GeneratingContent(state: CreateUi.Generating, onCancel: () -> Unit) 
 }
 
 @Composable
-private fun DoneContent(state: CreateUi.Done, vm: CreateViewModel) {
+private fun DoneContent(state: CreateUi.Done, vm: CreateViewModel, onShare: (AppMeta) -> Unit) {
     val context = LocalContext.current
     val attachments = rememberAttachments()
     var change by rememberSaveable { mutableStateOf("") }
+    var askStar by remember { mutableStateOf(false) }
+
+    // Third app of their own, freshly created: they are enjoying it, so ask for a star (once ever).
+    LaunchedEffect(state.app.id) {
+        val own = context.container.apps.apps.value.count { it.kind != AppKind.SAMPLE }
+        if (state.app.versionCount == 1 && own >= 3 && SupportPrefs(context).shouldAskForStar()) {
+            delay(1500)
+            askStar = true
+        }
+    }
+    if (askStar) StarDialog(onDismiss = { askStar = false })
 
     // The preview takes all the free space; the actions stay visible below it.
     Column(Modifier.fillMaxSize().imePadding()) {
@@ -296,18 +314,32 @@ private fun DoneContent(state: CreateUi.Done, vm: CreateViewModel) {
                     Text(state.app.name, style = MaterialTheme.typography.titleLarge, maxLines = 1)
                     Text(stringResource(R.string.gen_done_version, state.app.versionCount), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                FilledTonalButton(onClick = {
-                    if (!ShortcutHelper.pin(context, state.app, context.container.apps)) {
-                        Toast.makeText(context, R.string.pin_unsupported, Toast.LENGTH_SHORT).show()
-                    }
-                }) {
-                    Icon(Icons.AutoMirrored.Rounded.AddToHomeScreen, stringResource(R.string.action_pin_short), Modifier.size(18.dp))
+            }
+            // Labelled buttons on their own row, so the name keeps its space and nobody has to guess.
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                val compact = PaddingValues(horizontal = 10.dp, vertical = 8.dp)
+                FilledTonalButton(
+                    onClick = {
+                        if (!ShortcutHelper.pin(context, state.app, context.container.apps)) {
+                            Toast.makeText(context, R.string.pin_unsupported, Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    contentPadding = compact,
+                    modifier = Modifier.weight(1.2f),
+                ) {
+                    Icon(Icons.AutoMirrored.Rounded.AddToHomeScreen, null, Modifier.size(18.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text(stringResource(R.string.action_pin_short), maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
-                Spacer(Modifier.width(8.dp))
-                Button(onClick = { AppLauncher.open(context, state.app.id) }) {
+                FilledTonalButton(onClick = { onShare(state.app) }, contentPadding = compact, modifier = Modifier.weight(1f)) {
+                    Icon(Icons.Rounded.Share, null, Modifier.size(18.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text(stringResource(R.string.share_card_button), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
+                Button(onClick = { AppLauncher.open(context, state.app.id) }, contentPadding = compact, modifier = Modifier.weight(0.85f)) {
                     Icon(Icons.Rounded.OpenInFull, null, Modifier.size(18.dp))
                     Spacer(Modifier.width(6.dp))
-                    Text(stringResource(R.string.action_open))
+                    Text(stringResource(R.string.action_open), maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
             if (state.truncated) {
