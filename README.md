@@ -25,7 +25,8 @@ https://github.com/user-attachments/assets/d9b09e3d-3a41-4094-82b8-69c64a8655c1
 
 Acornix turns your phone into a place where software gets made. You bring an API key from your favourite AI (Claude, GPT, Gemini or any OpenAI-compatible model), and Acornix does the rest:
 
-- **Creates apps and games** from a sentence, your voice or a photo, and lets you keep improving them by asking.
+- **Creates apps and games** from a sentence, your voice or a photo, and lets you keep improving them by asking. Out of ideas? **The AI suggests original ones**.
+- **Lets you show them off** with a share card: your app, its name and how many seconds it took.
 - **Runs them like real apps**: full screen, offline, on your home screen, each with its own private database.
 - **Acts as an assistant** that can open apps, search YouTube, set alarms, blink the flashlight in Morse, read and change your apps' data and, if you allow it, tap and type inside other apps for you.
 - **Turns your phone or tablet into a desktop** with **AcornixOS**: windows, a Dock and a Launchpad, like a little Mac in your pocket.
@@ -42,12 +43,23 @@ No terminal, no server, no account. Everything you create lives on your phone.
 
 Type what you want, dictate it 🎙️ or attach a reference photo 📎 ("make an app like this"). Pick a type (game, utility, music…) or tap one of the ideas, and Acornix writes a complete, mobile-first web app **live in front of you**.
 
+**✨ Ideas from the AI.** Out of ideas? Your AI suggests original things to build, from sound toys and generative art to science simulations and odd little tools, following the type you picked. Tap one and the full request and the name are filled in for you; tap 🎲 for a new batch. Ideas are cached, so they only cost a few tokens now and then, and you can turn them off in Settings.
+
 When it's done you get an interactive preview, an **Open** button, an **Add to home screen** button and a suggested next improvement. Apply the suggestion or ask for your own changes ("add sound effects", "make the buttons bigger", "add a dark mode"). Every change is saved as a new version.
 
 <p align="center">
 <img src="docs/screenshots/create.jpg" width="230" alt="Describe your app">&nbsp;&nbsp;
 <img src="docs/screenshots/generating.jpg" width="230" alt="The code is written live">&nbsp;&nbsp;
 <img src="docs/screenshots/preview.jpg" width="230" alt="Preview, suggestions and improvements">
+</p>
+
+### 📣 Share what you made
+
+Made something cool? Tap **Share** and Acornix builds a card with **your app running big inside a phone**, its name, how many seconds the AI took to build it and what you asked for. Edit or hide the request, play with the app until it looks just right, then post it on X, Reddit, WhatsApp or anywhere else.
+
+<p align="center">
+<img src="docs/screenshots/share-card.jpg" width="300" alt="A share card: the app inside a phone, its name and ⚡ 70 s">&nbsp;&nbsp;
+<img src="docs/screenshots/ai-ideas.jpg" width="300" alt="Ideas from the AI">
 </p>
 
 ### 🧬 Functionalities: apps that use your phone
@@ -271,7 +283,7 @@ Acornix began as an AI-powered Python system for Termux. That version is kept in
 
 ## 🤝 Contributing
 
-Ideas, bug reports and pull requests are welcome. Open an [issue](https://github.com/gonzaroman/acornix/issues) to tell us what you built with Acornix or what you would like it to do next.
+If you like Acornix, a ⭐ on GitHub helps more people find it. Ideas, bug reports and pull requests are welcome. Open an [issue](https://github.com/gonzaroman/acornix/issues) to tell us what you built with Acornix or what you would like it to do next.
 
 ## 📄 License
 
