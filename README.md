@@ -13,12 +13,9 @@
 
 <a href="https://github.com/gonzaroman/acornix/releases/latest/download/acornix.apk"><b>⬇️ Download the APK</b></a>
 
-<br><br>
+<br>
 
-<img src="docs/screenshots/home.jpg" width="200" alt="Home">&nbsp;
-<img src="docs/screenshots/generating.jpg" width="200" alt="Writing the app live">&nbsp;
-<img src="docs/screenshots/preview.jpg" width="200" alt="The new app, ready">&nbsp;
-<img src="docs/screenshots/assistant.jpg" width="200" alt="The assistant at work">
+https://github.com/user-attachments/assets/d9b09e3d-3a41-4094-82b8-69c64a8655c1
 
 </div>
 
