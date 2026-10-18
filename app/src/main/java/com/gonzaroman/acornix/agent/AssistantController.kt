@@ -117,7 +117,7 @@ class AssistantController(
             val current = session.takeIf { signature == sessionSignature } ?: run {
                 val provider = settings.activeProvider()
                 val system = Prompts.assistant(
-                    language = Locale.getDefault().getDisplayLanguage(Locale.ENGLISH),
+                    language = settings.uiLocale().getDisplayLanguage(Locale.ENGLISH),
                     now = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT, Locale.ENGLISH).format(Date()),
                     apps = AgentTools.appListText(repo.apps.value),
                     controlEnabled = controlEnabled,

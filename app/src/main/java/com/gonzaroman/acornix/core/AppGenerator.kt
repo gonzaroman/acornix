@@ -17,6 +17,8 @@ data class GenerationRequest(
     val images: List<ImageData> = emptyList(),
     /** When set, the existing app is improved instead of creating a new one. */
     val improveAppId: String? = null,
+    /** The emoji of the AI idea it comes from, if any; otherwise one is guessed from the words. */
+    val emoji: String? = null,
 )
 
 data class GenerationProgress(val chars: Int, val code: String, val codeFinished: Boolean)
@@ -38,7 +40,7 @@ class AppGenerator(
         onProgress: (GenerationProgress) -> Unit = {},
     ): GenerationResult {
         val s = settings.current()
-        val language = Prompts.languageName(s.appLanguage)
+        val language = Prompts.languageName(s.appLanguage, settings.uiLocale())
         val provider = settings.activeProvider()
 
         val existing = request.improveAppId?.let { repo.get(it) ?: throw AiException("App not found: $it") }
@@ -79,7 +81,7 @@ class AppGenerator(
         } else {
             val name = request.name.ifBlank { suggestName(request.idea) }
             val seconds = ((System.currentTimeMillis() - startedAt) / 1000).toInt().coerceAtLeast(1)
-            repo.create(name, code, request.kind, description = request.idea, note = request.idea, buildSeconds = seconds)
+            repo.create(name, code, request.kind, description = request.idea, emoji = request.emoji, note = request.idea, buildSeconds = seconds)
         }
         return GenerationResult(app, parsed.suggestion, result.truncated)
     }

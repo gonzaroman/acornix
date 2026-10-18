@@ -470,4 +470,10 @@
     <string name="share_card_seconds">%d s</string>
     <string name="share_card_seconds_label">to create it with AI, on a phone</string>
     <string name="share_card_asked">What I asked for:</string>
+    <string name="ideas_ai_title">✨ Ideas from the AI</string>
+    <string name="ideas_more">🎲 Other ideas</string>
+    <string name="ideas_loading">The AI is coming up with ideas for you…</string>
+    <string name="ideas_failed">Couldn\'t get new ideas right now. Here are some to start with:</string>
+    <string name="settings_ai_ideas">✨ Ideas from the AI</string>
+    <string name="settings_ai_ideas_desc">When creating, the AI suggests original ideas. Each new batch uses a few tokens of your API key. Off: fixed examples, at no cost.</string>
 </resources>

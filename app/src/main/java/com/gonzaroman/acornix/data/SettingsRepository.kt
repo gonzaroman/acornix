@@ -54,6 +54,8 @@ data class Settings(
     val speakReplies: Boolean = false,
     val theme: ThemeMode = ThemeMode.SYSTEM,
     val dynamicColor: Boolean = true,
+    /** Ideas written by the AI in "Need ideas?"; off shows the fixed examples and spends nothing. */
+    val aiIdeas: Boolean = true,
 ) {
     fun config(type: ProviderType = provider) = ProviderConfig(
         type = type,
@@ -73,6 +75,7 @@ class SettingsRepository(private val context: Context) {
         val speakReplies = booleanPreferencesKey("speak_replies")
         val theme = stringPreferencesKey("theme")
         val dynamicColor = booleanPreferencesKey("dynamic_color")
+        val aiIdeas = booleanPreferencesKey("ai_ideas")
         fun model(t: ProviderType) = stringPreferencesKey("model_${t.id}")
         fun key(t: ProviderType) = stringPreferencesKey("key_${t.id}")
     }
@@ -91,6 +94,7 @@ class SettingsRepository(private val context: Context) {
         speakReplies = this[K.speakReplies] ?: false,
         theme = runCatching { ThemeMode.valueOf(this[K.theme] ?: "SYSTEM") }.getOrDefault(ThemeMode.SYSTEM),
         dynamicColor = this[K.dynamicColor] ?: true,
+        aiIdeas = this[K.aiIdeas] ?: true,
     )
 
     suspend fun saveProvider(type: ProviderType, model: String, apiKey: String, baseUrl: String? = null) {
@@ -107,9 +111,16 @@ class SettingsRepository(private val context: Context) {
     suspend fun setSpeakReplies(on: Boolean) = context.dataStore.edit { it[K.speakReplies] = on }
     suspend fun setTheme(mode: ThemeMode) = context.dataStore.edit { it[K.theme] = mode.name }
     suspend fun setDynamicColor(on: Boolean) = context.dataStore.edit { it[K.dynamicColor] = on }
+    suspend fun setAiIdeas(on: Boolean) = context.dataStore.edit { it[K.aiIdeas] = on }
 
     /** Builds a provider client from the active configuration. */
     suspend fun activeProvider(): AiProvider = createProvider(current().config())
+
+    /**
+     * The language Acornix is shown in. It can differ from the system's when the user picked a
+     * language just for Acornix in Android's settings, and "Automatic" should follow what they see.
+     */
+    fun uiLocale(): java.util.Locale = context.resources.configuration.locales.get(0) ?: java.util.Locale.getDefault()
 
     companion object {
         fun createProvider(c: ProviderConfig): AiProvider {

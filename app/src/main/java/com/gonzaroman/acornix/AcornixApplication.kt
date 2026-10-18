@@ -5,6 +5,7 @@ import android.content.Context
 import com.gonzaroman.acornix.agent.AgentTools
 import com.gonzaroman.acornix.agent.AssistantController
 import com.gonzaroman.acornix.core.AppGenerator
+import com.gonzaroman.acornix.core.IdeaGenerator
 import com.gonzaroman.acornix.data.AppDataStore
 import com.gonzaroman.acornix.data.AppRepository
 import com.gonzaroman.acornix.data.BackupManager
@@ -30,6 +31,7 @@ class AppContainer(context: Context) {
     val updates = UpdateChecker(context)
     val device = DeviceActions(context)
     val generator = AppGenerator(settings, apps, data)
+    val ideas = IdeaGenerator(settings, java.io.File(context.filesDir, "ideas.json"))
     val tools = AgentTools(context, device, apps, generator, data)
     val assistant = AssistantController(context, appScope, settings, apps, device, tools)
     private val samples = SampleAppsInstaller(context, apps)

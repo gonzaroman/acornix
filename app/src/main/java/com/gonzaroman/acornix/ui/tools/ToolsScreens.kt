@@ -419,7 +419,7 @@ fun StudioScreen(nav: NavHostController) {
             SectionTitle("1 · " + stringResource(R.string.studio_step1))
             OutlinedTextField(idea, { idea = it }, label = { Text(stringResource(R.string.field_idea)) }, minLines = 2, modifier = Modifier.fillMaxWidth())
             FilledTonalButton(onClick = {
-                val lang = Prompts.languageName(settings?.appLanguage ?: com.gonzaroman.acornix.data.AppLanguage.AUTO)
+                val lang = Prompts.languageName(settings?.appLanguage ?: com.gonzaroman.acornix.data.AppLanguage.AUTO, context.container.settings.uiLocale())
                 c.device.copyToClipboard(Prompts.manualTemplate(idea, lang, feature))
                 Toast.makeText(context, R.string.prompt_copied, Toast.LENGTH_SHORT).show()
             }) {

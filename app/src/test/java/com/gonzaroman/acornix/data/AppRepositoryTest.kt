@@ -90,4 +90,11 @@ class AppRepositoryTest {
         assertEquals(listOf("fresh", "old"), repo.apps.value.map { it.id })
         assertTrue(File(repo.dir(fresh.id), "acornix.json").readText().contains("updatedAt"))
     }
+
+    @Test
+    fun emojiPrefersTheLongestKeyword() {
+        assertEquals("🪐", AppRepository.guessEmoji("Planetas en contratiempo", AppKind.APP))
+        assertEquals("✈️", AppRepository.guessEmoji("An airplane game", AppKind.APP))
+        assertEquals("🎹", AppRepository.guessEmoji("Un juego de música", AppKind.APP))
+    }
 }

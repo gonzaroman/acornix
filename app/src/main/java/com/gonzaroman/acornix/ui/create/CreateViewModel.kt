@@ -43,7 +43,7 @@ class CreateViewModel(
     private var previousDone: CreateUi.Done? = null
     private var job: Job? = null
 
-    fun generate(idea: String, name: String, category: String?, images: List<ImageData>) {
+    fun generate(idea: String, name: String, category: String?, images: List<ImageData>, emoji: String? = null) {
         lastIdea = idea
         start(
             GenerationRequest(
@@ -53,6 +53,7 @@ class CreateViewModel(
                 category = category,
                 images = images,
                 improveAppId = improveTarget?.id,
+                emoji = emoji,
             ),
         )
     }

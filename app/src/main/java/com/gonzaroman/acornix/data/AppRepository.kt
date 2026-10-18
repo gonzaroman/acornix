@@ -266,7 +266,11 @@ class AppRepository(
 
         fun guessEmoji(text: String, kind: AppKind): String {
             val t = text.lowercase()
-            EMOJI_KEYWORDS.firstOrNull { (keys, _) -> keys.any { t.contains(it) } }?.let { return it.second }
+            // The longest matching keyword wins: "planetas" is a planet (🪐), not a plane (✈️).
+            EMOJI_KEYWORDS
+                .mapNotNull { (keys, emoji) -> keys.filter { t.contains(it) }.maxOfOrNull { it.length }?.let { it to emoji } }
+                .maxByOrNull { it.first }
+                ?.let { return it.second }
             return if (kind == AppKind.FEATURE) "🧬" else "🌰"
         }
     }

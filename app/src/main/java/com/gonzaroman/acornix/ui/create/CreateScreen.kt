@@ -66,6 +66,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -152,9 +153,13 @@ private fun FormContent(vm: CreateViewModel, feature: Boolean) {
     var name by rememberSaveable { mutableStateOf("") }
     var category by rememberSaveable { mutableStateOf<String?>(null) }
     val voice = rememberVoiceInput { idea = if (idea.isBlank()) it else "$idea $it" }
+    val scroll = rememberScrollState()
+    val scope = rememberCoroutineScope()
+    // The AI idea last picked: its emoji becomes the app's icon, as long as its text is still there.
+    var picked by remember { mutableStateOf<com.gonzaroman.acornix.core.Idea?>(null) }
 
     Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).imePadding().padding(20.dp),
+        Modifier.fillMaxSize().verticalScroll(scroll).imePadding().padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         if (target != null) {
@@ -208,20 +213,22 @@ private fun FormContent(vm: CreateViewModel, feature: Boolean) {
             }
         }
 
-        Text(stringResource(R.string.inspiration), style = MaterialTheme.typography.titleSmall)
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            val examples = stringArrayResource(
-                when {
-                    target != null -> R.array.improve_examples
-                    feature -> R.array.feature_examples
-                    else -> R.array.app_examples
-                },
-            )
-            examples.forEach { ex -> AssistChip(onClick = { idea = ex }, label = { Text(ex) }) }
+        if (target != null) {
+            Text(stringResource(R.string.inspiration), style = MaterialTheme.typography.titleSmall)
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                stringArrayResource(R.array.improve_examples).forEach { ex -> AssistChip(onClick = { idea = ex }, label = { Text(ex) }) }
+            }
+        } else {
+            IdeasSection(feature, category) { chosen ->
+                idea = chosen.prompt
+                picked = chosen.takeIf { it.title.isNotBlank() }
+                if (name.isBlank() && chosen.title.isNotBlank() && chosen.title.length <= 32) name = chosen.title
+                scope.launch { scroll.animateScrollTo(0) }
+            }
         }
 
         Button(
-            onClick = { vm.generate(idea, name, category, attachments.images()) },
+            onClick = { vm.generate(idea, name, category, attachments.images(), picked?.takeIf { it.prompt == idea }?.emoji) },
             enabled = idea.isNotBlank(),
             modifier = Modifier.fillMaxWidth().height(56.dp),
         ) {

@@ -469,4 +469,10 @@
     <string name="share_card_seconds">%d s</string>
     <string name="share_card_seconds_label">en crearla con IA, en el móvil</string>
     <string name="share_card_asked">Lo que pedí:</string>
+    <string name="ideas_ai_title">✨ Ideas de la IA</string>
+    <string name="ideas_more">🎲 Otras ideas</string>
+    <string name="ideas_loading">La IA está pensando ideas para ti…</string>
+    <string name="ideas_failed">Ahora no se han podido traer ideas nuevas. Aquí tienes algunas para empezar:</string>
+    <string name="settings_ai_ideas">✨ Ideas de la IA</string>
+    <string name="settings_ai_ideas_desc">Al crear, la IA te propone ideas originales. Cada tanda nueva gasta unos pocos tokens de tu clave. Desactivado: ideas fijas, sin coste.</string>
 </resources>

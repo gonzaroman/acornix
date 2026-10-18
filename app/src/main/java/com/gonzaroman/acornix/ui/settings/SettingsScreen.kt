@@ -130,6 +130,9 @@ fun SettingsScreen(nav: NavHostController) {
                     }
                 }
             }
+            SwitchRow(stringResource(R.string.settings_ai_ideas), stringResource(R.string.settings_ai_ideas_desc), s.aiIdeas) {
+                scope.launch { repo.setAiIdeas(it) }
+            }
         }
 
         SectionTitle(stringResource(R.string.settings_assistant))
