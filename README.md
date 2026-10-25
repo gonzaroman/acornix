@@ -1,8 +1,12 @@
 <div align="center">
 
-# 🌰 Acornix
+# AI app builder for Android - Create apps from voice - 🌰 Acornix
+
+## Vibe code app builder
 
 ### Create apps and control your phone just by asking.
+
+## Vibe Code apk download
 
 **Vibe coding in your pocket.** Describe an app, a game or a tool, and watch the AI write it live. Seconds later it runs full screen on your phone, saves its own data and can sit on your home screen like any other app. Or just ask the assistant to do things for you.
 
