@@ -1,12 +1,8 @@
 <div align="center">
 
-# AI app builder for Android - Create apps from voice - 🌰 Acornix
+# 🌰 Acornix: AI app builder for Android
 
-## Vibe code app builder
-
-### Create apps and control your phone just by asking.
-
-## Vibe Code apk download
+### Vibe code apps and games on your phone. Create apps from your voice, text or a photo.
 
 **Vibe coding in your pocket.** Describe an app, a game or a tool, and watch the AI write it live. Seconds later it runs full screen on your phone, saves its own data and can sit on your home screen like any other app. Or just ask the assistant to do things for you.
 
@@ -15,7 +11,7 @@
 ![Kotlin](https://img.shields.io/badge/Kotlin-Jetpack%20Compose-7f52ff?logo=kotlin&logoColor=white)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-<a href="https://github.com/gonzaroman/acornix/releases/latest/download/acornix.apk"><b>⬇️ Download the APK</b></a>
+<a href="https://github.com/gonzaroman/acornix/releases/latest/download/acornix.apk"><b>⬇️ Download the APK (free)</b></a>
 
 <br>
 
@@ -27,7 +23,7 @@ https://github.com/user-attachments/assets/d9b09e3d-3a41-4094-82b8-69c64a8655c1
 
 ## What is Acornix?
 
-Acornix turns your phone into a place where software gets made. You bring an API key from your favourite AI (Claude, GPT, Gemini or any OpenAI-compatible model), and Acornix does the rest:
+Acornix is a **free AI app builder for Android** and a **no-code app creator**: an AI app generator that turns a sentence, your voice or a photo into a working app or game, right on your phone. You bring an API key from your favourite AI (Claude, GPT, Gemini or any OpenAI-compatible model), and Acornix does the rest:
 
 - **Creates apps and games** from a sentence, your voice or a photo, and lets you keep improving them by asking. Out of ideas? **The AI suggests original ones**.
 - **Lets you show them off** with a share card: your app, its name and how many seconds it took.
@@ -43,19 +39,23 @@ No terminal, no server, no account. Everything you create lives on your phone.
 
 ## ✨ What you can do
 
-### 🛠️ Create apps by describing them
+### 🛠️ Create apps from text, voice or a photo
 
-Type what you want, dictate it 🎙️ or attach a reference photo 📎 ("make an app like this"). Pick a type (game, utility, music…) or tap one of the ideas, and Acornix writes a complete, mobile-first web app **live in front of you**.
+Type what you want, **create it from your voice** 🎙️ (voice to app, no typing needed) or attach a reference photo 📎 ("make an app like this"). Pick a type (game, utility, music…) or tap one of the ideas, and Acornix writes a complete, mobile-first web app **live in front of you**.
 
 **✨ Ideas from the AI.** Out of ideas? Your AI suggests original things to build, from sound toys and generative art to science simulations and odd little tools, following the type you picked. Tap one and the full request and the name are filled in for you; tap 🎲 for a new batch. Ideas are cached, so they only cost a few tokens now and then, and you can turn them off in Settings.
 
 When it's done you get an interactive preview, an **Open** button, an **Add to home screen** button and a suggested next improvement. Apply the suggestion or ask for your own changes ("add sound effects", "make the buttons bigger", "add a dark mode"). Every change is saved as a new version.
 
 <p align="center">
-<img src="docs/screenshots/create.jpg" width="230" alt="Describe your app">&nbsp;&nbsp;
-<img src="docs/screenshots/generating.jpg" width="230" alt="The code is written live">&nbsp;&nbsp;
-<img src="docs/screenshots/preview.jpg" width="230" alt="Preview, suggestions and improvements">
+<img src="docs/screenshots/create.jpg" width="230" alt="Describing a new app by text or voice in Acornix">&nbsp;&nbsp;
+<img src="docs/screenshots/generating.jpg" width="230" alt="The AI app generator writing the code live">&nbsp;&nbsp;
+<img src="docs/screenshots/preview.jpg" width="230" alt="Preview of the generated app with an AI suggestion">
 </p>
+
+### 🎮 An AI game builder
+
+Vibe coding a mobile game takes one sentence: *"a platformer with endless levels"*, *"a bowling game you play by swiping"*, *"a castle defense with bosses and an upgrade shop"*. Acornix builds it with touch controls, keeps your saves and high scores in the game's own database, and you can keep asking for more levels, sounds or power-ups.
 
 ### 📣 Share what you made
 
@@ -63,14 +63,14 @@ Made something cool? Tap **Share** and Acornix builds a card with **your app run
 
 <p align="center">
 <img src="docs/screenshots/share-card.jpg" width="300" alt="A share card: the app inside a phone, its name and ⚡ 70 s">&nbsp;&nbsp;
-<img src="docs/screenshots/ai-ideas.jpg" width="300" alt="Ideas from the AI">
+<img src="docs/screenshots/ai-ideas.jpg" width="300" alt="App and game ideas suggested by the AI">
 </p>
 
 ### 🧬 Functionalities: apps that use your phone
 
 Functionalities are apps that talk to your device through a built-in JavaScript bridge, `window.Acornix`. They can vibrate, switch the flashlight on, speak out loud, read the battery, send notifications, share, copy, open other apps and even **ask the AI** from inside the app. Some examples: a big SOS button, a battery dashboard, a pocket translator that speaks, a Pomodoro timer that vibrates.
 
-### 🤖 An assistant that gets things done
+### 🤖 An AI assistant that gets things done
 
 One chat for everything. Ask in your own words and the assistant picks the right tools, showing every step it takes:
 
@@ -83,7 +83,7 @@ One chat for everything. Ask in your own words and the assistant picks the right
 **Total control (optional).** Turn on the *Acornix total control* accessibility service and the assistant can also see the screen and tap, type and scroll inside other apps, for example *"open Settings and turn on dark mode"*. It only acts while a task you asked for is running. It **asks before** sending, paying, calling or deleting anything, never sees password fields, and you can stop it at any time from the notification.
 
 <p align="center">
-<img src="docs/screenshots/assistant.jpg" width="250" alt="Assistant">
+<img src="docs/screenshots/assistant.jpg" width="250" alt="The Acornix AI assistant at work">
 </p>
 
 ### 📱 Your apps, like real apps
@@ -97,7 +97,7 @@ All your creations live in **My Apps**, a launcher with live thumbnails, search 
 - **Share** it as a ZIP, with or without your data, or **rename** and **delete** it.
 
 <p align="center">
-<img src="docs/screenshots/apps.jpg" width="250" alt="My Apps">&nbsp;&nbsp;
+<img src="docs/screenshots/apps.jpg" width="250" alt="My Apps: the launcher with the apps you created">&nbsp;&nbsp;
 <img src="docs/screenshots/sheet.jpg" width="250" alt="App actions">
 </p>
 
@@ -155,25 +155,27 @@ Acornix checks GitHub for new versions. When one comes out you'll see what's new
 **Phone status** (battery, memory, storage), Material You colors with light and dark themes, and an interface in **English and Spanish**. Generated apps follow your phone's language too.
 
 <p align="center">
-<img src="docs/screenshots/home-dark.jpg" width="230" alt="Home in dark mode">&nbsp;&nbsp;
+<img src="docs/screenshots/home-dark.jpg" width="230" alt="Acornix home screen in dark mode">&nbsp;&nbsp;
 <img src="docs/screenshots/settings-dark.jpg" width="230" alt="Settings in dark mode">
 <br><sub>Dark mode too</sub>
 </p>
 
 ---
 
-## 🎮 Apps included
+## 🎮 Games and apps included
 
 Acornix comes with eight example apps, rebuilt for 2.0. They all work offline, adapt to any screen in portrait or landscape, and save their data with `Acornix.db`.
 
 | | | | |
 |:---:|:---:|:---:|:---:|
-| <img src="docs/screenshots/app-calculator.jpg" width="170"><br>**Calculator**<br><sub>History saved, proper operator precedence</sub> | <img src="docs/screenshots/app-bmi.jpg" width="170"><br>**BMI**<br><sub>Gauge, healthy range and progress chart</sub> | <img src="docs/screenshots/app-drummer.jpg" width="170"><br>**Drummer**<br><sub>8 pads, 16-step sequencer, saved beats</sub> | <img src="docs/screenshots/app-matrix.jpg" width="170"><br>**Matrix Camera**<br><sub>Live Matrix / ASCII / halftone camera</sub> |
-| <img src="docs/screenshots/app-bowling.jpg" width="170"><br>**Bowling**<br><sub>Swipe to throw, hook spin, real scoring</sub> | <img src="docs/screenshots/app-piano.jpg" width="170"><br>**Piano**<br><sub>4 instruments, multitouch, recordings</sub> | <img src="docs/screenshots/app-castle.jpg" width="170"><br>**Castle Defense**<br><sub>Waves, bosses and an upgrade shop</sub> | <img src="docs/screenshots/app-superm.jpg" width="170"><br>**Super M**<br><sub>Platformer with endless levels</sub> |
+| <img src="docs/screenshots/app-calculator.jpg" width="170" alt="Calculator app included in Acornix"><br>**Calculator**<br><sub>History saved, proper operator precedence</sub> | <img src="docs/screenshots/app-bmi.jpg" width="170" alt="BMI calculator app included in Acornix"><br>**BMI**<br><sub>Gauge, healthy range and progress chart</sub> | <img src="docs/screenshots/app-drummer.jpg" width="170" alt="Drum machine app included in Acornix"><br>**Drummer**<br><sub>8 pads, 16-step sequencer, saved beats</sub> | <img src="docs/screenshots/app-matrix.jpg" width="170" alt="Matrix camera app included in Acornix"><br>**Matrix Camera**<br><sub>Live Matrix / ASCII / halftone camera</sub> |
+| <img src="docs/screenshots/app-bowling.jpg" width="170" alt="Bowling game included in Acornix"><br>**Bowling**<br><sub>Swipe to throw, hook spin, real scoring</sub> | <img src="docs/screenshots/app-piano.jpg" width="170" alt="Piano app included in Acornix"><br>**Piano**<br><sub>4 instruments, multitouch, recordings</sub> | <img src="docs/screenshots/app-castle.jpg" width="170" alt="Castle defense game included in Acornix"><br>**Castle Defense**<br><sub>Waves, bosses and an upgrade shop</sub> | <img src="docs/screenshots/app-superm.jpg" width="170" alt="Platformer game included in Acornix"><br>**Super M**<br><sub>Platformer with endless levels</sub> |
 
 ---
 
-## 📲 Install
+## 📲 Download the APK and install
+
+Acornix is free: download the APK from GitHub releases and install it in a minute.
 
 1. **Download** [`acornix.apk`](https://github.com/gonzaroman/acornix/releases/latest/download/acornix.apk) from the [latest release](https://github.com/gonzaroman/acornix/releases/latest) on your phone.
 2. **Open it.** If Android asks, allow your browser or file manager to install apps, then tap **Install**. Google Play Protect may warn you because the app doesn't come from the Play Store; tap **More details › Install anyway**.
@@ -207,7 +209,7 @@ Tap **▾** next to *Model* in Settings to load the models available to your acc
 
 ## 🧑‍💻 For creators: the `window.Acornix` API
 
-Every app made with Acornix can use this API, and so can your own HTML apps imported as a ZIP. All calls return Promises.
+Every app made with Acornix can use this API, and so can your own HTML apps imported as a ZIP, whether you write them by hand or with your favourite AI coding assistant. All calls return Promises.
 
 ```js
 // Phone
