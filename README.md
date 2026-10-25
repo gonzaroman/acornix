@@ -1,8 +1,11 @@
 <div align="center">
 
-# 🌰 Acornix: AI app builder for Android
+# AI app builder for Android - Create apps from voice - 🌰 Acornix
+
+## Vibe code app builder
 
 ### Vibe code apps and games on your phone. Create apps from your voice, text or a photo.
+
 
 **Vibe coding in your pocket.** Describe an app, a game or a tool, and watch the AI write it live. Seconds later it runs full screen on your phone, saves its own data and can sit on your home screen like any other app. Or just ask the assistant to do things for you.
 
@@ -10,7 +13,7 @@
 ![Android 8.0+](https://img.shields.io/badge/Android-8.0%2B-3ddc84?logo=android&logoColor=white)
 ![Kotlin](https://img.shields.io/badge/Kotlin-Jetpack%20Compose-7f52ff?logo=kotlin&logoColor=white)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-
+## Vibe Code apk download
 <a href="https://github.com/gonzaroman/acornix/releases/latest/download/acornix.apk"><b>⬇️ Download the APK (free)</b></a>
 
 <br>
