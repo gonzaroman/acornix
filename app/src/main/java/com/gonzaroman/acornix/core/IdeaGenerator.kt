@@ -2,7 +2,9 @@ package com.gonzaroman.acornix.core
 
 import com.gonzaroman.acornix.data.AppLanguage
 import com.gonzaroman.acornix.data.SettingsRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -44,9 +46,16 @@ class IdeaGenerator(
     /** On in Settings (the default) and with an AI configured. */
     suspend fun isAvailable(): Boolean = settings.current().let { it.aiIdeas && it.config().isUsable }
 
-    /** The last batch the AI wrote for this kind, category and language, or null. */
-    suspend fun cached(feature: Boolean, category: String?): List<Idea>? =
-        mutex.withLock { read() }.batches[key(feature, category, language())]?.ideas
+    /**
+     * What the AI wrote last, kept until the user asks for more: for a category, its own last batch;
+     * with no category picked (how the screen opens), the last batch of any category.
+     */
+    suspend fun cached(feature: Boolean, category: String?): List<Idea>? {
+        val language = language()
+        val batches = mutex.withLock { read() }.batches
+        return if (category.isNullOrBlank()) (batches[lastKey(feature, language)] ?: batches[key(feature, null, language)])?.ideas
+        else batches[key(feature, category, language)]?.ideas
+    }
 
     /**
      * The built-in ideas for this kind and category ([categoryIndex] in the categories list, or -1),
@@ -65,29 +74,38 @@ class IdeaGenerator(
     /**
      * Asks the AI for a new batch and caches it. Throws on network/API errors. [onPartial] receives the
      * ideas finished so far while the answer streams in, so the first ones show up after a few seconds.
+     * If the user leaves before it ends, the ideas that already arrived are kept.
      */
     suspend fun fresh(feature: Boolean, category: String?, onPartial: (List<Idea>) -> Unit = {}): List<Idea> {
         val language = language()
         val seen = mutex.withLock { read() }.seen
         val provider = settings.activeProvider()
         val text = StringBuilder()
-        var shown = 0
-        val result = provider.streamText(system(feature, language), request(category, seen), quick = true) { delta ->
-            text.append(delta)
-            val done = parsePartial(text)
-            if (done.size > shown) {
-                shown = done.size
-                onPartial(done)
+        var arrived = emptyList<Idea>()
+        val result = try {
+            provider.streamText(system(feature, language), request(category, seen), quick = true) { delta ->
+                text.append(delta)
+                val done = parsePartial(text)
+                if (done.size > arrived.size) {
+                    arrived = done
+                    onPartial(done)
+                }
             }
+        } catch (e: CancellationException) {
+            if (arrived.isNotEmpty()) withContext(NonCancellable) { save(feature, category, language, arrived) }
+            throw e
         }
         val ideas = parse(result.text)
         if (ideas.isEmpty()) throw IllegalStateException("No ideas in the response")
-        mutex.withLock {
-            val cache = read()
-            val batches = cache.batches + (key(feature, category, language) to IdeaBatch(System.currentTimeMillis(), ideas))
-            write(IdeaCache(batches, (cache.seen + ideas.map { it.title }).takeLast(MAX_SEEN)))
-        }
+        save(feature, category, language, ideas)
         return ideas
+    }
+
+    private suspend fun save(feature: Boolean, category: String?, language: String, ideas: List<Idea>) = mutex.withLock {
+        val cache = read()
+        val batch = IdeaBatch(System.currentTimeMillis(), ideas)
+        val batches = cache.batches + (key(feature, category, language) to batch) + (lastKey(feature, language) to batch)
+        write(IdeaCache(batches, (cache.seen + ideas.map { it.title }).distinct().takeLast(MAX_SEEN)))
     }
 
     private suspend fun language() = Prompts.languageName(settings.current().appLanguage, settings.uiLocale())
@@ -106,6 +124,9 @@ class IdeaGenerator(
 
         fun key(feature: Boolean, category: String?, language: String) =
             "${if (feature) "feature" else "app"}|${category.orEmpty()}|$language"
+
+        /** The last batch the AI wrote for this kind and language, whatever its category. */
+        fun lastKey(feature: Boolean, language: String) = "${if (feature) "feature" else "app"}|*last*|$language"
 
         fun system(feature: Boolean, language: String) = """
             You invent ideas for Acornix, an Android app where people describe something and an AI
