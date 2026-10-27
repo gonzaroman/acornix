@@ -46,9 +46,10 @@ class AnthropicProvider(
         system: String,
         prompt: String,
         images: List<ImageData>,
+        quick: Boolean,
         onDelta: (String) -> Unit,
     ): TextResult = guard {
-        val params = baseParams(STREAM_MAX_TOKENS, OutputConfig.Effort.HIGH)
+        val params = baseParams(STREAM_MAX_TOKENS, if (quick) OutputConfig.Effort.LOW else OutputConfig.Effort.HIGH)
             .system(system)
             .addUserMessageOfBlockParams(userBlocks(prompt, images))
             .build()

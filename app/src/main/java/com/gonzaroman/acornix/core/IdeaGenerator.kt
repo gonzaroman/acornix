@@ -43,12 +43,24 @@ class IdeaGenerator(private val settings: SettingsRepository, private val file: 
         return batch.ideas to (System.currentTimeMillis() - batch.createdAt > MAX_AGE_MS)
     }
 
-    /** Asks the AI for a new batch and caches it. Throws on network/API errors. */
-    suspend fun fresh(feature: Boolean, category: String?): List<Idea> {
+    /**
+     * Asks the AI for a new batch and caches it. Throws on network/API errors. [onPartial] receives the
+     * ideas finished so far while the answer streams in, so the first ones show up after a few seconds.
+     */
+    suspend fun fresh(feature: Boolean, category: String?, onPartial: (List<Idea>) -> Unit = {}): List<Idea> {
         val language = language()
         val seen = mutex.withLock { read() }.seen
         val provider = settings.activeProvider()
-        val result = provider.streamText(system(feature, language), request(category, seen))
+        val text = StringBuilder()
+        var shown = 0
+        val result = provider.streamText(system(feature, language), request(category, seen), quick = true) { delta ->
+            text.append(delta)
+            val done = parsePartial(text)
+            if (done.size > shown) {
+                shown = done.size
+                onPartial(done)
+            }
+        }
         val ideas = parse(result.text)
         if (ideas.isEmpty()) throw IllegalStateException("No ideas in the response")
         mutex.withLock {
@@ -101,7 +113,7 @@ class IdeaGenerator(private val settings: SettingsRepository, private val file: 
               plain Pomodoro timers, weather or news apps.
             - Each idea must be doable well in one HTML file on a phone.
             - "title": max 8 words, catchy, no final period. "emoji": one fitting emoji.
-            - "prompt": 2–4 sentences addressed to the app builder: what it does, the key features,
+            - "prompt": 2–3 sentences addressed to the app builder: what it does, the key features,
               and the look and feel. Concrete and vivid.
             - Write "title" and "prompt" in $language.
 
@@ -117,6 +129,35 @@ class IdeaGenerator(private val settings: SettingsRepository, private val file: 
                 append("\nDon't repeat or closely resemble these, already suggested: ")
                 append(seen.takeLast(40).joinToString("; "))
             }
+        }
+
+        /** The ideas whose JSON object is already complete in a half-received answer. */
+        fun parsePartial(text: CharSequence): List<Idea> {
+            val start = text.indexOf("[")
+            if (start < 0) return emptyList()
+            val objects = mutableListOf<String>()
+            var depth = 0
+            var inString = false
+            var escaped = false
+            var objStart = -1
+            for (i in start + 1 until text.length) {
+                val ch = text[i]
+                if (inString) {
+                    when {
+                        escaped -> escaped = false
+                        ch == '\\' -> escaped = true
+                        ch == '"' -> inString = false
+                    }
+                    continue
+                }
+                when (ch) {
+                    '"' -> inString = true
+                    '{' -> { if (depth == 0) objStart = i; depth++ }
+                    '}' -> { depth--; if (depth == 0 && objStart >= 0) objects += text.substring(objStart, i + 1) }
+                    ']' -> if (depth == 0) break
+                }
+            }
+            return if (objects.isEmpty()) emptyList() else parse("[" + objects.joinToString(",") + "]")
         }
 
         /** Reads the JSON array even if the model wrapped it in a code fence or added text around it. */

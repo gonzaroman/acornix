@@ -37,16 +37,31 @@ class OpenAiProvider(
         system: String,
         prompt: String,
         images: List<ImageData>,
+        quick: Boolean,
         onDelta: (String) -> Unit,
     ): TextResult {
-        val body = buildJsonObject {
+        fun body(lowEffort: Boolean) = buildJsonObject {
             put("model", model)
             put("stream", true)
             put("messages", buildJsonArray {
                 add(buildJsonObject { put("role", "system"); put("content", system) })
                 add(userMessage(prompt, images))
             })
+            if (lowEffort) put("reasoning_effort", "low")
         }
+        // Only OpenAI itself: other servers may not know the parameter at all.
+        val lowEffort = quick && responsesApi && noReasoningKey !in noEffortParam
+        return try {
+            stream(body(lowEffort), onDelta)
+        } catch (e: AiException) {
+            // Models that don't reason (gpt-4o…) reject reasoning_effort: remember and retry without it.
+            if (!lowEffort || !e.message.orEmpty().let { it.startsWith("HTTP 400") && it.contains("reasoning_effort") }) throw e
+            noEffortParam += noReasoningKey
+            stream(body(false), onDelta)
+        }
+    }
+
+    private suspend fun stream(body: JsonObject, onDelta: (String) -> Unit): TextResult {
         val out = StringBuilder()
         var finish: String? = null
         http.streamSse("$base/chat/completions", body, headers) { data ->
@@ -265,6 +280,9 @@ class OpenAiProvider(
 
         /** Models that rejected tools while reasoning; remembered so later turns skip the failed call. */
         private val toolsNeedNoReasoning: MutableSet<String> = java.util.Collections.synchronizedSet(mutableSetOf())
+
+        /** Models that don't accept reasoning_effort at all (non-reasoning models). */
+        private val noEffortParam: MutableSet<String> = java.util.Collections.synchronizedSet(mutableSetOf())
 
         private fun AiException.asksForNoReasoning(): Boolean {
             val m = message.orEmpty()

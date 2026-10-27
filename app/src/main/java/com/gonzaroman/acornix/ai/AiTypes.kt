@@ -58,11 +58,16 @@ open class AiException(message: String, cause: Throwable? = null) : Exception(me
 class ProviderNotConfiguredException : AiException("AI provider not configured. Add your API key in Settings.")
 
 interface AiProvider {
-    /** Streams a single-turn completion; [onDelta] receives text chunks as they arrive. */
+    /**
+     * Streams a single-turn completion; [onDelta] receives text chunks as they arrive.
+     * [quick] asks reasoning models to think less, for light tasks (ideas, a connection test) where
+     * waiting a minute for deep thinking isn't worth it.
+     */
     suspend fun streamText(
         system: String,
         prompt: String,
         images: List<ImageData> = emptyList(),
+        quick: Boolean = false,
         onDelta: (String) -> Unit = {},
     ): TextResult
 

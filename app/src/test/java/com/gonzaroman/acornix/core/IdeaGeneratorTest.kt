@@ -27,6 +27,17 @@ class IdeaGeneratorTest {
     }
 
     @Test
+    fun partialAnswerYieldsOnlyFinishedIdeas() {
+        val half = """[{"emoji": "🎹", "title": "Tilt {theremin}", "prompt": "Tilt to play \"notes\"."},
+            {"emoji": "🌙", "title": "Moon", "prompt": "A moon that"""
+        val ideas = IdeaGenerator.parsePartial(half)
+        assertEquals(1, ideas.size)
+        assertEquals("Tilt {theremin}", ideas[0].title) // braces and quotes inside strings don't confuse it
+        assertTrue(IdeaGenerator.parsePartial("Sure! Here are").isEmpty())
+        assertEquals(2, IdeaGenerator.parsePartial(half + " glows.\"}]").size)
+    }
+
+    @Test
     fun requestNamesTheCategoryAndWhatWasAlreadyShown() {
         val r = IdeaGenerator.request("Music", listOf("Tilt theremin"))
         assertTrue(r.contains("\"Music\""))

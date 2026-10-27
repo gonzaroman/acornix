@@ -388,7 +388,7 @@ fun ProviderEditor(settings: AppSettings, modifier: Modifier = Modifier, onSaved
                     scope.launch {
                         test = try {
                             withTimeout(90_000) {
-                                SettingsRepository.createProvider(current()).streamText("You are a connection test.", "Reply with the single word OK.")
+                                SettingsRepository.createProvider(current()).streamText("You are a connection test.", "Reply with the single word OK.", quick = true)
                             }
                             TestState.Ok
                         } catch (e: Exception) {

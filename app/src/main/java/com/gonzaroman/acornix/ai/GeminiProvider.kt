@@ -24,6 +24,7 @@ class GeminiProvider(
         system: String,
         prompt: String,
         images: List<ImageData>,
+        quick: Boolean, // thinking options differ between Gemini versions; flash models are fast anyway
         onDelta: (String) -> Unit,
     ): TextResult {
         val body = buildJsonObject {

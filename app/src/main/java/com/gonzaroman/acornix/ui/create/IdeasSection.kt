@@ -1,15 +1,20 @@
 package com.gonzaroman.acornix.ui.create
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -35,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import com.gonzaroman.acornix.R
 import com.gonzaroman.acornix.container
 import com.gonzaroman.acornix.core.Idea
+import com.gonzaroman.acornix.core.IdeaGenerator
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -53,6 +59,8 @@ fun IdeasSection(feature: Boolean, category: String?, onPick: (Idea) -> Unit) {
     var available by remember { mutableStateOf<Boolean?>(null) }
     var ideas by remember(feature, category) { mutableStateOf<List<Idea>>(emptyList()) }
     var loading by remember { mutableStateOf(false) }
+    /** The list shows a new batch that is still arriving. */
+    var streaming by remember { mutableStateOf(false) }
     var failed by remember(feature, category) { mutableStateOf(false) }
     var job by remember { mutableStateOf<Job?>(null) }
 
@@ -62,13 +70,14 @@ fun IdeasSection(feature: Boolean, category: String?, onPick: (Idea) -> Unit) {
             loading = true
             failed = false
             try {
-                ideas = generator.fresh(feature, category)
+                ideas = generator.fresh(feature, category) { partial -> scope.launch { ideas = partial; streaming = true } }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 failed = true
             } finally {
                 loading = false
+                streaming = false
             }
         }
     }
@@ -99,7 +108,11 @@ fun IdeasSection(feature: Boolean, category: String?, onPick: (Idea) -> Unit) {
             }
         }
         when {
-            ideas.isNotEmpty() -> ideas.forEach { IdeaCard(it) { onPick(it) } }
+            ideas.isNotEmpty() -> {
+                ideas.forEach { IdeaCard(it) { onPick(it) } }
+                // While a new batch streams in, keep its place so the screen doesn't jump.
+                if (streaming) repeat(IdeaGenerator.BATCH_SIZE - ideas.size) { IdeaPlaceholder() }
+            }
             loading -> Text(
                 stringResource(R.string.ideas_loading),
                 style = MaterialTheme.typography.bodyMedium,
@@ -112,6 +125,23 @@ fun IdeasSection(feature: Boolean, category: String?, onPick: (Idea) -> Unit) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 StaticIdeas(feature, null, onPick)
+            }
+        }
+    }
+}
+
+/** An empty card the size of an idea, for the ones still on their way. */
+@Composable
+private fun IdeaPlaceholder() {
+    val shade = MaterialTheme.colorScheme.surfaceVariant
+    OutlinedCard(modifier = Modifier.fillMaxWidth()) {
+        Row(Modifier.padding(horizontal = 14.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(32.dp).background(shade, CircleShape))
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Box(Modifier.fillMaxWidth(0.55f).height(14.dp).background(shade, RoundedCornerShape(7.dp)))
+                Box(Modifier.fillMaxWidth().height(10.dp).background(shade, RoundedCornerShape(5.dp)))
+                Box(Modifier.fillMaxWidth(0.8f).height(10.dp).background(shade, RoundedCornerShape(5.dp)))
             }
         }
     }

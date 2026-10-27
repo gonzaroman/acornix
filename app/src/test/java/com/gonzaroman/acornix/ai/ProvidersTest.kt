@@ -51,6 +51,23 @@ class ProvidersTest {
     }
 
     @Test
+    fun openAiQuickTextAsksForLowEffortAndDropsItIfTheModelRefuses() = runTest {
+        server.enqueue(MockResponse().setResponseCode(400).setBody("""
+            {"error":{"message":"Unrecognized request argument supplied: reasoning_effort"}}
+        """.trimIndent()))
+        server.enqueue(sse("""data: {"choices":[{"delta":{"content":"OK"},"finish_reason":"stop"}]}""", "data: [DONE]"))
+        server.enqueue(sse("""data: {"choices":[{"delta":{"content":"OK"},"finish_reason":"stop"}]}""", "data: [DONE]"))
+        val p = OpenAiProvider("k", "gpt-4o-mini", server.url("/v1").toString(), responsesApi = true)
+        assertEquals("OK", p.streamText("s", "p", quick = true).text)
+        assertEquals("OK", p.streamText("s", "p", quick = true).text)
+
+        fun effort() = AiJson.parseToJsonElement(server.takeRequest().body.readUtf8()).jsonObject["reasoning_effort"]?.jsonPrimitive?.content
+        assertEquals("low", effort())
+        assertEquals(null, effort())
+        assertEquals(null, effort()) // remembered: no failed call the next time
+    }
+
+    @Test
     fun openAiToolLoop() = runTest {
         server.enqueue(MockResponse().setBody("""
             {"choices":[{"finish_reason":"tool_calls","message":{"role":"assistant","content":null,
