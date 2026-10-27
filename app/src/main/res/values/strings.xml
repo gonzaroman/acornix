@@ -153,7 +153,7 @@
     <string name="control_help">How to turn it on</string>
     <string name="control_help_intro">Total control lets the assistant see the screen and tap, type and scroll inside other apps. For your security only you can switch it on, in Android\'s settings. It takes a minute.</string>
     <string name="control_help_on_title">Turn it on</string>
-    <string name="control_help_on_1">Open Accessibility and tap “Acornix total control”. Depending on your phone it is under “Downloaded apps”, “Installed apps” or “Installed services”.</string>
+    <string name="control_help_on_1">Open Accessibility and scroll all the way down: under “Downloaded apps” (or “Installed apps” / “Installed services”, depending on your phone) tap “Acornix total control”.</string>
     <string name="control_help_on_2">Turn on “Use Acornix total control”.</string>
     <string name="control_help_on_3">Android asks you to confirm: tap “Allow”. Done!</string>
     <string name="control_help_restricted_title">Greyed out or “Restricted setting”?</string>

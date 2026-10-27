@@ -152,7 +152,7 @@
     <string name="control_help">Cómo activarlo</string>
     <string name="control_help_intro">El Control total permite que el asistente vea la pantalla y pulse, escriba y desplace dentro de otras apps. Por seguridad, solo tú puedes activarlo, en los ajustes de Android. Se tarda un minuto.</string>
     <string name="control_help_on_title">Actívalo</string>
-    <string name="control_help_on_1">Abre Accesibilidad y toca «Control total de Acornix». Según el móvil está en «Aplicaciones descargadas», «Aplicaciones instaladas» o «Servicios instalados».</string>
+    <string name="control_help_on_1">Abre Accesibilidad y baja hasta el final: en «Aplicaciones descargadas» (o «Aplicaciones instaladas» / «Servicios instalados», según el móvil) toca «Control total de Acornix».</string>
     <string name="control_help_on_2">Activa «Usar Control total de Acornix».</string>
     <string name="control_help_on_3">Android te pide confirmación: toca «Permitir». ¡Listo!</string>
     <string name="control_help_restricted_title">¿Sale en gris o dice «ajustes restringidos»?</string>
