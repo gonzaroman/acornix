@@ -402,21 +402,6 @@
         <item>Creativa</item>
         <item>Productividad</item>
     </string-array>
-    <string-array name="app_examples">
-        <item>Un piano para móvil con varios instrumentos</item>
-        <item>Un juego de avión en 3D con controles táctiles</item>
-        <item>Un Arkanoid con botones táctiles</item>
-        <item>Una lista de tareas con categorías y recordatorios</item>
-        <item>Un simulador del sistema solar que pueda mover con los dedos</item>
-        <item>Un juego tipo Flappy Bird</item>
-    </string-array>
-    <string-array name="feature_examples">
-        <item>Un botón SOS grande que haga parpadear la linterna y vibre</item>
-        <item>Un panel de batería con gráficas y avisos</item>
-        <item>Un traductor de bolsillo que lea el resultado en voz alta</item>
-        <item>Un temporizador Pomodoro que vibre y notifique</item>
-        <item>Un chat con la IA que responda hablando</item>
-    </string-array>
     <string-array name="improve_examples">
         <item>Hazla más bonita y moderna</item>
         <item>Añade efectos de sonido</item>
@@ -471,8 +456,9 @@
     <string name="share_card_asked">Lo que pedí:</string>
     <string name="ideas_ai_title">✨ Ideas de la IA</string>
     <string name="ideas_more">🎲 Otras ideas</string>
-    <string name="ideas_loading">La IA está pensando ideas para ti…</string>
-    <string name="ideas_failed">Ahora no se han podido traer ideas nuevas. Aquí tienes algunas para empezar:</string>
+    <string name="ideas_loading">Generando ideas para ti… tarda unos segundos.</string>
+    <string name="ideas_ask_ai">🎲 Ideas de la IA</string>
+    <string name="ideas_failed">Ahora no se han podido traer ideas nuevas. Inténtalo dentro de un momento.</string>
     <string name="settings_ai_ideas">✨ Ideas de la IA</string>
-    <string name="settings_ai_ideas_desc">Al crear, la IA te propone ideas originales. Cada tanda nueva gasta unos pocos tokens de tu clave. Desactivado: ideas fijas, sin coste.</string>
+    <string name="settings_ai_ideas_desc">Al crear, puedes pedirle a la IA ideas originales. Cada tanda nueva gasta unos pocos tokens de tu clave. Desactivado: solo las ideas de serie, sin coste.</string>
 </resources>

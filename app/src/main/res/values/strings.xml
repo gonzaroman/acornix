@@ -403,21 +403,6 @@
         <item>Creative</item>
         <item>Productivity</item>
     </string-array>
-    <string-array name="app_examples">
-        <item>A piano for mobile with several instruments</item>
-        <item>A 3D airplane game with touch controls</item>
-        <item>An Arkanoid with touch buttons</item>
-        <item>A to-do list with categories and reminders</item>
-        <item>A solar system simulator I can move with my fingers</item>
-        <item>A Flappy Bird style game</item>
-    </string-array>
-    <string-array name="feature_examples">
-        <item>A big SOS button that blinks the flashlight and vibrates</item>
-        <item>A battery dashboard with charts and alerts</item>
-        <item>A pocket translator that reads the result aloud</item>
-        <item>A Pomodoro timer that vibrates and notifies</item>
-        <item>An AI chat that answers out loud</item>
-    </string-array>
     <string-array name="improve_examples">
         <item>Make it prettier and more modern</item>
         <item>Add sound effects</item>
@@ -472,8 +457,9 @@
     <string name="share_card_asked">What I asked for:</string>
     <string name="ideas_ai_title">✨ Ideas from the AI</string>
     <string name="ideas_more">🎲 Other ideas</string>
-    <string name="ideas_loading">The AI is coming up with ideas for you…</string>
-    <string name="ideas_failed">Couldn\'t get new ideas right now. Here are some to start with:</string>
+    <string name="ideas_loading">Generating ideas for you… it takes a few seconds.</string>
+    <string name="ideas_ask_ai">🎲 Ideas from the AI</string>
+    <string name="ideas_failed">Couldn\'t get new ideas right now. Try again in a moment.</string>
     <string name="settings_ai_ideas">✨ Ideas from the AI</string>
-    <string name="settings_ai_ideas_desc">When creating, the AI suggests original ideas. Each new batch uses a few tokens of your API key. Off: fixed examples, at no cost.</string>
+    <string name="settings_ai_ideas_desc">When creating, you can ask the AI for original ideas. Each new batch uses a few tokens of your API key. Off: only the built-in ideas, at no cost.</string>
 </resources>

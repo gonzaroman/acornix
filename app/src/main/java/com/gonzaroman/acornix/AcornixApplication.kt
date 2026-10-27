@@ -31,7 +31,9 @@ class AppContainer(context: Context) {
     val updates = UpdateChecker(context)
     val device = DeviceActions(context)
     val generator = AppGenerator(settings, apps, data)
-    val ideas = IdeaGenerator(settings, java.io.File(context.filesDir, "ideas.json"))
+    val ideas = IdeaGenerator(settings, java.io.File(context.filesDir, "ideas.json")) {
+        context.assets.open("ideas/default_ideas.json").bufferedReader().use { it.readText() }
+    }
     val tools = AgentTools(context, device, apps, generator, data)
     val assistant = AssistantController(context, appScope, settings, apps, device, tools)
     private val samples = SampleAppsInstaller(context, apps)

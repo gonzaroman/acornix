@@ -1,5 +1,6 @@
 package com.gonzaroman.acornix.core
 
+import com.gonzaroman.acornix.data.AppLanguage
 import com.gonzaroman.acornix.data.SettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
@@ -24,23 +25,41 @@ private data class IdeaCache(
 )
 
 /**
- * Asks the AI for fresh, surprising things to build, so the "Need ideas?" section changes and
- * inspires instead of always showing the same examples. Batches are cached per kind, category and
- * language: opening the screen costs nothing, and a new batch is only asked for when there is none,
- * the old one is a day old, or the user taps "Other ideas".
+ * The "Need ideas?" section. Everyone starts with the same built-in ideas ([defaults], written for
+ * Acornix in English and Spanish), so opening the screen never costs tokens. Only when the user asks,
+ * the AI writes a fresh, surprising batch; the last one is kept per kind, category and language and
+ * shown from then on.
  */
-class IdeaGenerator(private val settings: SettingsRepository, private val file: File) {
+class IdeaGenerator(
+    private val settings: SettingsRepository,
+    private val file: File,
+    private val defaults: () -> String,
+) {
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
     private val mutex = Mutex()
+    private val builtIn: Map<String, Map<String, Map<String, List<Idea>>>> by lazy {
+        runCatching { json.decodeFromString<Map<String, Map<String, Map<String, List<Idea>>>>>(defaults()) }.getOrDefault(emptyMap())
+    }
 
     /** On in Settings (the default) and with an AI configured. */
     suspend fun isAvailable(): Boolean = settings.current().let { it.aiIdeas && it.config().isUsable }
 
-    /** The cached batch for this key, or null. [stale] tells if it is older than a day. */
-    suspend fun cached(feature: Boolean, category: String?): Pair<List<Idea>, Boolean>? {
-        val key = key(feature, category, language())
-        val batch = mutex.withLock { read() }.batches[key] ?: return null
-        return batch.ideas to (System.currentTimeMillis() - batch.createdAt > MAX_AGE_MS)
+    /** The last batch the AI wrote for this kind, category and language, or null. */
+    suspend fun cached(feature: Boolean, category: String?): List<Idea>? =
+        mutex.withLock { read() }.batches[key(feature, category, language())]?.ideas
+
+    /**
+     * The built-in ideas for this kind and category ([categoryIndex] in the categories list, or -1),
+     * in Spanish when Acornix is shown in Spanish and in English otherwise.
+     */
+    suspend fun builtIn(feature: Boolean, categoryIndex: Int): List<Idea> {
+        val lang = when (settings.current().appLanguage) {
+            AppLanguage.SPANISH -> "es"
+            AppLanguage.ENGLISH -> "en"
+            AppLanguage.AUTO -> if (settings.uiLocale().language == "es") "es" else "en"
+        }
+        val sets = builtIn[lang]?.get(if (feature) "feature" else "app") ?: return emptyList()
+        return sets[if (feature || categoryIndex < 0) "" else categoryIndex.toString()] ?: sets[""].orEmpty()
     }
 
     /**
@@ -84,7 +103,6 @@ class IdeaGenerator(private val settings: SettingsRepository, private val file: 
     companion object {
         const val BATCH_SIZE = 6
         private const val MAX_SEEN = 60
-        private const val MAX_AGE_MS = 24 * 60 * 60 * 1000L
 
         fun key(feature: Boolean, category: String?, language: String) =
             "${if (feature) "feature" else "app"}|${category.orEmpty()}|$language"

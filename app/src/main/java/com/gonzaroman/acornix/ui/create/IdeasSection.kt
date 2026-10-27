@@ -4,8 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
@@ -43,21 +40,22 @@ import com.gonzaroman.acornix.core.Idea
 import com.gonzaroman.acornix.core.IdeaGenerator
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
- * "Need ideas?": with an AI configured, a batch of original ideas written by the AI (cached, so
- * opening the screen is free) and a button for more; without one, or if it fails, the fixed examples.
+ * "Need ideas?": the built-in ideas, or the last batch the AI wrote, so opening the screen never costs
+ * tokens. With an AI configured, a button asks it for a new batch, which shows up idea by idea.
  */
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun IdeasSection(feature: Boolean, category: String?, onPick: (Idea) -> Unit) {
     val context = LocalContext.current
     val generator = context.container.ideas
     val scope = rememberCoroutineScope()
-    var available by remember { mutableStateOf<Boolean?>(null) }
+    val categoryIndex = stringArrayResource(R.array.categories).indexOf(category)
+    var available by remember { mutableStateOf(false) }
     var ideas by remember(feature, category) { mutableStateOf<List<Idea>>(emptyList()) }
+    /** The ideas shown were written by the AI (not the built-in ones). */
+    var fromAi by remember(feature, category) { mutableStateOf(false) }
     var loading by remember { mutableStateOf(false) }
     /** The list shows a new batch that is still arriving. */
     var streaming by remember { mutableStateOf(false) }
@@ -71,6 +69,7 @@ fun IdeasSection(feature: Boolean, category: String?, onPick: (Idea) -> Unit) {
             failed = false
             try {
                 ideas = generator.fresh(feature, category) { partial -> scope.launch { ideas = partial; streaming = true } }
+                fromAi = true
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -84,49 +83,45 @@ fun IdeasSection(feature: Boolean, category: String?, onPick: (Idea) -> Unit) {
 
     LaunchedEffect(feature, category) {
         available = generator.isAvailable()
-        if (available != true) return@LaunchedEffect
-        delay(400) // tapping through the categories shouldn't fire a request for each one
-        val cached = generator.cached(feature, category)
-        if (cached != null) ideas = cached.first
-        if (cached == null || cached.second) refresh()
-    }
-
-    if (available != true) {
-        StaticIdeas(feature, stringResource(R.string.inspiration), onPick)
-        return
+        val cached = if (available) generator.cached(feature, category) else null
+        fromAi = cached != null
+        ideas = cached ?: generator.builtIn(feature, categoryIndex)
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.ideas_ai_title), style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
-            TextButton(onClick = { refresh() }, enabled = !loading) {
-                if (loading) {
-                    CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
-                    Spacer(Modifier.width(8.dp))
+            Text(
+                stringResource(if (fromAi) R.string.ideas_ai_title else R.string.inspiration),
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.weight(1f),
+            )
+            if (available) {
+                TextButton(onClick = { refresh() }, enabled = !loading) {
+                    if (loading) {
+                        CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
+                        Spacer(Modifier.width(8.dp))
+                    }
+                    Text(stringResource(if (fromAi) R.string.ideas_more else R.string.ideas_ask_ai))
                 }
-                Text(stringResource(R.string.ideas_more))
             }
         }
-        when {
-            ideas.isNotEmpty() -> {
-                ideas.forEach { IdeaCard(it) { onPick(it) } }
-                // While a new batch streams in, keep its place so the screen doesn't jump.
-                if (streaming) repeat(IdeaGenerator.BATCH_SIZE - ideas.size) { IdeaPlaceholder() }
-            }
-            loading -> Text(
+        if (loading) {
+            Text(
                 stringResource(R.string.ideas_loading),
                 style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
+        if (failed) {
+            Text(
+                stringResource(R.string.ideas_failed),
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            failed -> {
-                Text(
-                    stringResource(R.string.ideas_failed),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                StaticIdeas(feature, null, onPick)
-            }
         }
+        ideas.forEach { IdeaCard(it) { onPick(it) } }
+        // While a new batch streams in, keep its place so the screen doesn't jump.
+        if (streaming) repeat(IdeaGenerator.BATCH_SIZE - ideas.size) { IdeaPlaceholder() }
     }
 }
 
@@ -162,21 +157,6 @@ private fun IdeaCard(idea: Idea, onClick: () -> Unit) {
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
-            }
-        }
-    }
-}
-
-/** The fixed examples: without an API key, or when the AI couldn't answer. */
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun StaticIdeas(feature: Boolean, title: String?, onPick: (Idea) -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        if (title != null) Text(title, style = MaterialTheme.typography.titleSmall)
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            stringArrayResource(if (feature) R.array.feature_examples else R.array.app_examples).forEach { ex ->
-                // No title: a fixed example is a full request, not a name for the app.
-                AssistChip(onClick = { onPick(Idea(title = "", prompt = ex)) }, label = { Text(ex) })
             }
         }
     }

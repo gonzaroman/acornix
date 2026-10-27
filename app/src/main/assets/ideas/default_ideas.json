@@ -1,0 +1,159 @@
+{
+  "en": {
+    "app": {
+      "": [
+        {"emoji": "🚁", "title": "Neon Drone Race", "prompt": "A 3D drone racing game: fly a drone through glowing neon rings over a futuristic city at night, with a lap timer, a boost button and an autopilot demo mode."},
+        {"emoji": "🐠", "title": "Pocket Aquarium", "prompt": "A relaxing 3D aquarium: colorful fish swim in schools between swaying seaweed and coral, with rising bubbles and light rays from above. Tap the glass to drop food and drag to rotate the camera."},
+        {"emoji": "🌀", "title": "Neon Kaleidoscope", "prompt": "A drawing app where every stroke is mirrored in 8-way symmetry with glowing neon trails, sparkles and colors that slowly shift. Include an autoplay mode that draws by itself and a button to clear."},
+        {"emoji": "🏙️", "title": "Tiny Pixel City", "prompt": "An isometric pixel art city builder: tap empty tiles to build houses, shops, parks and skyscrapers, with little cars and tiny people moving around and a day and night cycle where the windows light up."},
+        {"emoji": "🎹", "title": "Tilt Theremin", "prompt": "A musical instrument you play by tilting the phone: tilting changes the pitch and touching the screen controls the volume, with glowing waves on screen and a few synth sounds to choose from."},
+        {"emoji": "🌌", "title": "Draw Your Own Constellation", "prompt": "Tap a starry night sky to place stars and connect them into your own constellation, give it a name and a short legend, and keep a gallery of the ones you've drawn."}
+      ],
+      "0": [
+        {"emoji": "🧲", "title": "Gravity Flip Runner", "prompt": "An endless runner where tapping flips gravity so you run on the floor or the ceiling, dodging spikes, with a speed that keeps increasing and a best score."},
+        {"emoji": "✈️", "title": "Paper Plane Toss", "prompt": "Swipe to throw a paper plane across an office, with fans that push it, bonus rings to fly through and a distance record to beat."},
+        {"emoji": "🧩", "title": "Color Flood", "prompt": "A puzzle where you flood a grid of colored tiles from the corner, choosing a color each turn, trying to fill the whole board in as few moves as possible, with a new level every day."},
+        {"emoji": "🚁", "title": "Neon Drone Race", "prompt": "A 3D drone racing game: fly a drone through glowing neon rings over a futuristic city at night, with a lap timer, a boost button and an autopilot demo mode."},
+        {"emoji": "🏙️", "title": "Tiny Pixel City", "prompt": "An isometric pixel art city builder: tap empty tiles to build houses, shops, parks and skyscrapers, with little cars and tiny people moving around and a day and night cycle where the windows light up."},
+        {"emoji": "🎳", "title": "Neon Bowling", "prompt": "A bowling game where you swipe to throw the ball and curve it with your finger, glowing neon pins, real scoring with strikes and spares, and a best game record."}
+      ],
+      "1": [
+        {"emoji": "📏", "title": "Pocket Level and Ruler", "prompt": "A spirit level that uses the phone's motion sensors, with a big bubble and the angle in degrees, plus an on-screen ruler in centimeters and inches."},
+        {"emoji": "🧾", "title": "Fair Bill Splitter", "prompt": "Split a restaurant bill between friends: add people and what each one ordered, mark shared dishes and the tip, and see exactly how much each person pays."},
+        {"emoji": "⏱️", "title": "Multi Timer Board", "prompt": "Several named countdown timers running at the same time on big colorful cards, for cooking or board games, each one with its own sound when it ends."},
+        {"emoji": "🔍", "title": "Magnifier and Mirror", "prompt": "Use the camera as a magnifying glass with zoom, brightness and a freeze button to read small print, plus a front camera mirror mode."},
+        {"emoji": "🎲", "title": "Dice and Coin Box", "prompt": "Roll any number of 3D dice, flip a coin or spin a wheel of your own options, with satisfying animations and a history of the last results."},
+        {"emoji": "📦", "title": "Where Did I Put It", "prompt": "Keep track of where you store things at home: add items with a photo, the room and the drawer, and find them later with a quick search."}
+      ],
+      "2": [
+        {"emoji": "🥁", "title": "Pocket Beat Maker", "prompt": "A 16-step drum machine with kick, snare, hi-hats and claps, tempo control and patterns you can save and play back."},
+        {"emoji": "🎸", "title": "Chord Finder", "prompt": "Pick a key and see its chords on a guitar fretboard and a piano keyboard, tap any chord to hear it, and chain them into a short progression."},
+        {"emoji": "🌧️", "title": "Rain Piano", "prompt": "Raindrops fall down the screen and play soft piano notes when they land on the keys. Tap to add drops and choose a scale for a calming melody."},
+        {"emoji": "🎹", "title": "Tilt Theremin", "prompt": "A musical instrument you play by tilting the phone: tilting changes the pitch and touching the screen controls the volume, with glowing waves on screen and a few synth sounds to choose from."},
+        {"emoji": "🎚️", "title": "Loop Pedal Pad", "prompt": "Record short sounds with the microphone into four pads, loop them in time with a metronome and mix their volumes to build a song."},
+        {"emoji": "🎼", "title": "Melody Painter", "prompt": "Paint lines on a grid and a playhead turns them into a melody: height is pitch, color is the instrument, with a tempo slider and a play button."}
+      ],
+      "3": [
+        {"emoji": "🪐", "title": "Solar System Explorer", "prompt": "A 3D solar system you can rotate with your finger: tap any planet to fly to it and read fun facts about its size, moons and how long its day lasts."},
+        {"emoji": "🚀", "title": "Times Table Space Race", "prompt": "Learn the multiplication tables by answering to power a rocket racing to the Moon, with a level for each table and stars for speed."},
+        {"emoji": "🧪", "title": "Pocket Periodic Table", "prompt": "An interactive periodic table colored by element type: tap an element to see its properties and a fun fact, with a quiz mode to guess the symbols."},
+        {"emoji": "🌍", "title": "Flag Quiz Around the World", "prompt": "Guess the country from its flag on a spinning globe, with continents as levels, a timer, streaks and a map that fills in as you learn."},
+        {"emoji": "🫀", "title": "Inside the Human Body", "prompt": "An interactive body map: tap organs to see what they do with simple animations, and test yourself with a drag-and-drop quiz."},
+        {"emoji": "⏳", "title": "History Timeline Game", "prompt": "Drag historical events into the right order on a timeline, with pictures made of emoji, short explanations and harder levels each round."}
+      ],
+      "4": [
+        {"emoji": "💧", "title": "Water Plant Tracker", "prompt": "A water tracker where a little plant grows every time you log a glass and wilts if you forget, with a daily goal and a weekly history."},
+        {"emoji": "🫧", "title": "Breathing Bubble", "prompt": "A guided breathing exercise with a calm bubble that grows and shrinks for box breathing and 4-7-8 patterns, with soft sounds and a session timer."},
+        {"emoji": "🧘", "title": "Desk Stretch Breaks", "prompt": "A desk break helper that counts your sitting time and every so often shows a short animated stretch to do, keeping a streak of breaks taken."},
+        {"emoji": "😴", "title": "Sleep Diary", "prompt": "Log when you went to bed, woke up and how you felt, and see your sleep on a beautiful weekly chart with your average and best nights."},
+        {"emoji": "🍎", "title": "Rainbow Plate", "prompt": "Track how many colors of fruit and vegetables you eat each day by tapping colored circles, with a weekly rainbow that fills up."},
+        {"emoji": "🚶", "title": "Walk Challenge Map", "prompt": "Turn your daily walks into a journey along a famous route: log your kilometers and watch your marker move along the map with milestones."}
+      ]
+      ,
+      "5": [
+        {"emoji": "🎨", "title": "Pixel Art Studio", "prompt": "A pixel art editor with a 32×32 canvas, a color palette, a fill bucket and a mirror mode, that saves your drawings in a gallery and exports them as PNG."},
+        {"emoji": "✨", "title": "Glow Writing", "prompt": "Write or draw with your finger and the strokes glow and slowly fade like light painting in the dark, with colors and brush sizes to choose from."},
+        {"emoji": "🖼️", "title": "Generative Poster Maker", "prompt": "Create abstract posters with random shapes, gradients and layouts: tap to generate a new one, tweak the colors and save your favorites."},
+        {"emoji": "🌀", "title": "Neon Kaleidoscope", "prompt": "A drawing app where every stroke is mirrored in 8-way symmetry with glowing neon trails, sparkles and colors that slowly shift. Include an autoplay mode that draws by itself and a button to clear."},
+        {"emoji": "🐠", "title": "Pocket Aquarium", "prompt": "A relaxing 3D aquarium: colorful fish swim in schools between swaying seaweed and coral, with rising bubbles and light rays from above. Tap the glass to drop food and drag to rotate the camera."},
+        {"emoji": "📸", "title": "Retro Photo Booth", "prompt": "Use the camera to take photos with retro filters like film, comic and old TV, add a frame and a caption, and keep them in a gallery."}
+      ],
+      "6": [
+        {"emoji": "📝", "title": "Notes with Checklists", "prompt": "A clean, professional notes app with titles, checklists, pinned notes, color labels and search, that saves everything on the phone."},
+        {"emoji": "🗂️", "title": "Kanban Board", "prompt": "A simple Kanban board with To do, Doing and Done columns, cards you drag between them, colors and due dates."},
+        {"emoji": "🎯", "title": "Habit Streaks", "prompt": "Track daily habits with big tap-to-complete circles, streak counters, a monthly heatmap and a short encouraging message."},
+        {"emoji": "🛒", "title": "Smart Shopping List", "prompt": "A shopping list grouped by supermarket aisle, with quantities, items you buy often one tap away, and a satisfying swipe to tick them off."},
+        {"emoji": "📅", "title": "Week Planner", "prompt": "Plan your week on a clean board with a column per day, colored blocks for tasks and events, and a summary of what is left today."},
+        {"emoji": "💰", "title": "Spending Jars", "prompt": "Split your monthly money into jars like food, fun and savings, log expenses with one tap and watch each jar empty with a nice animation."}
+      ]
+    },
+    "feature": {
+      "": [
+        {"emoji": "🏋️", "title": "Talking Workout Coach", "prompt": "A 3-minute workout coach with a big countdown ring that says each exercise out loud, counts down the last seconds by voice and vibrates when switching to the next one."},
+        {"emoji": "🔦", "title": "Morse Flashlight", "prompt": "Type a message and the flashlight blinks it in Morse code while the screen shows each letter as it's sent, with a big SOS button."},
+        {"emoji": "🗣️", "title": "Pocket Translator", "prompt": "Type a sentence, choose a language and the AI translates it and reads it out loud, keeping a history of your translations."},
+        {"emoji": "🔋", "title": "Battery Coach", "prompt": "A battery dashboard with the level, temperature and charging state, a chart over time and a notification when it reaches the level you choose."},
+        {"emoji": "🔮", "title": "Talking Oracle", "prompt": "Ask a question, tap the glowing crystal ball and a mysterious oracle answers out loud with a vibration, using the AI for witty answers."},
+        {"emoji": "⏰", "title": "Focus Sprints", "prompt": "A 25-minute focus timer that notifies you and vibrates when each sprint ends, and reads a short motivating phrase out loud."}
+      ]
+    }
+  },
+  "es": {
+    "app": {
+      "": [
+        {"emoji": "🚁", "title": "Carrera de drones neón", "prompt": "Un juego de carreras de drones en 3D: vuela atravesando anillos de neón sobre una ciudad futurista de noche, con cronómetro por vuelta, botón de turbo y un modo demo con piloto automático."},
+        {"emoji": "🐠", "title": "Acuario de bolsillo", "prompt": "Un acuario 3D relajante: peces de colores nadan en bancos entre algas y corales, con burbujas que suben y rayos de luz. Toca el cristal para echarles comida y arrastra para girar la cámara."},
+        {"emoji": "🌀", "title": "Caleidoscopio de neón", "prompt": "Una app de dibujo en la que cada trazo se refleja con simetría de 8 ejes, con estelas de neón brillantes, destellos y colores que cambian poco a poco. Con un modo automático que dibuja solo y un botón para borrar."},
+        {"emoji": "🏙️", "title": "Ciudad de píxeles", "prompt": "Un constructor de ciudades isométrico en pixel art: toca las parcelas vacías para construir casas, tiendas, parques y rascacielos, con cochecitos y gente diminuta moviéndose y un ciclo de día y noche en el que se encienden las ventanas."},
+        {"emoji": "🎹", "title": "Theremín de inclinar", "prompt": "Un instrumento que se toca inclinando el móvil: la inclinación cambia la nota y tocar la pantalla controla el volumen, con ondas brillantes en pantalla y varios sonidos de sintetizador."},
+        {"emoji": "🌌", "title": "Dibuja tu constelación", "prompt": "Toca un cielo estrellado para colocar estrellas y unirlas en tu propia constelación, ponle un nombre y una pequeña leyenda, y guarda una galería con las que dibujes."}
+      ],
+      "0": [
+        {"emoji": "🧲", "title": "Corre con la gravedad", "prompt": "Un runner infinito en el que al tocar se invierte la gravedad y corres por el suelo o por el techo esquivando pinchos, con una velocidad que no para de subir y un récord."},
+        {"emoji": "✈️", "title": "Lanza el avión de papel", "prompt": "Desliza para lanzar un avión de papel por una oficina, con ventiladores que lo empujan, anillos de bonus que atravesar y un récord de distancia que superar."},
+        {"emoji": "🧩", "title": "Inunda de color", "prompt": "Un puzle en el que inundas una cuadrícula de casillas de colores desde la esquina, eligiendo un color en cada turno, para llenar todo el tablero en el menor número de jugadas, con un nivel nuevo cada día."},
+        {"emoji": "🚁", "title": "Carrera de drones neón", "prompt": "Un juego de carreras de drones en 3D: vuela atravesando anillos de neón sobre una ciudad futurista de noche, con cronómetro por vuelta, botón de turbo y un modo demo con piloto automático."},
+        {"emoji": "🏙️", "title": "Ciudad de píxeles", "prompt": "Un constructor de ciudades isométrico en pixel art: toca las parcelas vacías para construir casas, tiendas, parques y rascacielos, con cochecitos y gente diminuta moviéndose y un ciclo de día y noche en el que se encienden las ventanas."},
+        {"emoji": "🎳", "title": "Bolos de neón", "prompt": "Un juego de bolos en el que deslizas para lanzar la bola y le das efecto con el dedo, con bolos de neón, puntuación real con plenos y semiplenos, y un récord de partida."}
+      ],
+      "1": [
+        {"emoji": "📏", "title": "Nivel y regla de bolsillo", "prompt": "Un nivel de burbuja que usa los sensores de movimiento del móvil, con una burbuja grande y el ángulo en grados, más una regla en pantalla en centímetros y pulgadas."},
+        {"emoji": "🧾", "title": "Divide la cuenta", "prompt": "Divide la cuenta del restaurante entre amigos: añade a las personas y lo que pidió cada una, marca los platos compartidos y la propina, y mira cuánto paga cada uno exactamente."},
+        {"emoji": "⏱️", "title": "Panel de temporizadores", "prompt": "Varios temporizadores con nombre funcionando a la vez en tarjetas grandes y de colores, para cocinar o para juegos de mesa, cada uno con su sonido al terminar."},
+        {"emoji": "🔍", "title": "Lupa y espejo", "prompt": "Usa la cámara como lupa con zoom, brillo y un botón para congelar la imagen y leer la letra pequeña, más un modo espejo con la cámara frontal."},
+        {"emoji": "🎲", "title": "Caja de dados y monedas", "prompt": "Lanza los dados 3D que quieras, tira una moneda o gira una ruleta con tus propias opciones, con animaciones muy satisfactorias y el historial de los últimos resultados."},
+        {"emoji": "📦", "title": "¿Dónde lo guardé?", "prompt": "Apunta dónde guardas las cosas en casa: añade objetos con foto, la habitación y el cajón, y encuéntralos después con una búsqueda rápida."}
+      ],
+      "2": [
+        {"emoji": "🥁", "title": "Caja de ritmos de bolsillo", "prompt": "Una caja de ritmos de 16 pasos con bombo, caja, charles y palmas, control de tempo y patrones que puedes guardar y volver a escuchar."},
+        {"emoji": "🎸", "title": "Buscador de acordes", "prompt": "Elige una tonalidad y mira sus acordes en el mástil de una guitarra y en un teclado de piano, toca cualquier acorde para oírlo y encadénalos en una pequeña progresión."},
+        {"emoji": "🌧️", "title": "Piano de lluvia", "prompt": "Caen gotas por la pantalla y tocan notas suaves de piano al llegar a las teclas. Toca para añadir gotas y elige una escala para crear una melodía relajante."},
+        {"emoji": "🎹", "title": "Theremín de inclinar", "prompt": "Un instrumento que se toca inclinando el móvil: la inclinación cambia la nota y tocar la pantalla controla el volumen, con ondas brillantes en pantalla y varios sonidos de sintetizador."},
+        {"emoji": "🎚️", "title": "Pedal de loops", "prompt": "Graba sonidos cortos con el micrófono en cuatro pads, repítelos en bucle al ritmo de un metrónomo y mezcla sus volúmenes para montar una canción."},
+        {"emoji": "🎼", "title": "Pinta melodías", "prompt": "Pinta líneas en una cuadrícula y un cabezal de reproducción las convierte en melodía: la altura es la nota y el color el instrumento, con un control de tempo y un botón de play."}
+      ],
+      "3": [
+        {"emoji": "🪐", "title": "Explora el sistema solar", "prompt": "Un sistema solar en 3D que puedes girar con el dedo: toca cualquier planeta para viajar hasta él y leer curiosidades sobre su tamaño, sus lunas y lo que dura su día."},
+        {"emoji": "🚀", "title": "Carrera espacial de las tablas", "prompt": "Aprende las tablas de multiplicar respondiendo para impulsar un cohete en una carrera hacia la Luna, con un nivel por cada tabla y estrellas por la rapidez."},
+        {"emoji": "🧪", "title": "Tabla periódica de bolsillo", "prompt": "Una tabla periódica interactiva coloreada por tipo de elemento: toca un elemento para ver sus propiedades y una curiosidad, con un modo concurso para adivinar los símbolos."},
+        {"emoji": "🌍", "title": "Banderas del mundo", "prompt": "Adivina el país por su bandera sobre un globo que gira, con los continentes como niveles, cronómetro, rachas y un mapa que se va llenando según aprendes."},
+        {"emoji": "🫀", "title": "Dentro del cuerpo humano", "prompt": "Un mapa interactivo del cuerpo: toca los órganos para ver qué hacen con animaciones sencillas y ponte a prueba con un test de arrastrar y soltar."},
+        {"emoji": "⏳", "title": "Juego de la línea del tiempo", "prompt": "Arrastra acontecimientos históricos a su sitio en una línea del tiempo, con dibujos hechos de emojis, explicaciones cortas y niveles más difíciles en cada ronda."}
+      ],
+      "4": [
+        {"emoji": "💧", "title": "La planta del agua", "prompt": "Un registro de agua en el que una plantita crece cada vez que anotas un vaso y se marchita si te olvidas, con un objetivo diario y un historial semanal."},
+        {"emoji": "🫧", "title": "Burbuja para respirar", "prompt": "Un ejercicio de respiración guiada con una burbuja tranquila que crece y se encoge, para respiración cuadrada y 4-7-8, con sonidos suaves y un temporizador de sesión."},
+        {"emoji": "🧘", "title": "Pausas para estirar", "prompt": "Un ayudante para quien trabaja sentado: cuenta el tiempo que llevas sentado y cada cierto rato te enseña un estiramiento corto animado, con una racha de pausas hechas."},
+        {"emoji": "😴", "title": "Diario de sueño", "prompt": "Apunta cuándo te acostaste, cuándo te levantaste y cómo te sentiste, y mira tu sueño en un gráfico semanal muy bonito con tu media y tus mejores noches."},
+        {"emoji": "🍎", "title": "Plato arcoíris", "prompt": "Apunta cuántos colores de frutas y verduras comes cada día tocando círculos de colores, con un arcoíris semanal que se va llenando."},
+        {"emoji": "🚶", "title": "Reto de caminar", "prompt": "Convierte tus paseos en un viaje por una ruta famosa: apunta tus kilómetros y mira cómo avanza tu marcador por el mapa con etapas por el camino."}
+      ],
+      "5": [
+        {"emoji": "🎨", "title": "Estudio de pixel art", "prompt": "Un editor de pixel art con un lienzo de 32×32, paleta de colores, bote de pintura y modo espejo, que guarda tus dibujos en una galería y los exporta como PNG."},
+        {"emoji": "✨", "title": "Escribe con luz", "prompt": "Escribe o dibuja con el dedo y los trazos brillan y se desvanecen poco a poco, como pintar con luz en la oscuridad, con colores y tamaños de pincel para elegir."},
+        {"emoji": "🖼️", "title": "Generador de pósteres", "prompt": "Crea pósteres abstractos con formas, degradados y composiciones al azar: toca para generar uno nuevo, ajusta los colores y guarda tus favoritos."},
+        {"emoji": "🌀", "title": "Caleidoscopio de neón", "prompt": "Una app de dibujo en la que cada trazo se refleja con simetría de 8 ejes, con estelas de neón brillantes, destellos y colores que cambian poco a poco. Con un modo automático que dibuja solo y un botón para borrar."},
+        {"emoji": "🐠", "title": "Acuario de bolsillo", "prompt": "Un acuario 3D relajante: peces de colores nadan en bancos entre algas y corales, con burbujas que suben y rayos de luz. Toca el cristal para echarles comida y arrastra para girar la cámara."},
+        {"emoji": "📸", "title": "Fotomatón retro", "prompt": "Usa la cámara para hacer fotos con filtros retro como película, cómic o televisión antigua, añade un marco y un texto, y guárdalas en una galería."}
+      ],
+      "6": [
+        {"emoji": "📝", "title": "Notas con listas", "prompt": "Una app de notas limpia y profesional con títulos, listas de tareas, notas fijadas, etiquetas de color y buscador, que lo guarda todo en el móvil."},
+        {"emoji": "🗂️", "title": "Tablero Kanban", "prompt": "Un tablero Kanban sencillo con columnas Por hacer, Haciendo y Hecho, tarjetas que se arrastran entre ellas, colores y fechas límite."},
+        {"emoji": "🎯", "title": "Rachas de hábitos", "prompt": "Sigue tus hábitos diarios con círculos grandes que se completan con un toque, contadores de racha, un mapa de calor mensual y un mensaje de ánimo."},
+        {"emoji": "🛒", "title": "Lista de la compra lista", "prompt": "Una lista de la compra agrupada por pasillos del súper, con cantidades, lo que compras a menudo a un toque y un gesto muy satisfactorio para tacharlo."},
+        {"emoji": "📅", "title": "Planificador semanal", "prompt": "Planifica tu semana en un tablero limpio con una columna por día, bloques de colores para tareas y eventos, y un resumen de lo que te queda hoy."},
+        {"emoji": "💰", "title": "Huchas de gastos", "prompt": "Reparte tu dinero del mes en huchas como comida, ocio y ahorro, apunta gastos con un toque y mira cómo se vacía cada hucha con una animación bonita."}
+      ]
+    },
+    "feature": {
+      "": [
+        {"emoji": "🏋️", "title": "Entrenador que habla", "prompt": "Un entrenador de 3 minutos con un gran anillo de cuenta atrás que dice cada ejercicio en voz alta, cuenta los últimos segundos con la voz y vibra al pasar al siguiente."},
+        {"emoji": "🔦", "title": "Linterna Morse", "prompt": "Escribe un mensaje y la linterna lo emite en código Morse mientras la pantalla muestra cada letra según se envía, con un botón grande de SOS."},
+        {"emoji": "🗣️", "title": "Traductor de bolsillo", "prompt": "Escribe una frase, elige un idioma y la IA la traduce y la lee en voz alta, guardando un historial de tus traducciones."},
+        {"emoji": "🔋", "title": "Entrenador de batería", "prompt": "Un panel de batería con el nivel, la temperatura y si está cargando, un gráfico en el tiempo y una notificación cuando llega al nivel que elijas."},
+        {"emoji": "🔮", "title": "Oráculo que habla", "prompt": "Haz una pregunta, toca la bola de cristal brillante y un oráculo misterioso responde en voz alta con una vibración, usando la IA para dar respuestas ingeniosas."},
+        {"emoji": "⏰", "title": "Sprints de concentración", "prompt": "Un temporizador de concentración de 25 minutos que te avisa con una notificación y una vibración al acabar cada sprint y lee en voz alta una frase motivadora."}
+      ]
+    }
+  }
+}
