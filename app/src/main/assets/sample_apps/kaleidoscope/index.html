@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#0b0917">
+<title>Neon Prism</title>
+<style>
+:root{color-scheme:dark;--bg:#0b0917;--muted:#8f88a9;--line:rgba(255,255,255,.09);--lime:#d4ff83}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#f8f4ff}
+body{background:radial-gradient(ellipse at 20% 40%,#19102c 0,transparent 55%),radial-gradient(ellipse at 90% 70%,#101b2c 0,transparent 50%),#0b0917}
+button,input{font:inherit}button{color:inherit;cursor:pointer;touch-action:manipulation;border:0}button:active{transform:scale(.96)}button:focus-visible,input:focus-visible{outline:2px solid var(--lime);outline-offset:4px}
+.app{height:100%;height:100dvh;display:flex;flex-direction:column;padding:env(safe-area-inset-top) max(18px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(18px,env(safe-area-inset-left));max-width:800px;margin:auto}
+header{height:87px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:11px}.brand-icon{height:41px;width:41px;background:linear-gradient(145deg,#41255d,#19172d);border:1px solid #705183;border-radius:14px;display:grid;place-items:center;color:#e4a8ff;box-shadow:0 0 26px #b452ff16}
+h1{font-size:21px;letter-spacing:-.8px;margin:0;font-weight:750}.eyebrow{font-size:9px;letter-spacing:2.3px;color:#a49ab9;margin-top:4px}
+.header-right{display:flex;align-items:center;gap:13px}.save-dot{width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px #c6ff6766}.icon-button{width:43px;height:43px;border-radius:14px;background:#ffffff06;border:1px solid var(--line);display:grid;place-items:center}.icon-button:disabled{opacity:.3}
+svg{height:22px;width:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.stage{position:relative;flex:1;min-height:100px;margin:0 -18px;overflow:hidden;touch-action:none;isolation:isolate}
+canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+#stars{pointer-events:none;opacity:0;transition:opacity .8s}
+.stage.galaxy #stars{opacity:1}
+.drawing-layer{position:absolute;inset:0;pointer-events:none;transform-origin:50% 50%;will-change:transform,filter}
+#effects{pointer-events:none}
+.stage-label{position:absolute;top:8px;left:25px;color:#8b819f;font-size:9px;letter-spacing:1.8px;display:flex;align-items:center;gap:7px;pointer-events:none}.stage-label i{display:block;width:4px;height:4px;background:#bca5df;border-radius:50%}
+.fold-label{position:absolute;right:25px;top:5px;font-size:10px;font-weight:600;color:#b8a7cc;border:1px solid #ffffff10;border-radius:20px;padding:5px 9px;pointer-events:none}
+.hint{pointer-events:none;position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;transition:opacity .7s}.hint.hidden{opacity:0}.hint-symbol{color:#dec0ff;margin:auto auto 18px;width:52px;height:52px;filter:drop-shadow(0 0 12px #c66cff80)}.hint h2{font-size:22px;font-weight:500;letter-spacing:-.7px;margin:0 0 9px}.hint p{font-size:12px;color:#9c90b0;margin:0;line-height:1.7}
+footer{flex-shrink:0;padding:13px 0 12px;position:relative}
+.controls{background:linear-gradient(130deg,#211a30ed,#141321f5);border:1px solid #ffffff13;border-radius:25px;padding:17px 16px 15px;box-shadow:0 16px 55px #0004}
+.style-row{display:flex;align-items:center;justify-content:space-between;gap:13px;margin-bottom:17px}
+.palettes{display:flex;align-items:center;gap:9px}
+.swatch{width:31px;height:31px;border-radius:50%;border:3px solid #211a30;position:relative;background:conic-gradient(#ff76e1,#996aff,#64e6ff,#a7ffb7,#ffe29e,#ff76e1);box-shadow:0 0 0 1px #ffffff15}
+.swatch.selected{box-shadow:0 0 0 2px #f3e9ff}.swatch::after{content:"";position:absolute;inset:-8px}
+.swatch[data-palette="aurora"]{background:linear-gradient(135deg,#60ffd2,#43bfff 55%,#bd7cff)}
+.swatch[data-palette="ember"]{background:linear-gradient(135deg,#ffce76,#ff697d 55%,#ed67ff)}
+.brush-control{display:flex;align-items:center;gap:9px;flex:1;max-width:145px}.brush-dot{width:5px;height:5px;border-radius:50%;background:#c0b5d0;flex-shrink:0}.brush-dot.big{width:11px;height:11px}
+input[type=range]{width:100%;min-width:42px;height:28px;margin:0;appearance:none;-webkit-appearance:none;background:transparent;touch-action:pan-x}
+input[type=range]::-webkit-slider-runnable-track{height:3px;background:#4a3c5b;border-radius:5px}
+input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;height:17px;width:17px;border-radius:50%;background:#eee4ff;margin-top:-7px;box-shadow:0 0 12px #d8b3ff40}
+input[type=range]::-moz-range-track{height:3px;background:#4a3c5b}input[type=range]::-moz-range-thumb{height:17px;width:17px;border:0;border-radius:50%;background:#eee4ff}
+.actions{display:grid;grid-template-columns:1.16fr 1.13fr .8fr;gap:8px}
+.action{height:54px;border-radius:15px;background:#ffffff07;border:1px solid #ffffff0b;display:flex;align-items:center;justify-content:center;gap:7px;font-size:12px;font-weight:600;white-space:nowrap}.action svg{width:18px;height:18px}.action.primary{background:var(--lime);color:#1c2620;border-color:transparent;box-shadow:0 4px 20px #d4ff8310}.action.primary.playing{background:#d9c3ff;color:#2b1943}
+.galaxy-toggle{width:100%;min-height:46px;margin-top:10px;padding:0 12px;border-radius:14px;border:1px solid #ffffff12;background:#ffffff04;display:flex;align-items:center;gap:9px;text-align:left;transition:background .3s,border-color .3s}
+.galaxy-toggle>svg{color:#bdacdf;width:20px;height:20px;flex-shrink:0}
+.galaxy-copy{flex:1;font-size:12px;font-weight:600}
+.galaxy-copy small{display:block;font-size:10px;font-weight:400;color:#9f93b6;margin-top:2px}
+.galaxy-toggle[aria-pressed="true"]{background:linear-gradient(110deg,#9d65ff22,#54b6ff15);border-color:#bb91ff65}
+.galaxy-toggle[aria-pressed="true"]>svg{color:#ddc2ff;filter:drop-shadow(0 0 5px #b18aff)}
+.toggle-track{width:34px;height:20px;background:#51445f;border-radius:20px;padding:3px;flex-shrink:0;transition:background .3s}
+.toggle-track::after{content:"";display:block;width:14px;height:14px;border-radius:50%;background:#d1c4e2;transition:transform .3s,background .3s}
+.galaxy-toggle[aria-pressed="true"] .toggle-track{background:#a57adf}
+.galaxy-toggle[aria-pressed="true"] .toggle-track::after{transform:translateX(14px);background:#fff}
+.footnote{font-size:10px;letter-spacing:.3px;text-align:center;color:#777087;margin:12px 0 0;height:14px;transition:color .2s}.footnote.notice{color:#d6c2ed}
+.backdrop{position:fixed;inset:0;z-index:10;background:#05030bbd;backdrop-filter:blur(10px);display:flex;align-items:flex-end;justify-content:center;padding:20px 18px calc(20px + env(safe-area-inset-bottom));opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s}
+.backdrop.open{opacity:1;visibility:visible}.sheet{width:100%;max-width:430px;background:#211a30;border:1px solid #ffffff16;border-radius:27px;padding:24px;transform:translateY(25px);transition:transform .25s}.open .sheet{transform:translateY(0)}
+.sheet-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}.sheet h2{font-size:22px;letter-spacing:-.5px;margin:0}.sheet p{font-size:13px;color:#a99bbb;line-height:1.6;margin:0 0 23px}.close{background:#ffffff09;border-radius:50%;height:35px;width:35px;display:grid;place-items:center}.close svg{height:17px;width:17px}
+.sym-options{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.sym-option{height:83px;border-radius:15px;border:1px solid #ffffff12;background:#ffffff05;font-size:12px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:9px}.sym-option.selected{border-color:#d4ff83;background:#d4ff8310;color:#d4ff83}.sym-option svg{width:29px;height:29px}
+.dialog-actions{display:flex;gap:10px}.dialog-actions button{flex:1;height:49px;border-radius:14px;font-size:13px;font-weight:600;background:#ffffff0b}.dialog-actions .danger{background:#ff8cb6;color:#331224}
+@media(max-height:650px){header{height:69px}.controls{padding:12px}.style-row{margin-bottom:12px}footer{padding-top:8px;padding-bottom:7px}.action{height:47px}.footnote{margin-top:8px}.hint h2{font-size:19px}.hint-symbol{width:36px;height:36px;margin-bottom:10px}.galaxy-toggle{margin-top:8px}.galaxy-copy small{display:none}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+<defs>
+<symbol id="prism" viewBox="0 0 24 24"><path d="m12 2 3.1 6.9L22 12l-6.9 3.1L12 22l-3.1-6.9L2 12l6.9-3.1Z"/><path d="m5 5 7 3 7-3-3 7 3 7-7-3-7 3 3-7Z"/></symbol>
+<symbol id="undo" viewBox="0 0 24 24"><path d="M8 5 3 10l5 5M3 10h11a6 6 0 0 1 0 12" transform="translate(0 -2)"/></symbol>
+<symbol id="play" viewBox="0 0 24 24"><path d="m9 5 11 7-11 7Z"/></symbol>
+<symbol id="pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+<symbol id="clear" viewBox="0 0 24 24"><path d="m14 3 7 7-10 11H6l-4-4L14 3Z"/><path d="m8 9 7 7M11 21h10"/></symbol>
+<symbol id="close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+<symbol id="galaxy" viewBox="0 0 24 24"><path d="m12 5 1.7 4.8L18.5 12l-4.8 1.7L12 19l-1.7-5.3L5.5 12l4.8-2.2Z"/><path d="M6 3v4M4 5h4M20 16v4M18 18h4"/><circle cx="19" cy="5" r="1"/></symbol>
+</defs>
+</svg>
+<main class="app">
+<header>
+<div class="brand"><div class="brand-icon"><svg><use href="#prism"/></svg></div><div><h1>Neon Prism</h1><div class="eyebrow">A LITTLE TOUCH OF MAGIC</div></div></div>
+<div class="header-right"><span class="save-dot" id="saveDot" title="Canvas saved"></span><button class="icon-button" id="undoBtn" aria-label="Undo last stroke" disabled><svg><use href="#undo"/></svg></button></div>
+</header>
+<section class="stage" id="stage" aria-label="Kaleidoscope drawing canvas">
+<canvas id="stars" aria-hidden="true"></canvas>
+<canvas id="guide" aria-hidden="true"></canvas>
+<div class="drawing-layer" id="drawingLayer"><canvas id="art"></canvas><canvas id="effects" aria-hidden="true"></canvas></div>
+<div class="stage-label"><i></i><span id="liveLabel">TOUCH TO CREATE</span></div><div class="fold-label" id="foldLabel">8-fold symmetry</div>
+<div class="hint" id="hint"><svg class="hint-symbol"><use href="#prism"/></svg><h2>Make a little magic.</h2><p>Draw anywhere. Watch it bloom.<br>Every line has a beautiful reflection.</p></div>
+</section>
+<footer>
+<div class="controls">
+<div class="style-row">
+<div class="palettes" aria-label="Color palette">
+<button class="swatch selected" data-palette="spectrum" aria-label="Spectrum colors" aria-pressed="true"></button>
+<button class="swatch" data-palette="aurora" aria-label="Aurora colors" aria-pressed="false"></button>
+<button class="swatch" data-palette="ember" aria-label="Ember colors" aria-pressed="false"></button>
+</div>
+<div class="brush-control"><span class="brush-dot"></span><input id="brush" type="range" min="1" max="6" step=".5" value="2.5" aria-label="Brush size"><span class="brush-dot big"></span></div>
+</div>
+<div class="actions">
+<button class="action primary" id="autoBtn"><svg><use href="#play"/></svg><span>Autoplay</span></button>
+<button class="action" id="symBtn"><svg><use href="#prism"/></svg><span id="symText">Symmetry 8</span></button>
+<button class="action" id="clearBtn"><svg><use href="#clear"/></svg><span>Clear</span></button>
+</div>
+<button class="galaxy-toggle" id="galaxyBtn" aria-pressed="false">
+<svg aria-hidden="true"><use href="#galaxy"/></svg>
+<span class="galaxy-copy">Galaxy mode<small>Starry skies, slow orbits &amp; glowing pulses</small></span>
+<span class="toggle-track" aria-hidden="true"></span>
+</button>
+</div>
+<p class="footnote" id="status" role="status">Your canvas is saved automatically</p>
+</footer>
+</main>
+<div class="backdrop" id="symModal" role="dialog" aria-modal="true" aria-labelledby="symTitle">
+<div class="sheet"><div class="sheet-header"><h2 id="symTitle">More ways to glow</h2><button class="close" aria-label="Close symmetry options"><svg><use href="#close"/></svg></button></div><p>Choose the symmetry for your next strokes.</p><div class="sym-options" id="symOptions"></div></div>
+</div>
+<div class="backdrop" id="clearModal" role="dialog" aria-modal="true" aria-labelledby="clearTitle">
+<div class="sheet"><div class="sheet-header"><h2 id="clearTitle">A fresh canvas?</h2><button class="close" aria-label="Cancel"><svg><use href="#close"/></svg></button></div><p>Clear your artwork and make room for new magic. You can undo this right afterward.</p><div class="dialog-actions"><button id="cancelClear">Keep drawing</button><button class="danger" id="confirmClear">Clear canvas</button></div></div>
+</div>
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const db = window.Acornix?.db || {
+ async get(key){try{return JSON.parse(localStorage.getItem(key))}catch{return null}},
+ async set(key,value){localStorage.setItem(key,JSON.stringify(value))}
+};
+const key='neon-prism-artwork-v1';
+const stage=$('stage'), art=$('art'), fx=$('effects'), guide=$('guide'), stars=$('stars'), drawingLayer=$('drawingLayer');
+const ctx=art.getContext('2d'), fctx=fx.getContext('2d'), gctx=guide.getContext('2d'), sctx=stars.getContext('2d');
+const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
+let W=1,H=1,U=1,dpr=1,ready=false,strokes=[],current=null,cleared=null;
+let settings={symmetry:8,palette:'spectrum',brush:2.5,galaxy:false};
+let playing=false,pointer=null,particles=[],autoShape=null,autoClock=0,lastFrame=0;
+let galaxyAngle=0,galaxyClock=0,starfield=[];
+let saveTimer,noticeTimer,queue=Promise.resolve(),revision=0,modalWasPlaying=false;
+const hueSeed=Math.random()*360;
+function hue(t){const v=t*.018+hueSeed;if(settings.palette==='aurora')return 155+(Math.sin(v*.025)+1)*65;if(settings.palette==='ember')return 290+(Math.sin(v*.025)+1)*45;return v%360}
+function color(h,l=65,a=1){return `hsla(${h},100%,${l}%,${a})`}
+function point(x,y,h){return {x,y,h}}
+function copies(p,n,fn){
+ for(let k=0;k<n/2;k++){
+  const a=k*Math.PI*4/n,c=Math.cos(a),s=Math.sin(a);
+  for(const m of [1,-1]){const x=p.x,y=p.y*m;fn(W/2+(x*c-y*s)*U,H/2+(x*s+y*c)*U)}
+ }
+}
+function segment(st,a,b){
+ const n=st.n,w=st.w*U;
+ const paths=[];
+ copies(a,n,(x,y)=>paths.push([x,y]));
+ let i=0;
+ ctx.beginPath();
+ copies(b,n,(x,y)=>{const from=paths[i++];ctx.moveTo(from[0],from[1]);ctx.lineTo(x,y)});
+ ctx.lineCap='round';ctx.lineJoin='round';
+ ctx.globalCompositeOperation='lighter';
+ ctx.strokeStyle=color(b.h,54,.38);ctx.lineWidth=w*2.4;ctx.shadowColor=color(b.h,60);ctx.shadowBlur=w*4+5;ctx.stroke();
+ ctx.shadowBlur=0;ctx.strokeStyle=color(b.h,65,.84);ctx.lineWidth=w;ctx.stroke();
+ ctx.strokeStyle=color(b.h,88,.7);ctx.lineWidth=Math.max(.5,w*.32);ctx.stroke();
+ ctx.globalCompositeOperation='source-over';
+}
+function drawStroke(st){
+ if(!st.p.length)return;
+ if(st.p.length===1){const p=st.p[0];segment(st,p,{...p,x:p.x+.0002});return}
+ for(let i=1;i<st.p.length;i++)segment(st,st.p[i-1],st.p[i]);
+}
+function rebuild(){
+ ctx.clearRect(0,0,W,H);
+ for(const s of strokes)drawStroke(s);
+ if(current)drawStroke(current);
+ if(autoShape)drawStroke(autoShape.stroke);
+}
+function drawGuide(){
+ gctx.clearRect(0,0,W,H);
+ const cx=W/2,cy=H/2;
+ gctx.strokeStyle=settings.galaxy?'rgba(175,137,224,.035)':'rgba(175,137,224,.065)';gctx.lineWidth=1;
+ for(const r of [.3,.6,.9]){gctx.beginPath();gctx.arc(cx,cy,U*r,0,Math.PI*2);gctx.stroke()}
+ gctx.setLineDash([2,9]);
+ for(let i=0;i<settings.symmetry;i++){const a=i*Math.PI*2/settings.symmetry;gctx.beginPath();gctx.moveTo(cx,cy);gctx.lineTo(cx+Math.cos(a)*U*1.15,cy+Math.sin(a)*U*1.15);gctx.stroke()}
+ gctx.setLineDash([]);gctx.fillStyle='#d8b8ff40';gctx.beginPath();gctx.arc(cx,cy,2,0,Math.PI*2);gctx.fill();
+}
+function createStars(){
+ starfield=[];
+ const count=Math.max(55,Math.min(160,Math.round(W*H/1700)));
+ for(let i=0;i<count;i++)starfield.push({
+  x:Math.random(),y:Math.random(),r:.35+Math.random()*1.1,
+  phase:Math.random()*Math.PI*2,speed:.4+Math.random()*.8,
+  alpha:.25+Math.random()*.65,h:200+Math.random()*75
+ });
+}
+function drawStars(){
+ sctx.clearRect(0,0,W,H);
+ const glow=sctx.createRadialGradient(W*.46,H*.5,0,W*.46,H*.5,Math.max(W,H)*.65);
+ glow.addColorStop(0,'rgba(106,48,167,.19)');
+ glow.addColorStop(.5,'rgba(35,75,126,.10)');
+ glow.addColorStop(1,'rgba(11,9,23,0)');
+ sctx.fillStyle=glow;sctx.fillRect(0,0,W,H);
+ for(const s of starfield){
+  const twinkle=reducedMotion.matches? .8 : .63+.37*Math.sin(galaxyClock*s.speed+s.phase);
+  const x=s.x*W,y=s.y*H;
+  sctx.fillStyle=`hsla(${s.h},80%,87%,${s.alpha*twinkle})`;
+  sctx.beginPath();sctx.arc(x,y,s.r,0,Math.PI*2);sctx.fill();
+  if(s.r>1.25){
+   sctx.strokeStyle=`hsla(${s.h},90%,85%,${s.alpha*twinkle*.35})`;
+   sctx.lineWidth=.65;sctx.beginPath();
+   sctx.moveTo(x-3,y);sctx.lineTo(x+3,y);sctx.moveTo(x,y-3);sctx.lineTo(x,y+3);sctx.stroke();
+  }
+ }
+}
+function updateGalaxy(dt){
+ if(settings.galaxy){
+  if(!reducedMotion.matches){
+   galaxyClock+=dt;
+   galaxyAngle=(galaxyAngle+dt*Math.PI/120)%(Math.PI*2);
+  }
+  drawingLayer.style.transform=`rotate(${galaxyAngle}rad)`;
+  const brightness=reducedMotion.matches?1.12:1.12+.26*Math.sin(galaxyClock*Math.PI/2.8);
+  drawingLayer.style.filter=`brightness(${brightness})`;
+  drawStars();
+ }else{
+  drawingLayer.style.transform='none';
+  drawingLayer.style.filter='none';
+ }
+}
+function canvasPoint(ev,r){
+ const x=(ev.clientX-r.left-W/2)/U,y=(ev.clientY-r.top-H/2)/U;
+ const angle=settings.galaxy?galaxyAngle:0,c=Math.cos(angle),s=Math.sin(angle);
+ return point(x*c+y*s,-x*s+y*c,hue(performance.now()));
+}
+function resize(){
+ const r=stage.getBoundingClientRect();W=Math.max(1,r.width);H=Math.max(1,r.height);U=Math.min(W,H)*.46;dpr=Math.min(window.devicePixelRatio||1,2);
+ for(const c of [art,fx,guide,stars]){c.width=Math.round(W*dpr);c.height=Math.round(H*dpr);c.getContext('2d').setTransform(dpr,0,0,dpr,0,0)}
+ createStars();drawGuide();rebuild();updateGalaxy(0);
+}
+function syncUI(){
+ document.querySelectorAll('.swatch').forEach(el=>{const active=el.dataset.palette===settings.palette;el.classList.toggle('selected',active);el.setAttribute('aria-pressed',active)});
+ $('brush').value=settings.brush;$('foldLabel').textContent=`${settings.symmetry}-fold symmetry`;$('symText').textContent=`Symmetry ${settings.symmetry}`;
+ $('hint').classList.toggle('hidden',!!strokes.length||!!current||playing);
+ $('undoBtn').disabled=!strokes.length&&!cleared;
+ document.querySelectorAll('.sym-option').forEach(b=>{const active=+b.dataset.n===settings.symmetry;b.classList.toggle('selected',active);b.setAttribute('aria-pressed',active)});
+ $('autoBtn').classList.toggle('playing',playing);$('autoBtn').setAttribute('aria-pressed',playing);
+ $('autoBtn').querySelector('use').setAttribute('href',playing?'#pause':'#play');
+ $('autoBtn').querySelector('span').textContent=playing?'Pause':'Autoplay';
+ $('liveLabel').textContent=playing?'A LITTLE AUTOMATIC MAGIC':settings.galaxy?'A GALAXY AT YOUR FINGERTIPS':'TOUCH TO CREATE';
+ stage.classList.toggle('galaxy',settings.galaxy);
+ $('galaxyBtn').setAttribute('aria-pressed',settings.galaxy);
+ updateGalaxy(0);
+}
+function notice(text){clearTimeout(noticeTimer);$('status').textContent=text;$('status').classList.add('notice');noticeTimer=setTimeout(()=>{$('status').textContent='Your canvas is saved automatically';$('status').classList.remove('notice')},2600)}
+function save(immediate=false){
+ clearTimeout(saveTimer);$('saveDot').style.background='#dcb4ff';
+ const run=()=>{
+  const data=JSON.parse(JSON.stringify({strokes,settings}));const rev=++revision;
+  queue=queue.catch(()=>{}).then(()=>db.set(key,data)).then(()=>{if(rev===revision){$('saveDot').style.background='#d4ff83';$('saveDot').title='Canvas saved'}}).catch(()=>{notice('Could not save. Please keep the app open.');$('saveDot').style.background='#ff8cb6'});
+ };
+ if(immediate)run();else saveTimer=setTimeout(run,350);
+}
+function startStroke(){return {n:settings.symmetry,w:settings.brush/180,p:[]}}
+function addPoint(st,p,spark=true){
+ const prev=st.p[st.p.length-1];st.p.push(p);
+ if(prev)segment(st,prev,p);else segment(st,p,{...p,x:p.x+.0002});
+ if(spark&&Math.random()<.55){copies(p,st.n,(x,y)=>{if(particles.length<150)particles.push({x,y,vx:(Math.random()-.5)*24,vy:(Math.random()-.6)*28,life:.35+Math.random()*.4,max:.75,h:p.h,r:Math.random()*1.5+.5})})}
+}
+function finishManual(){
+ if(!current)return;
+ strokes.push(current);current=null;pointer=null;cleared=null;syncUI();save();
+}
+function finishAuto(){
+ if(autoShape?.stroke.p.length){strokes.push(autoShape.stroke);cleared=null;save()}
+ autoShape=null;syncUI();
+}
+function setPlaying(value){
+ if(playing===value)return;
+ if(!value)finishAuto();
+ playing=value;autoClock=0;syncUI();
+}
+stage.addEventListener('pointerdown',e=>{
+ if(!ready||pointer!==null)return;
+ e.preventDefault();setPlaying(false);pointer=e.pointerId;stage.setPointerCapture(pointer);current=startStroke();
+ addPoint(current,canvasPoint(e,stage.getBoundingClientRect()));
+ syncUI();
+});
+stage.addEventListener('pointermove',e=>{
+ if(e.pointerId!==pointer||!current)return;e.preventDefault();
+ const events=e.getCoalescedEvents?.()||[e],r=stage.getBoundingClientRect();
+ for(const ev of events){
+  const p=canvasPoint(ev,r);
+  const prev=current.p[current.p.length-1];if(Math.hypot(p.x-prev.x,p.y-prev.y)*U>.65)addPoint(current,p);
+ }
+});
+stage.addEventListener('pointerup',e=>{if(e.pointerId===pointer)finishManual()});
+stage.addEventListener('pointercancel',e=>{if(e.pointerId===pointer)finishManual()});
+stage.addEventListener('lostpointercapture',e=>{if(e.pointerId===pointer)finishManual()});
+$('autoBtn').onclick=()=>{if(ready){finishManual();setPlaying(!playing)}};
+$('galaxyBtn').onclick=()=>{
+ if(!ready)return;
+ finishManual();settings.galaxy=!settings.galaxy;
+ if(!settings.galaxy){galaxyAngle=0;galaxyClock=0}
+ drawGuide();syncUI();save();
+ notice(settings.galaxy?'Galaxy mode on. Let your artwork orbit.':'Galaxy mode off. Back to your canvas.');
+};
+$('undoBtn').onclick=()=>{
+ setPlaying(false);finishManual();
+ if(cleared){strokes=cleared;cleared=null;notice('Artwork restored')}
+ else if(strokes.length){strokes.pop();notice('Last stroke undone')}
+ rebuild();syncUI();save();
+};
+document.querySelectorAll('.swatch').forEach(b=>b.onclick=()=>{
+ settings.palette=b.dataset.palette;syncUI();save();notice(`${b.dataset.palette[0].toUpperCase()+b.dataset.palette.slice(1)} colors selected`);
+});
+$('brush').oninput=e=>{settings.brush=+e.target.value;save()};
+function openModal(id){modalWasPlaying=playing;setPlaying(false);finishManual();$(id).classList.add('open');$(id).querySelector('button').focus()}
+function closeModal(el,resume=true){el.classList.remove('open');if(resume&&modalWasPlaying)setPlaying(true);modalWasPlaying=false;$(el.id==='symModal'?'symBtn':'clearBtn').focus()}
+$('symBtn').onclick=()=>openModal('symModal');
+$('clearBtn').onclick=()=>{if(strokes.length||current||playing)openModal('clearModal');else notice('Your canvas is ready for a little magic')};
+document.querySelectorAll('.backdrop').forEach(el=>{
+ el.addEventListener('click',e=>{if(e.target===el||e.target.closest('.close'))closeModal(el)});
+ el.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closeModal(el);
+  if(e.key==='Tab'){
+   const buttons=[...el.querySelectorAll('button')],first=buttons[0],last=buttons[buttons.length-1];
+   if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
+   else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+  }
+ });
+});
+$('cancelClear').onclick=()=>closeModal($('clearModal'));
+$('confirmClear').onclick=()=>{
+ cleared=strokes;strokes=[];particles=[];closeModal($('clearModal'),false);rebuild();syncUI();save();notice('Fresh canvas. Undo brings your artwork back.');
+};
+for(const n of [4,6,8,12,16]){
+ const b=document.createElement('button');b.className='sym-option';b.dataset.n=n;b.setAttribute('aria-label',`${n}-fold symmetry`);
+ let lines='';for(let i=0;i<n;i++){const a=i*2*Math.PI/n;lines+=`<path d="M16 16 L${16+12*Math.cos(a)} ${16+12*Math.sin(a)}"/>`}
+ b.innerHTML=`<svg viewBox="0 0 32 32" aria-hidden="true">${lines}<circle cx="16" cy="16" r="3" fill="currentColor" stroke="none"/></svg><span>${n}-fold</span>`;
+ b.onclick=()=>{settings.symmetry=n;drawGuide();syncUI();save();closeModal($('symModal'));notice(`${n} reflections, endless possibilities`)};
+ $('symOptions').appendChild(b);
+}
+function createAutoShape(){
+ return {stroke:startStroke(),t:0,duration:3+Math.random()*2,phase:Math.random()*Math.PI*2,a:2+Math.floor(Math.random()*4),b:1+Math.floor(Math.random()*3),r:.45+Math.random()*.43,offset:Math.random()*2};
+}
+function animate(time){
+ const dt=Math.min((time-(lastFrame||time))/1000,.045);lastFrame=time;
+ if(!document.hidden)updateGalaxy(dt);
+ if(playing&&ready){
+  if(!autoShape)autoShape=createAutoShape();
+  autoClock+=dt;let count=0;
+  while(autoClock>1/35&&count++<4){
+   autoClock-=1/35;
+   const s=autoShape;s.t+=1/35;
+   const t=s.t/s.duration*Math.PI*2;
+   const r=s.r*(.63+.3*Math.sin(s.b*t+s.phase));
+   const a=s.offset+t*.7;
+   const x=r*Math.cos(a)+.11*Math.cos(s.a*t+s.phase);
+   const y=r*Math.sin(a)+.11*Math.sin((s.a+1)*t);
+   addPoint(s.stroke,point(x,y,hue(time+s.t*70)));
+   if(s.t>=s.duration){finishAuto();autoShape=createAutoShape()}
+  }
+ }
+ fctx.clearRect(0,0,W,H);
+ for(let i=particles.length-1;i>=0;i--){
+  const p=particles[i];p.life-=dt;if(p.life<=0){particles.splice(i,1);continue}
+  p.x+=p.vx*dt;p.y+=p.vy*dt;
+  fctx.globalAlpha=Math.min(1,p.life*2);fctx.fillStyle=color(p.h,85);fctx.shadowBlur=8;fctx.shadowColor=color(p.h);
+  fctx.beginPath();fctx.arc(p.x,p.y,p.r*Math.min(1,p.life*3),0,Math.PI*2);fctx.fill();
+ }
+ fctx.globalAlpha=1;fctx.shadowBlur=0;
+ requestAnimationFrame(animate);
+}
+async function load(){
+ try{
+  const data=await db.get(key);
+  if(data){
+   strokes=Array.isArray(data.strokes)?data.strokes:[];
+   settings={...settings,...data.settings};
+   if(![4,6,8,12,16].includes(settings.symmetry))settings.symmetry=8;
+   settings.galaxy=settings.galaxy===true;
+  }
+ }catch{notice('Unable to load your saved canvas')}
+ ready=true;syncUI();resize();
+}
+window.addEventListener('acornixdata',async()=>{
+ clearTimeout(saveTimer);setPlaying(false);finishManual();await queue.catch(()=>{});await load();notice('Canvas refreshed');
+});
+document.addEventListener('visibilitychange',()=>{
+ lastFrame=0;
+ if(document.hidden){finishManual();setPlaying(false);save(true)}
+});
+window.addEventListener('pagehide',()=>{finishManual();setPlaying(false);save(true)});
+new ResizeObserver(resize).observe(stage);
+resize();load();requestAnimationFrame(animate);
+})();
+</script>
+</body>
+</html>

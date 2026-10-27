@@ -256,19 +256,33 @@ class AcornixAccessibilityService : AccessibilityService() {
         return performGlobalAction(code)
     }
 
-    /** Captures the screen as a JPEG (Android 11+). */
-    suspend fun screenshot(): ImageData? {
-        if (Build.VERSION.SDK_INT < 30) return null
-        val bitmap = captureScreen() ?: return null
+    /** Captures the screen as a JPEG (Android 11+), or says why it couldn't. */
+    suspend fun screenshot(): Result<ImageData> {
+        if (Build.VERSION.SDK_INT < 30) return Result.failure(IllegalStateException("Screenshots need Android 11 or newer."))
+        var capture = captureScreen()
+        // Android refuses screenshots taken less than a third of a second apart: wait and try again.
+        repeat(2) {
+            if (capture.second != ERROR_TAKE_SCREENSHOT_INTERVAL_TIME_SHORT) return@repeat
+            delay(400)
+            capture = captureScreen()
+        }
+        val bitmap = capture.first ?: return Result.failure(IllegalStateException(screenshotError(capture.second)))
         val scale = SCREENSHOT_WIDTH.toFloat() / bitmap.width
         val scaled = if (scale < 1f) Bitmap.createScaledBitmap(bitmap, SCREENSHOT_WIDTH, (bitmap.height * scale).toInt(), true) else bitmap
         val out = ByteArrayOutputStream()
         scaled.compress(Bitmap.CompressFormat.JPEG, 70, out)
-        return ImageData(Base64.encodeToString(out.toByteArray(), Base64.NO_WRAP), "image/jpeg")
+        return Result.success(ImageData(Base64.encodeToString(out.toByteArray(), Base64.NO_WRAP), "image/jpeg"))
     }
 
+    private fun screenshotError(code: Int?): String = when (code) {
+        ERROR_TAKE_SCREENSHOT_SECURE_WINDOW -> "The app on screen blocks screenshots. Use read_screen instead."
+        ERROR_TAKE_SCREENSHOT_INTERVAL_TIME_SHORT -> "Screenshots are being taken too fast. Wait a moment and try again."
+        else -> "The screenshot failed (error $code). Use read_screen instead."
+    }
+
+    /** The bitmap, or null and Android's error code. */
     @RequiresApi(30)
-    private suspend fun captureScreen(): Bitmap? =
+    private suspend fun captureScreen(): Pair<Bitmap?, Int?> =
         suspendCancellableCoroutine { cont ->
             takeScreenshot(
                 Display.DEFAULT_DISPLAY,
@@ -278,11 +292,11 @@ class AcornixAccessibilityService : AccessibilityService() {
                         val hw = Bitmap.wrapHardwareBuffer(result.hardwareBuffer, result.colorSpace)
                         val soft = hw?.copy(Bitmap.Config.ARGB_8888, false)
                         result.hardwareBuffer.close()
-                        if (cont.isActive) cont.resume(soft)
+                        if (cont.isActive) cont.resume(soft to null)
                     }
 
                     override fun onFailure(errorCode: Int) {
-                        if (cont.isActive) cont.resume(null)
+                        if (cont.isActive) cont.resume(null to errorCode)
                     }
                 },
             )

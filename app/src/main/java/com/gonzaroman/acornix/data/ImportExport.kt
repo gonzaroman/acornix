@@ -220,6 +220,12 @@ class SampleAppsInstaller(private val context: Context, private val repo: AppRep
             "castle defense" to "Castle Defense",
             "imc" to "IMC",
             "matrixCamera" to "Matrix Camera",
+            "droneRace" to "Neon Drone Race",
+            "notes" to "Notes",
+            "kaleidoscope" to "Neon Kaleidoscope",
+            "aquarium" to "Reef Aquarium",
+            "pocketCoach" to "Pocket Coach",
+            "pixelCity" to "Pixel City",
         )
     }
 }

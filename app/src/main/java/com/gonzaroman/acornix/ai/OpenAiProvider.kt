@@ -14,12 +14,17 @@ import okhttp3.OkHttpClient
 /**
  * OpenAI Chat Completions. Also used for any OpenAI-compatible endpoint (OpenRouter, Groq, Ollama…)
  * by passing a different [baseUrl].
+ *
+ * With [responsesApi] (OpenAI itself), the assistant uses the Responses API instead: OpenAI's reasoning models
+ * can only think between tool calls there. On Chat Completions they must run with reasoning off, and some
+ * (gpt-6.1-sol) refuse that entirely.
  */
 class OpenAiProvider(
     private val apiKey: String,
     private val model: String,
     baseUrl: String = DEFAULT_BASE_URL,
     private val http: OkHttpClient = HttpClients.default,
+    private val responsesApi: Boolean = false,
 ) : AiProvider {
 
     private val base = baseUrl.trim().trimEnd('/')
@@ -55,7 +60,8 @@ class OpenAiProvider(
         return TextResult(out.toString(), truncated = finish == "length", refused = finish == "content_filter")
     }
 
-    override fun newAgentSession(system: String, tools: List<ToolSpec>): AgentSession = Session(system, tools)
+    override fun newAgentSession(system: String, tools: List<ToolSpec>): AgentSession =
+        if (responsesApi) ResponsesSession(system, tools) else Session(system, tools)
 
     override suspend fun listModels(): List<String> {
         val res = http.getJson("$base/models", headers)
@@ -145,6 +151,112 @@ class OpenAiProvider(
                 ToolCall(obj.str("id") ?: fn.str("name").orEmpty(), fn.str("name").orEmpty(), args)
             }
             return AgentReply(message.contentText(), calls, choice.str("finish_reason"))
+        }
+    }
+
+    /**
+     * The Responses API, with reasoning on between tool calls. OpenAI keeps the conversation
+     * (previous_response_id), so each turn only sends what is new.
+     */
+    private inner class ResponsesSession(private val system: String, tools: List<ToolSpec>) : AgentSession {
+        private val toolsJson = buildJsonArray {
+            tools.forEach { t ->
+                add(buildJsonObject {
+                    put("type", "function")
+                    put("name", t.name)
+                    put("description", t.description)
+                    put("parameters", t.parameters)
+                })
+            }
+        }
+        private var previousId: String? = null
+
+        /** call_ids still waiting for a result (after a stop or an error); the API rejects a turn without them. */
+        private var pending: List<String> = emptyList()
+
+        override suspend fun send(text: String, images: List<ImageData>): AgentReply {
+            val input = buildJsonArray {
+                pending.forEach { add(callOutput(it, "Stopped by the user.")) }
+                add(userInput(text, images))
+            }
+            return complete(input)
+        }
+
+        override suspend fun sendToolResults(results: List<ToolResult>): AgentReply {
+            val input = buildJsonArray {
+                results.forEach { r -> add(callOutput(r.call.id, if (r.isError) "ERROR: ${r.content}" else r.content, r.image)) }
+                val answered = results.map { it.call.id }.toSet()
+                pending.filter { it !in answered }.forEach { add(callOutput(it, "Skipped.")) }
+            }
+            return complete(input)
+        }
+
+        /**
+         * A screenshot goes inside the tool's own output. Sent as a separate user message, reasoning models
+         * took it for "make an app like this" and answered with an HTML page.
+         */
+        private fun callOutput(id: String, output: String, image: ImageData? = null) = buildJsonObject {
+            put("type", "function_call_output")
+            put("call_id", id)
+            if (image == null) {
+                put("output", output)
+            } else {
+                put("output", buildJsonArray {
+                    add(buildJsonObject { put("type", "input_text"); put("text", output) })
+                    add(buildJsonObject {
+                        put("type", "input_image")
+                        put("image_url", "data:${image.mimeType};base64,${image.base64}")
+                    })
+                })
+            }
+        }
+
+        private fun userInput(text: String, images: List<ImageData>) = buildJsonObject {
+            put("role", "user")
+            put("content", buildJsonArray {
+                add(buildJsonObject { put("type", "input_text"); put("text", text) })
+                images.forEach { img ->
+                    add(buildJsonObject {
+                        put("type", "input_image")
+                        put("image_url", "data:${img.mimeType};base64,${img.base64}")
+                    })
+                }
+            })
+        }
+
+        private suspend fun complete(input: JsonArray): AgentReply {
+            val body = buildJsonObject {
+                put("model", model)
+                put("instructions", system)
+                put("input", input)
+                put("reasoning", buildJsonObject { put("effort", "medium") })
+                put("store", true)
+                if (toolsJson.isNotEmpty()) put("tools", toolsJson)
+                previousId?.let { put("previous_response_id", it) }
+            }
+            val res = http.postJson("$base/responses", body, headers)
+            previousId = res.str("id")
+            val text = StringBuilder()
+            val calls = mutableListOf<ToolCall>()
+            (res["output"] as? JsonArray).orEmpty().forEach { el ->
+                val item = el as? JsonObject ?: return@forEach
+                when (item.str("type")) {
+                    "message" -> (item["content"] as? JsonArray).orEmpty().forEach { part ->
+                        val p = part as? JsonObject ?: return@forEach
+                        (p.str("text") ?: p.str("refusal"))?.let { text.append(it) }
+                    }
+                    "function_call" -> {
+                        val id = item.str("call_id") ?: return@forEach
+                        val args = runCatching {
+                            AiJson.parseToJsonElement(item.str("arguments").orEmpty().ifBlank { "{}" }).jsonObject
+                        }.getOrElse { JsonObject(emptyMap()) }
+                        calls += ToolCall(id, item.str("name").orEmpty(), args)
+                    }
+                }
+            }
+            pending = calls.map { it.id }
+            val stop = (res["incomplete_details"] as? JsonObject)?.str("reason") ?: res.str("status")
+            return AgentReply(text.toString(), calls, stop)
         }
     }
 

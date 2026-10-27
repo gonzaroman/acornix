@@ -217,7 +217,7 @@ class AgentTools(
         return when (call.name) {
             "read_screen" -> ToolResult(call, svc.readScreen())
             "screenshot" -> {
-                val img = svc.screenshot() ?: return ToolResult(call, "Screenshots need Android 11 or newer.", isError = true)
+                val img = svc.screenshot().getOrElse { return ToolResult(call, it.message.orEmpty(), isError = true) }
                 ToolResult(call, "Screenshot attached.", image = img)
             }
             "tap", "long_press" -> {

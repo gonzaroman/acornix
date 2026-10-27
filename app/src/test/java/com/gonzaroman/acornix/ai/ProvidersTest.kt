@@ -94,6 +94,65 @@ class ProvidersTest {
     }
 
     @Test
+    fun openAiResponsesToolLoopReasonsAndChainsTurns() = runTest {
+        server.enqueue(MockResponse().setBody("""
+            {"id":"resp_1","status":"completed","output":[
+              {"type":"reasoning","summary":[]},
+              {"type":"function_call","call_id":"call_1","name":"get_weather","arguments":"{\"city\":\"Málaga\"}"}]}
+        """.trimIndent()))
+        server.enqueue(MockResponse().setBody("""
+            {"id":"resp_2","status":"completed","output":[
+              {"type":"message","role":"assistant","content":[{"type":"output_text","text":"Sunny in Málaga"}]}]}
+        """.trimIndent()))
+
+        val session = OpenAiProvider("k", "gpt-6.1-sol", server.url("/v1").toString(), responsesApi = true)
+            .newAgentSession("sys", listOf(weatherTool))
+        val first = session.send("weather?")
+        val call = first.toolCalls.single()
+        assertEquals("call_1", call.id)
+        assertEquals("Málaga", call.arguments.str("city"))
+        val second = session.sendToolResults(listOf(ToolResult(call, "28C", image = ImageData("QUJD"))))
+        assertEquals("Sunny in Málaga", second.text)
+
+        val req1 = server.takeRequest()
+        assertEquals("/v1/responses", req1.path)
+        val body1 = AiJson.parseToJsonElement(req1.body.readUtf8()).jsonObject
+        assertEquals("sys", body1["instructions"]!!.jsonPrimitive.content)
+        assertEquals("medium", body1["reasoning"]!!.jsonObject["effort"]!!.jsonPrimitive.content)
+        assertEquals(null, body1["reasoning_effort"])
+        assertEquals("get_weather", body1["tools"]!!.jsonArray[0].jsonObject["name"]!!.jsonPrimitive.content)
+
+        val body2 = AiJson.parseToJsonElement(server.takeRequest().body.readUtf8()).jsonObject
+        assertEquals("resp_1", body2["previous_response_id"]!!.jsonPrimitive.content)
+        val input = body2["input"]!!.jsonArray
+        assertEquals(1, input.size)
+        val output = input[0].jsonObject
+        assertEquals("function_call_output", output["type"]!!.jsonPrimitive.content)
+        assertEquals("call_1", output["call_id"]!!.jsonPrimitive.content)
+        // The screenshot travels inside the tool output, not as a user message.
+        val parts = output["output"]!!.jsonArray
+        assertEquals("28C", parts[0].jsonObject["text"]!!.jsonPrimitive.content)
+        assertEquals("data:image/jpeg;base64,QUJD", parts[1].jsonObject["image_url"]!!.jsonPrimitive.content)
+    }
+
+    @Test
+    fun openAiResponsesAnswersPendingCallsAfterAStop() = runTest {
+        server.enqueue(MockResponse().setBody("""
+            {"id":"r1","output":[{"type":"function_call","call_id":"c9","name":"get_weather","arguments":"{}"}]}
+        """.trimIndent()))
+        server.enqueue(MockResponse().setBody("""{"id":"r2","output":[]}"""))
+        val session = OpenAiProvider("k", "m", server.url("/v1").toString(), responsesApi = true)
+            .newAgentSession("sys", listOf(weatherTool))
+        session.send("weather?")
+        session.send("never mind") // the user stopped before the tool ran
+
+        server.takeRequest()
+        val input = AiJson.parseToJsonElement(server.takeRequest().body.readUtf8()).jsonObject["input"]!!.jsonArray
+        assertEquals("c9", input[0].jsonObject["call_id"]!!.jsonPrimitive.content)
+        assertEquals("user", input[1].jsonObject["role"]!!.jsonPrimitive.content)
+    }
+
+    @Test
     fun httpErrorsAreReadable() = runTest {
         server.enqueue(MockResponse().setResponseCode(401).setBody("""{"error":{"message":"Invalid key"}}"""))
         val e = runCatching { OpenAiProvider("k", "m", server.url("/v1").toString()).streamText("s", "p") }.exceptionOrNull()

@@ -127,7 +127,7 @@ class SettingsRepository(private val context: Context) {
             if (!c.isUsable) throw ProviderNotConfiguredException()
             return when (c.type) {
                 ProviderType.ANTHROPIC -> AnthropicProvider(c.apiKey, c.model)
-                ProviderType.OPENAI -> OpenAiProvider(c.apiKey, c.model)
+                ProviderType.OPENAI -> OpenAiProvider(c.apiKey, c.model, responsesApi = true)
                 ProviderType.GEMINI -> GeminiProvider(c.apiKey, c.model)
                 ProviderType.CUSTOM -> OpenAiProvider(c.apiKey, c.model, c.baseUrl)
             }

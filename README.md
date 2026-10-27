@@ -167,12 +167,19 @@ Acornix checks GitHub for new versions. When one comes out you'll see what's new
 
 ## 🎮 Games and apps included
 
-Acornix comes with eight example apps, rebuilt for 2.0. They all work offline, adapt to any screen in portrait or landscape, and save their data with `Acornix.db`.
+Acornix comes with fourteen example apps. Eight were rebuilt for 2.0: they all work offline, adapt to any screen in portrait or landscape, and save their data with `Acornix.db`.
 
 | | | | |
 |:---:|:---:|:---:|:---:|
 | <img src="docs/screenshots/app-calculator.jpg" width="170" alt="Calculator app included in Acornix"><br>**Calculator**<br><sub>History saved, proper operator precedence</sub> | <img src="docs/screenshots/app-bmi.jpg" width="170" alt="BMI calculator app included in Acornix"><br>**BMI**<br><sub>Gauge, healthy range and progress chart</sub> | <img src="docs/screenshots/app-drummer.jpg" width="170" alt="Drum machine app included in Acornix"><br>**Drummer**<br><sub>8 pads, 16-step sequencer, saved beats</sub> | <img src="docs/screenshots/app-matrix.jpg" width="170" alt="Matrix camera app included in Acornix"><br>**Matrix Camera**<br><sub>Live Matrix / ASCII / halftone camera</sub> |
 | <img src="docs/screenshots/app-bowling.jpg" width="170" alt="Bowling game included in Acornix"><br>**Bowling**<br><sub>Swipe to throw, hook spin, real scoring</sub> | <img src="docs/screenshots/app-piano.jpg" width="170" alt="Piano app included in Acornix"><br>**Piano**<br><sub>4 instruments, multitouch, recordings</sub> | <img src="docs/screenshots/app-castle.jpg" width="170" alt="Castle defense game included in Acornix"><br>**Castle Defense**<br><sub>Waves, bosses and an upgrade shop</sub> | <img src="docs/screenshots/app-superm.jpg" width="170" alt="Platformer game included in Acornix"><br>**Super M**<br><sub>Platformer with endless levels</sub> |
+
+The other six were made with AI on a phone, each from a single request and one improvement, for our step-by-step videos, and they are included exactly as they came out. Reef Aquarium loads its 3D engine from the internet.
+
+| | | |
+|:---:|:---:|:---:|
+| <img src="docs/screenshots/app-drone.jpg" width="170" alt="3D drone racing game made with AI in Acornix"><br>**Neon Drone Race**<br><sub>3D race through neon rings, with rival drones</sub> | <img src="docs/screenshots/app-notes.jpg" width="170" alt="Notes app made with AI in Acornix"><br>**Notes**<br><sub>Checklists, pinned notes, colors and search</sub> | <img src="docs/screenshots/app-kaleidoscope.jpg" width="170" alt="Neon kaleidoscope drawing app made with AI in Acornix"><br>**Neon Kaleidoscope**<br><sub>8-way mirrored neon drawing and a galaxy mode</sub> |
+| <img src="docs/screenshots/app-aquarium.jpg" width="170" alt="3D aquarium app made with AI in Acornix"><br>**Reef Aquarium**<br><sub>Feed the fish; glowing jellyfish at night</sub> | <img src="docs/screenshots/app-coach.jpg" width="170" alt="Talking workout coach app made with AI in Acornix"><br>**Pocket Coach**<br><sub>A workout coach that talks and vibrates</sub> | <img src="docs/screenshots/app-pixelcity.jpg" width="170" alt="Isometric pixel art city builder game made with AI in Acornix"><br>**Pixel City**<br><sub>Build a city, day and night, fireworks</sub> |
 
 ---
 
@@ -275,7 +282,7 @@ app/src/main/java/com/gonzaroman/acornix/
 ├── agent/     Assistant tools and conversation loop
 ├── web/       Full-screen app runner, per-app origins, window.Acornix bridge
 └── ui/        Jetpack Compose screens (Material 3)
-app/src/main/assets/sample_apps/   The eight example apps
+app/src/main/assets/sample_apps/   The fourteen example apps
 ```
 
 **Tech:** Kotlin, Jetpack Compose and Material 3, OkHttp, kotlinx.serialization, DataStore, SQLite, AndroidX WebKit, Coil, and the official Anthropic Java SDK.

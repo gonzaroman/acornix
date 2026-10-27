@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#111716">
+<title>Pulse • Your 3-minute coach</title>
+<style>
+:root{--bg:#111716;--card:#1c2522;--lime:#d4fa67;--orange:#ff9365;--text:#f6f8f0;--muted:#a1afa5}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow-x:hidden}
+button{font:inherit;cursor:pointer;touch-action:manipulation}
+button:focus-visible{outline:3px solid var(--orange);outline-offset:4px}
+.app{max-width:520px;margin:auto;padding:calc(22px + env(safe-area-inset-top)) max(22px,env(safe-area-inset-right)) calc(26px + env(safe-area-inset-bottom)) max(22px,env(safe-area-inset-left))}
+header{display:flex;align-items:center;justify-content:space-between}
+.brand{font-size:26px;font-weight:900;letter-spacing:-1px;display:flex;align-items:center;gap:9px}
+.brand-mark{color:var(--lime);font-size:32px;line-height:1}
+.icon-button{border:1px solid #354137;border-radius:50%;width:46px;height:46px;background:var(--card);color:var(--text);display:grid;place-items:center}
+.icon-button svg{width:22px;height:22px}
+.eyebrow{font-size:11px;font-weight:800;letter-spacing:2px;color:var(--lime);margin:27px 0 8px}
+h1{font-size:clamp(30px,8vw,39px);line-height:1.08;letter-spacing:-1.5px;margin:0}
+.sub{font-size:14px;color:var(--muted);margin:10px 0 0;line-height:1.5}
+.stage{position:relative;text-align:center;margin-top:22px;background:radial-gradient(ellipse at 50% 40%,#2b3b25 0%,transparent 68%);border-radius:28px}
+.status{display:inline-flex;align-items:center;gap:7px;background:#263023;border:1px solid #3c492b;color:var(--lime);padding:6px 11px;border-radius:20px;font-size:10px;font-weight:800;letter-spacing:1.5px}
+.dot{height:6px;width:6px;border-radius:50%;background:currentColor}
+.running .dot{animation:blink 1.3s infinite}
+.ring-wrap{position:relative;width:min(75vw,294px);height:min(75vw,294px);margin:12px auto 0}
+.ring{height:100%;width:100%;transform:rotate(-90deg);overflow:visible}
+.track{stroke:#2b352b;stroke-width:9;fill:none}
+.progress{stroke:var(--lime);stroke-width:9;fill:none;stroke-linecap:round;transition:stroke-dashoffset .15s linear,stroke .3s;filter:drop-shadow(0 0 8px #cfff4a20)}
+.ring-inner{position:absolute;inset:22px;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.figure{height:63px;width:73px;color:var(--lime);margin-bottom:1px;overflow:visible}
+.figure .body{transform-origin:40px 40px}
+.running .figure .body{animation:move .85s ease-in-out infinite alternate}
+.figure[data-exercise="1"] .body{--dy:8px;--rot:0deg}
+.figure[data-exercise="2"] .body{--dy:0px;--rot:-13deg}
+.figure[data-exercise="3"] .body{--dy:5px;--rot:6deg}
+.figure[data-exercise="4"] .body{--dy:0px;--rot:10deg}
+.figure[data-exercise="5"] .body{animation-duration:.28s}
+.time{font-size:65px;line-height:1;font-weight:850;letter-spacing:-3px;font-variant-numeric:tabular-nums}
+.time-label{font-size:10px;letter-spacing:2px;color:var(--muted);font-weight:700;margin-top:7px}
+.trophy{display:none;font-size:100px;line-height:1.25;filter:drop-shadow(0 8px 22px #ffd15c55)}
+.complete .trophy{display:block;animation:trophy-pop .75s cubic-bezier(.2,.8,.3,1.3) both}
+.complete .figure,.complete .time{display:none}
+.complete .time-label{color:var(--lime);margin-top:12px}
+.complete .status{border-color:#80703e;background:#383322;color:#ffe28b}
+.complete{background:radial-gradient(ellipse at 50% 40%,#514025 0%,transparent 70%)}
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:20}
+.exercise-title{margin:12px 0 6px;font-size:25px;letter-spacing:-.7px}
+.cue{color:var(--muted);font-size:13px;line-height:1.5;min-height:39px;max-width:290px;margin:0 auto}
+.timeline{display:flex;gap:5px;margin:20px 0 11px}
+.segment{height:5px;flex:1;border-radius:4px;background:#303b31;overflow:hidden}
+.segment span{display:block;height:100%;width:0;background:var(--lime);border-radius:4px;transition:width .2s}
+.meta{display:flex;justify-content:space-between;color:var(--muted);font-size:12px}
+.meta strong{font-weight:650;color:var(--text)}
+.controls{display:flex;gap:10px;margin-top:20px}
+.primary{border:0;background:var(--lime);color:#182011;min-height:58px;border-radius:18px;font-weight:850;font-size:17px;flex:1;display:flex;align-items:center;justify-content:center;gap:11px;box-shadow:0 6px 28px #d4fa670c}
+.primary:active{transform:scale(.98)}
+.reset{border:1px solid #354137;background:var(--card);color:var(--text);border-radius:18px;width:58px;min-height:58px;font-size:25px}
+.coach-note{display:flex;justify-content:center;align-items:center;gap:6px;color:var(--muted);font-size:11px;margin:13px 0 25px}
+.coach-note span{color:var(--orange)}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.section-head h2{font-size:16px;margin:0;letter-spacing:-.2px}
+.section-head span{color:var(--muted);font-size:11px}
+.exercise-list{background:var(--card);border:1px solid #2a362c;border-radius:20px;overflow:hidden}
+.exercise-row{display:flex;align-items:center;gap:12px;padding:13px 15px;border-bottom:1px solid #2c362e;transition:background .25s}
+.exercise-row:last-child{border-bottom:0}
+.exercise-row.current{background:#303d27}
+.number{height:31px;width:31px;display:grid;place-items:center;border-radius:10px;background:#2a352d;color:var(--muted);font-size:12px;font-weight:750}
+.current .number{background:var(--lime);color:#192113}
+.done .number{color:var(--lime)}
+.row-name{font-weight:650;font-size:13px;flex:1}
+.row-time{font-size:12px;color:var(--muted)}
+.footer{font-size:11px;color:#89968b;text-align:center;line-height:1.7;margin:17px 14px 0}
+.toast{position:fixed;bottom:calc(24px + env(safe-area-inset-bottom));left:50%;transform:translate(-50%,20px);width:max-content;max-width:calc(100vw - 36px);background:#f4f7eb;color:#1c281b;padding:13px 18px;border-radius:15px;font-size:13px;box-shadow:0 8px 40px #0007;opacity:0;pointer-events:none;transition:.25s;z-index:30}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+dialog{background:#202b22;color:var(--text);border:1px solid #46543c;border-radius:24px;padding:25px;width:calc(100% - 44px);max-width:360px}
+dialog::backdrop{background:#000b;backdrop-filter:blur(5px)}
+dialog h2{margin:0 0 10px}
+dialog p{color:var(--muted);font-size:14px;line-height:1.6}
+.dialog-actions{display:flex;gap:10px;margin-top:20px}
+.dialog-actions button{flex:1;min-height:48px;border-radius:13px;border:0;font-weight:750;background:var(--lime);color:#172113}
+.dialog-actions .secondary{background:#354034;color:var(--text)}
+@keyframes blink{50%{opacity:.35}}
+@keyframes move{to{transform:translateY(var(--dy,-4px)) rotate(var(--rot,-7deg))}}
+@keyframes trophy-pop{0%{transform:scale(.25) rotate(-18deg);opacity:0}65%{transform:scale(1.15) rotate(7deg);opacity:1}100%{transform:scale(1) rotate(0);opacity:1}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+@media(max-height:730px){.eyebrow{margin-top:20px}.ring-wrap{width:min(75vw,240px);height:min(75vw,240px)}.figure{height:48px}.time{font-size:57px}.stage{margin-top:17px}.exercise-title{margin-top:6px}.trophy{font-size:84px}}
+</style>
+</head>
+<body>
+<main class="app">
+<header>
+<div class="brand"><span class="brand-mark">ϟ</span>pulse<span style="color:var(--lime)">.</span></div>
+<button class="icon-button" id="voice" aria-label="Turn voice off" aria-pressed="true"></button>
+</header>
+<p class="eyebrow">SMALL SESSION. BIG ENERGY.</p>
+<h1>Your next 3 minutes.<br>Make them count.</h1>
+<p class="sub" id="subtitle">Six moves. No equipment. Just you.</p>
+<section class="stage" id="stage" aria-label="Workout timer">
+<div class="status"><span class="dot"></span><span id="status">READY WHEN YOU ARE</span></div>
+<div class="ring-wrap">
+<svg class="ring" viewBox="0 0 300 300" aria-hidden="true">
+<circle class="track" cx="150" cy="150" r="138"/>
+<circle class="progress" id="ring" cx="150" cy="150" r="138" stroke-dasharray="867.08" stroke-dashoffset="0"/>
+</svg>
+<div class="ring-inner">
+<svg class="figure" id="figure" viewBox="0 0 80 75" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<g class="body"><circle cx="40" cy="12" r="6"/><path d="M40 24v21M40 28L25 37l-9-9M40 28l14 9 10-11M40 45L28 57l-5 12M40 45l12 10 10 1"/></g>
+</svg>
+<div class="trophy" role="img" aria-label="Workout completion trophy">🏆</div>
+<div class="time" id="time" role="timer" aria-label="3 minutes">03:00</div>
+<div class="time-label" id="timeLabel">TOTAL WORKOUT</div>
+</div>
+</div>
+<h2 class="exercise-title" id="exerciseTitle">A little movement. A big win.</h2>
+<p class="cue" id="cue">Find a little space, stand tall,<br>and let your coach take it from here.</p>
+</section>
+<div class="timeline" id="timeline" aria-hidden="true"></div>
+<div class="meta"><span id="step">6 exercises · 30 seconds each</span><strong id="remaining">03:00 total</strong></div>
+<div class="controls">
+<button class="primary" id="start" disabled>Getting ready…</button>
+<button class="reset" id="reset" aria-label="Restart workout" hidden>↺</button>
+</div>
+<div class="coach-note" id="coachNote"><span>◖))</span> Voice guidance + switch vibrations</div>
+<div class="section-head"><h2>The game plan</h2><span>ALL STANDING</span></div>
+<div class="exercise-list" id="list"></div>
+<p class="footer">Move at your own pace. Keep steps small and comfortable.<br>Stop if you feel pain, dizziness, or unusual discomfort.</p>
+</main>
+<canvas id="confetti" aria-hidden="true" hidden></canvas>
+<div class="toast" id="toast" role="status"></div>
+<dialog id="restartDialog">
+<h2>Fresh start?</h2>
+<p>Your current session will reset. Your completed workouts will stay saved.</p>
+<div class="dialog-actions"><button class="secondary" id="cancelReset">Keep going</button><button id="confirmReset">Start over</button></div>
+</dialog>
+<script>
+(()=>{
+'use strict';
+const bridge=window.Acornix;
+const $=id=>document.getElementById(id);
+const moves=[
+{name:'March in place',spoken:'March in place. Stand tall and swing your arms.',cue:'Stand tall. Lift your knees and swing your arms.',encouragement:'Halfway! Great start. Keep that comfortable rhythm!'},
+{name:'Easy squats',spoken:'Easy squats. Hips back, chest up. Only go as low as feels comfortable.',cue:'Hips back, chest up. Choose a comfortable depth.',encouragement:'Halfway! You’re building strength, one squat at a time!'},
+{name:'Wall push-ups',spoken:'Wall push-ups. Hands on a sturdy wall, bend your elbows and press away.',cue:'Hands on a sturdy wall. Bend, then press away.',encouragement:'Halfway! Looking strong. Keep it steady and controlled!'},
+{name:'Alternating step-backs',spoken:'Alternating step-backs. Step one foot back, return, then switch sides.',cue:'Step back, return, switch. Keep a soft bend in your knees.',encouragement:'Halfway! Every step counts. You’re doing great!'},
+{name:'Standing knee lifts',spoken:'Standing knee lifts. Bring one knee toward your opposite hand, then switch.',cue:'Lift a knee toward the opposite hand. Switch sides.',encouragement:'Halfway! Keep breathing. You’ve got a great rhythm!'},
+{name:'Quick side steps',spoken:'Quick side steps. Step side to side. No jumping. Finish strong!',cue:'Step side to side. Soft knees, no jumping. You’ve got this!',encouragement:'Halfway! Just fifteen seconds to your big win. You’ve got this!'}
+];
+const key='pulseCoach.v1';
+let state={mode:'idle',remaining:180000,voice:true,completed:0,encouraged:[]};
+let deadline=0,lastSecond=-1,lastIndex=-1,lastCount=-1,loaded=false,toastTimer;
+let pending=null,saving=false,confettiFrame=0,confettiTimeout;
+function toast(text){$('toast').textContent=text;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3600)}
+async function read(){if(bridge)return await bridge.db.get(key);const s=localStorage.getItem(key);return s?JSON.parse(s):null}
+async function persist(){
+ pending={...state,encouraged:[...state.encouraged]};
+ if(saving)return;
+ saving=true;
+ while(pending){
+ const value=pending;pending=null;
+ try{if(bridge)await bridge.db.set(key,value);else localStorage.setItem(key,JSON.stringify(value))}
+ catch(e){toast('Your progress could not be saved on this device.')}
+ }
+ saving=false;
+}
+function stopSpeech(){if(!bridge&&window.speechSynthesis)window.speechSynthesis.cancel()}
+async function say(text){
+ if(!state.voice)return;
+ try{
+ if(bridge)await bridge.speak(text,'en-US');
+ else if('speechSynthesis'in window){const u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=1.05;window.speechSynthesis.speak(u)}
+ else throw Error();
+ }catch(e){toast('Voice is unavailable. Follow the on-screen coach.')}
+}
+async function buzz(pattern){
+ try{if(bridge)await bridge.vibrate(pattern);else if(navigator.vibrate)navigator.vibrate(pattern)}
+ catch(e){toast('Vibration is unavailable. Keep an eye on the timer.')}
+}
+function clearConfetti(){
+ cancelAnimationFrame(confettiFrame);
+ clearTimeout(confettiTimeout);
+ $('confetti').hidden=true;
+}
+function celebrate(){
+ clearConfetti();
+ const canvas=$('confetti'),ctx=canvas.getContext('2d');
+ if(!ctx)return;
+ const w=window.innerWidth,h=window.innerHeight,dpr=Math.min(window.devicePixelRatio||1,2);
+ canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);
+ ctx.setTransform(dpr,0,0,dpr,0,0);
+ canvas.hidden=false;
+ const colors=['#d4fa67','#ff9365','#ffd45c','#ff76b4','#78dfff','#ffffff'];
+ const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const particles=Array.from({length:200},()=>({
+ x:reduced?Math.random()*w:w*.5,
+ y:reduced?Math.random()*h:h*.4,
+ vx:(Math.random()-.5)*w*1.8,
+ vy:-180-Math.random()*h*.85,
+ size:5+Math.random()*7,
+ angle:Math.random()*Math.PI*2,
+ spin:(Math.random()-.5)*14,
+ color:colors[Math.floor(Math.random()*colors.length)]
+ }));
+ function draw(p,alpha){
+ ctx.save();ctx.globalAlpha=alpha;ctx.translate(p.x,p.y);ctx.rotate(p.angle);
+ ctx.fillStyle=p.color;ctx.fillRect(-p.size/2,-p.size/3,p.size,p.size*.65);ctx.restore();
+ }
+ if(reduced){
+ particles.forEach(p=>draw(p,.85));
+ confettiTimeout=setTimeout(clearConfetti,1800);
+ return;
+ }
+ const began=performance.now();let previous=began;
+ function frame(now){
+ const elapsed=(now-began)/1000,dt=Math.min((now-previous)/1000,.035);previous=now;
+ ctx.clearRect(0,0,w,h);
+ particles.forEach(p=>{
+ p.vx*=Math.exp(-dt*.6);p.vy+=h*.6*dt;
+ p.x+=p.vx*dt;p.y+=p.vy*dt;p.angle+=p.spin*dt;
+ draw(p,Math.max(0,Math.min(1,(4-elapsed)/.8)));
+ });
+ if(elapsed<4)confettiFrame=requestAnimationFrame(frame);
+ else clearConfetti();
+ }
+ confettiFrame=requestAnimationFrame(frame);
+}
+function fmt(seconds){return String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0')}
+function sec(){return Math.ceil(state.remaining/1000)}
+function index(){return Math.min(5,Math.floor((180000-state.remaining)/30000))}
+function voiceIcon(){
+ $('voice').innerHTML=state.voice?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 5 6 9H3v6h3l5 4zM15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 5 6 9H3v6h3l5 4zM16 9l6 6m0-6-6 6"/></svg>';
+ $('voice').setAttribute('aria-label',state.voice?'Turn voice off':'Turn voice on');
+ $('voice').setAttribute('aria-pressed',String(state.voice));
+}
+function render(){
+ const active=state.mode==='running'||state.mode==='paused',done=state.mode==='complete';
+ const i=index(),s=sec(),part=active?Math.ceil((state.remaining-(5-i)*30000)/1000):done?0:180;
+ $('stage').classList.toggle('running',state.mode==='running');
+ $('stage').classList.toggle('complete',done);
+ $('status').textContent=done?'SESSION COMPLETE':state.mode==='running'?'LET’S GET MOVING':state.mode==='paused'?'TAKE A BREATH':'READY WHEN YOU ARE';
+ $('time').textContent=fmt(part);
+ $('time').setAttribute('aria-label',part+' seconds');
+ $('timeLabel').textContent=done?'YOU SHOWED UP':active?'SECONDS LEFT':'TOTAL WORKOUT';
+ $('ring').style.strokeDashoffset=867.08*(1-(active?(state.remaining-(5-i)*30000)/30000:1));
+ $('ring').style.stroke=active&&part<=3?'var(--orange)':'var(--lime)';
+ $('figure').dataset.exercise=String(i);
+ $('exerciseTitle').textContent=done?'Big energy. Well earned.':active?moves[i].name:'A little movement. A big win.';
+ $('cue').textContent=done?'Three minutes for yourself. That’s a win. Breathe, relax, and enjoy the feeling.':active?moves[i].cue:'Find a little space, stand tall, and let your coach take it from here.';
+ $('step').textContent=done?'6 of 6 exercises complete':active?'MOVE '+(i+1)+' OF 6':'6 exercises · 30 seconds each';
+ $('remaining').textContent=done?'03:00 completed':fmt(s)+' total';
+ $('start').textContent=state.mode==='running'?'Ⅱ  Pause workout':state.mode==='paused'?'▶  Resume workout':done?'↻  Go again':'▶  Let’s go';
+ $('reset').hidden=!active;
+ $('subtitle').textContent=done?state.completed+' workout'+(state.completed===1?'':'s')+' completed. Keep your momentum.':'Six moves. No equipment. Just you.';
+ $('coachNote').innerHTML=state.voice?'<span>◖))</span> Voice guidance + switch vibrations':'<span>◌</span> Voice off · switch vibrations on';
+ document.querySelectorAll('.exercise-row').forEach((row,n)=>{
+ row.classList.toggle('current',active&&n===i);
+ row.classList.toggle('done',done||(active&&n<i));
+ row.querySelector('.number').textContent=done||(active&&n<i)?'✓':String(n+1).padStart(2,'0');
+ });
+ document.querySelectorAll('.segment span').forEach((el,n)=>el.style.width=(done?100:Math.max(0,Math.min(100,(180000-state.remaining-n*30000)/300)))+'%');
+ voiceIcon();
+}
+function finish(){
+ state.remaining=0;state.mode='complete';state.completed++;stopSpeech();render();persist();
+ celebrate();
+ buzz([130,90,130,90,250]);
+ say('Yes! Workout complete. You showed up and made those three minutes count. Amazing work!');
+}
+function tick(){
+ if(state.mode!=='running')return;
+ state.remaining=Math.max(0,deadline-Date.now());
+ if(state.remaining<=0){finish();return}
+ const i=index(),s=sec(),part=s-(5-i)*30;
+ if(i!==lastIndex){
+ lastIndex=i;lastCount=-1;stopSpeech();buzz([90,60,90]);say(moves[i].spoken);
+ }
+ if(part<=15&&!state.encouraged.includes(i)){
+ state.encouraged.push(i);
+ if(part>3){
+ toast(moves[i].encouragement);
+ say(moves[i].encouragement);
+ }
+ persist();
+ }
+ if(part<=3&&part!==lastCount){lastCount=part;say(String(part))}
+ render();
+ if(s!==lastSecond){lastSecond=s;persist()}
+}
+function start(){
+ if(!loaded)return;
+ if(state.mode==='running'){
+ state.remaining=Math.max(0,deadline-Date.now());
+ if(!state.remaining){finish();return}
+ state.mode='paused';stopSpeech();render();persist();return;
+ }
+ if(state.mode==='complete'){state.remaining=180000;state.mode='idle'}
+ const resuming=state.mode==='paused';
+ if(!resuming){state.encouraged=[];clearConfetti()}
+ state.mode='running';deadline=Date.now()+state.remaining;lastIndex=index();lastCount=-1;lastSecond=-1;
+ stopSpeech();buzz(90);
+ say(resuming?'Let’s keep going. '+moves[lastIndex].spoken:moves[0].spoken);
+ render();persist();tick();
+}
+$('start').onclick=start;
+$('voice').onclick=()=>{
+ state.voice=!state.voice;
+ if(!state.voice)stopSpeech();
+ else if(state.mode==='running')say(moves[index()].spoken);
+ render();persist();
+};
+$('reset').onclick=()=>{
+ if(state.mode==='running'){state.remaining=Math.max(0,deadline-Date.now());state.mode='paused';stopSpeech();render();persist()}
+ $('restartDialog').showModal();
+};
+$('cancelReset').onclick=()=>$('restartDialog').close();
+$('confirmReset').onclick=()=>{
+ $('restartDialog').close();stopSpeech();clearConfetti();state.mode='idle';state.remaining=180000;state.encouraged=[];lastIndex=-1;lastCount=-1;render();persist();
+};
+$('list').innerHTML=moves.map((m,i)=>'<div class="exercise-row"><span class="number">'+String(i+1).padStart(2,'0')+'</span><span class="row-name">'+m.name+'</span><span class="row-time">30s</span></div>').join('');
+$('timeline').innerHTML=moves.map(()=>'<div class="segment"><span></span></div>').join('');
+async function load(external=false){
+ try{
+ const saved=await read();
+ if(saved&&typeof saved==='object'){
+ stopSpeech();
+ state={mode:['idle','paused','running','complete'].includes(saved.mode)?saved.mode:'idle',remaining:Math.min(180000,Math.max(0,Number(saved.remaining)||0)),voice:saved.voice!==false,completed:Math.max(0,Number(saved.completed)||0),encouraged:Array.isArray(saved.encouraged)?saved.encouraged.filter(n=>Number.isInteger(n)&&n>=0&&n<6):[]};
+ if(state.mode==='running')state.mode='paused';
+ if(state.mode==='paused'&&state.remaining===0)state.mode='idle';
+ if(state.mode==='idle'){state.remaining=180000;state.encouraged=[]}
+ // Midpoints already passed before loading should not be replayed.
+ moves.forEach((m,i)=>{
+ if(180000-state.remaining>=i*30000+15000&&!state.encouraged.includes(i))state.encouraged.push(i);
+ });
+ if(external){clearConfetti();toast('Saved workout refreshed.')}
+ }
+ }catch(e){toast('Saved progress is unavailable. You can still work out.')}
+ loaded=true;$('start').disabled=false;render();
+}
+document.addEventListener('visibilitychange',()=>{
+ if(document.hidden&&state.mode==='running'){
+ state.remaining=Math.max(0,deadline-Date.now());persist();
+ }else if(!document.hidden)tick();
+});
+window.addEventListener('pagehide',()=>{
+ if(state.mode==='running'){state.remaining=Math.max(0,deadline-Date.now());persist()}
+});
+window.addEventListener('acornixdata',()=>load(true));
+setInterval(tick,120);
+render();load();
+})();
+</script>
+</body>
+</html>
