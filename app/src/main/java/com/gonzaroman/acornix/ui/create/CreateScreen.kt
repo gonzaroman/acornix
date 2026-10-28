@@ -204,6 +204,17 @@ private fun FormContent(vm: CreateViewModel, feature: Boolean) {
             Text(stringResource(R.string.attach_reference))
         }
 
+        // Right under the request, so nobody has to scroll past the ideas to find it.
+        Button(
+            onClick = { vm.generate(idea, name, category, attachments.images(), picked?.takeIf { it.prompt == idea }?.emoji) },
+            enabled = idea.isNotBlank(),
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+        ) {
+            Icon(Icons.Rounded.AutoAwesome, null)
+            Spacer(Modifier.width(8.dp))
+            Text(stringResource(if (target != null) R.string.apply_change else R.string.create_button), style = MaterialTheme.typography.titleMedium)
+        }
+
         if (target == null && !feature) {
             Text(stringResource(R.string.field_category), style = MaterialTheme.typography.titleSmall)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -227,15 +238,6 @@ private fun FormContent(vm: CreateViewModel, feature: Boolean) {
             }
         }
 
-        Button(
-            onClick = { vm.generate(idea, name, category, attachments.images(), picked?.takeIf { it.prompt == idea }?.emoji) },
-            enabled = idea.isNotBlank(),
-            modifier = Modifier.fillMaxWidth().height(56.dp),
-        ) {
-            Icon(Icons.Rounded.AutoAwesome, null)
-            Spacer(Modifier.width(8.dp))
-            Text(stringResource(if (target != null) R.string.apply_change else R.string.create_button), style = MaterialTheme.typography.titleMedium)
-        }
         Spacer(Modifier.navigationBarsPadding())
     }
 }
