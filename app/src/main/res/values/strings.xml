@@ -525,4 +525,28 @@
     <string name="tour_os_button">Open AcornixOS</string>
     <string name="tour_end_title">Your imagination is the limit</string>
     <string name="tour_end_text">Create anything you want. You can watch this tour again any time in Settings.</string>
+    <!-- Apps that use the AI -->
+    <string name="uses_ai_chip">🧠 AI</string>
+    <string name="uses_ai_note">🧠 This app uses your AI: each answer spends a few tokens of your key. It will ask you first.</string>
+    <string name="ai_permission_title">“%1$s” wants to use your AI</string>
+    <string name="ai_permission_text">Each answer spends a few tokens of your %1$s key. You can change this later in the app\'s options (long-press it in My Apps).</string>
+    <string name="ai_permission_allow">Allow</string>
+    <string name="ai_permission_deny">Don\'t allow</string>
+    <string name="ai_permission_option">Use my AI</string>
+    <string name="ai_permission_allowed">Allowed</string>
+    <string name="ai_permission_denied">Not allowed</string>
+    <string name="ai_permission_unasked">It will ask the first time</string>
+    <!-- Reviewing a shared app before installing it -->
+    <string name="import_review_title">Install “%1$s”?</string>
+    <string name="import_review_warning">This app was made by someone else. Install it only if you trust who shared it: you do it at your own risk. Your AI can review its code first.</string>
+    <string name="import_review_button">🔍 Review it with AI</string>
+    <string name="import_review_running">Your AI is reading the code… it can take a minute.</string>
+    <string name="import_review_failed">The review couldn\'t be done right now. You can try again or decide without it.</string>
+    <string name="import_review_no_ai">Set up your AI in Settings to review apps before installing them.</string>
+    <string name="import_review_safe">Nothing suspicious found</string>
+    <string name="import_review_caution">Some things to check</string>
+    <string name="import_review_danger">This app looks dangerous</string>
+    <string name="import_review_disclaimer">An AI review helps, but it can miss things. Installing is your decision.</string>
+    <string name="import_install">Install</string>
+    <string name="import_install_anyway">Install anyway</string>
 </resources>

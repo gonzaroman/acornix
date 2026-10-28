@@ -103,6 +103,8 @@ import com.gonzaroman.acornix.ui.components.rememberAttachments
 import com.gonzaroman.acornix.ui.components.rememberVoiceInput
 import com.gonzaroman.acornix.web.AcornixWebView
 import com.gonzaroman.acornix.web.AppLauncher
+import androidx.compose.runtime.produceState
+import androidx.compose.material3.Surface
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -322,6 +324,20 @@ private fun DoneContent(state: CreateUi.Done, vm: CreateViewModel, onShare: (App
                 Column(Modifier.weight(1f)) {
                     Text(state.app.name, style = MaterialTheme.typography.titleLarge, maxLines = 1)
                     Text(stringResource(R.string.gen_done_version, state.app.versionCount), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            // Say it plainly when the app will spend tokens of the user's key.
+            val usesAi by produceState(false, state.app.id, state.app.versionCount) {
+                value = com.gonzaroman.acornix.data.AppRepository.usesAi(context.container.apps.readCode(state.app.id))
+            }
+            if (usesAi) {
+                Surface(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.tertiaryContainer) {
+                    Text(
+                        stringResource(R.string.uses_ai_note),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer,
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
+                    )
                 }
             }
             // Labelled buttons on their own row, so the name keeps its space and nobody has to guess.

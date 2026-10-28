@@ -279,6 +279,9 @@ class AcornixJsBridge(
                 AppLauncher.open(context, app.id); JsonPrimitive(true)
             }
             "askAI" -> {
+                if (!AiPermissionPrompt.ensure(context, appId)) {
+                    throw IllegalStateException("You haven't allowed this app to use your AI. You can allow it in its options in Acornix (long-press the app).")
+                }
                 val options = AskAiOptions.from(arg(1))
                 val images = options.images.map { AskAi.toImage(it) ?: throw IllegalArgumentException("Could not read the image") }
                 val sofar = StringBuilder()

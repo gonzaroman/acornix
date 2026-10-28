@@ -30,6 +30,8 @@ class AppContainer(context: Context) {
     val backups = BackupManager(context, apps, data)
     val updates = UpdateChecker(context)
     val device = DeviceActions(context)
+    val aiPermissions = com.gonzaroman.acornix.data.AiPermissions(context)
+    val appReview = com.gonzaroman.acornix.core.AppReview(settings)
     val generator = AppGenerator(settings, apps, data)
     val ideas = IdeaGenerator(settings, java.io.File(context.filesDir, "ideas.json")) {
         context.assets.open("ideas/default_ideas.json").bufferedReader().use { it.readText() }

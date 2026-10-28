@@ -143,6 +143,19 @@ fun AppCard(app: AppMeta, onClick: () -> Unit, onLongClick: () -> Unit, modifier
             } else {
                 Text(app.emoji, fontSize = 54.sp)
             }
+            if (app.usesAi) {
+                Surface(
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+                    modifier = Modifier.align(Alignment.TopStart).padding(8.dp),
+                ) {
+                    Text(
+                        stringResource(R.string.uses_ai_chip),
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                    )
+                }
+            }
             if (app.kind != AppKind.APP) {
                 Surface(
                     shape = CircleShape,

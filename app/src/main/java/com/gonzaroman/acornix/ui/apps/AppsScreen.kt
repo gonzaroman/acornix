@@ -76,6 +76,8 @@ import com.gonzaroman.acornix.ui.components.EmptyState
 import com.gonzaroman.acornix.ui.components.relativeTime
 import com.gonzaroman.acornix.web.AppLauncher
 import kotlinx.coroutines.launch
+import androidx.compose.material3.Switch
+import androidx.compose.ui.unit.sp
 
 private enum class Filter(val label: Int) { ALL(R.string.filter_all), APPS(R.string.filter_apps), FEATURES(R.string.filter_features), SAMPLES(R.string.filter_samples) }
 
@@ -200,6 +202,25 @@ fun AppActionsSheet(app: AppMeta, nav: NavHostController, onDismiss: () -> Unit)
             scope.launch {
                 if (c.data.hasData(app.id)) askData = true else { shareAppZip(context, app, false); onDismiss() }
             }
+        }
+        if (app.usesAi) {
+            var allowed by remember { mutableStateOf(c.aiPermissions.get(app.id)) }
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.ai_permission_option)) },
+                supportingContent = {
+                    Text(stringResource(when (allowed) {
+                        true -> R.string.ai_permission_allowed
+                        false -> R.string.ai_permission_denied
+                        null -> R.string.ai_permission_unasked
+                    }))
+                },
+                leadingContent = { Text("🧠", fontSize = 20.sp) },
+                trailingContent = {
+                    Switch(checked = allowed == true, onCheckedChange = { on -> c.aiPermissions.set(app.id, on); allowed = on })
+                },
+                modifier = Modifier.padding(horizontal = 8.dp),
+                colors = androidx.compose.material3.ListItemDefaults.colors(containerColor = Color.Transparent),
+            )
         }
         SheetAction(Icons.Rounded.DriveFileRenameOutline, stringResource(R.string.action_rename)) { renaming = true }
         SheetAction(Icons.Rounded.Delete, stringResource(R.string.action_delete), MaterialTheme.colorScheme.error) { deleting = true }

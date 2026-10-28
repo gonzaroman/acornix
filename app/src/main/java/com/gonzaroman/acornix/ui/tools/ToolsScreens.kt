@@ -115,17 +115,11 @@ fun ImportExportScreen(nav: NavHostController) {
     var busy by remember { mutableStateOf(false) }
     var confirmRestore by remember { mutableStateOf<android.net.Uri?>(null) }
 
+    var reviewing by remember { mutableStateOf<android.net.Uri?>(null) }
     val importer = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        uri ?: return@rememberLauncherForActivityResult
-        scope.launch {
-            try {
-                val app = c.importExport.import(uri)
-                Toast.makeText(context, context.getString(R.string.import_done, app.name), Toast.LENGTH_LONG).show()
-            } catch (e: ImportException) {
-                Toast.makeText(context, importErrorMessage(context, e), Toast.LENGTH_LONG).show()
-            }
-        }
+        reviewing = uri
     }
+    reviewing?.let { uri -> com.gonzaroman.acornix.ui.components.ImportReviewDialog(uri) { reviewing = null } }
     val saver = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
         val (app, withData) = saving ?: return@rememberLauncherForActivityResult
         saving = null

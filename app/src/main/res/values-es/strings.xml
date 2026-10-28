@@ -524,4 +524,28 @@
     <string name="tour_os_button">Abrir AcornixOS</string>
     <string name="tour_end_title">Tu imaginación es el límite</string>
     <string name="tour_end_text">Crea lo que quieras. Puedes volver a ver este recorrido cuando quieras en Ajustes.</string>
+    <!-- Apps que usan la IA -->
+    <string name="uses_ai_chip">🧠 IA</string>
+    <string name="uses_ai_note">🧠 Esta app usa tu IA: cada respuesta gasta unos pocos tokens de tu clave. Te pedirá permiso antes.</string>
+    <string name="ai_permission_title">«%1$s» quiere usar tu IA</string>
+    <string name="ai_permission_text">Cada respuesta gasta unos pocos tokens de tu clave de %1$s. Puedes cambiarlo después en las opciones de la app (mantenla pulsada en Mis apps).</string>
+    <string name="ai_permission_allow">Permitir</string>
+    <string name="ai_permission_deny">No permitir</string>
+    <string name="ai_permission_option">Usar mi IA</string>
+    <string name="ai_permission_allowed">Permitido</string>
+    <string name="ai_permission_denied">No permitido</string>
+    <string name="ai_permission_unasked">Preguntará la primera vez</string>
+    <!-- Revisar una app compartida antes de instalarla -->
+    <string name="import_review_title">¿Instalar «%1$s»?</string>
+    <string name="import_review_warning">Esta app la ha creado otra persona. Instálala solo si confías en quien te la pasa: lo haces bajo tu responsabilidad. Tu IA puede revisar su código antes.</string>
+    <string name="import_review_button">🔍 Analizarla con IA</string>
+    <string name="import_review_running">Tu IA está leyendo el código… puede tardar un minuto.</string>
+    <string name="import_review_failed">Ahora no se ha podido hacer la revisión. Puedes intentarlo otra vez o decidir sin ella.</string>
+    <string name="import_review_no_ai">Configura tu IA en Ajustes para poder revisar las apps antes de instalarlas.</string>
+    <string name="import_review_safe">No he visto nada sospechoso</string>
+    <string name="import_review_caution">Hay cosas que conviene revisar</string>
+    <string name="import_review_danger">Esta app parece peligrosa</string>
+    <string name="import_review_disclaimer">La revisión de la IA ayuda, pero puede pasar algo por alto. Instalarla es decisión tuya.</string>
+    <string name="import_install">Instalar</string>
+    <string name="import_install_anyway">Instalar igualmente</string>
 </resources>

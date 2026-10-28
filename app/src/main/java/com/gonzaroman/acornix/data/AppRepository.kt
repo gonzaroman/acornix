@@ -30,6 +30,8 @@ data class AppMeta(
     val versionCount: Int = 1,
     /** How long the AI took to write the first version, for the share card. 0 = unknown. */
     val buildSeconds: Int = 0,
+    /** The code calls the user's AI (read from index.html, never saved). */
+    @kotlinx.serialization.Transient val usesAi: Boolean = false,
 )
 
 @Serializable
@@ -191,6 +193,7 @@ class AppRepository(
         return meta.copy(
             createdAt = meta.createdAt.takeIf { it > 0 } ?: modified,
             updatedAt = meta.updatedAt.takeIf { it > 0 } ?: modified,
+            usesAi = runCatching { usesAi(index.readText()) }.getOrDefault(false),
         )
     }
 
@@ -218,6 +221,10 @@ class AppRepository(
     }
 
     companion object {
+        /** Whether a page asks the user's AI (Acornix.askAI or Acornix.ai.chat). */
+        fun usesAi(code: String): Boolean = AI_CALL.containsMatchIn(code)
+        private val AI_CALL = Regex("""\baskAI\b|\bai\.chat\b""")
+
         const val APPS_DIR = "my_apps"
         const val INDEX = "index.html"
         const val META = "acornix.json"

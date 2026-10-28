@@ -53,15 +53,32 @@ class ImportExport(
             ?: error("Cannot write to the selected file")
     }
 
-    suspend fun import(uri: Uri): AppMeta {
+    suspend fun import(uri: Uri): AppMeta = install(preview(uri))
+
+    /** Reads a shared app without installing it, so the user can review it first. */
+    suspend fun preview(uri: Uri): ImportPreview {
         val fileName = displayName(uri) ?: "imported.zip"
         val name = AppRepository.prettyName(fileName.substringBeforeLast('.'))
         val entries = withContext(Dispatchers.IO) {
             context.contentResolver.openInputStream(uri)?.use { readZip(it) }
                 ?: throw ImportException(ImportException.Reason.NOT_A_ZIP)
         }
-        return importEntries(name, entries)
+        if (entries.isEmpty()) throw ImportException(ImportException.Reason.NOT_A_ZIP)
+        val prefix = findAppRoot(entries.keys)
+        if (prefix == null) {
+            val isPlugin = entries.any { (path, bytes) ->
+                path.endsWith("main.py") && String(bytes).let { "config =" in it || "config=" in it }
+            }
+            throw ImportException(if (isPlugin) ImportException.Reason.PYTHON_PLUGIN else ImportException.Reason.NO_INDEX)
+        }
+        // The code the AI reviews: every text file of the app, index.html first.
+        val code = entries.filterKeys { it.startsWith(prefix) && TEXT_FILE.containsMatchIn(it) && !it.endsWith(DATA_FILE) }
+            .entries.sortedBy { if (it.key.endsWith("index.html")) 0 else 1 }
+            .joinToString("\n\n") { (path, bytes) -> "=== ${path.removePrefix(prefix)} ===\n" + String(bytes) }
+        return ImportPreview(name, entries, code)
     }
+
+    suspend fun install(preview: ImportPreview): AppMeta = importEntries(preview.name, preview.entries)
 
     internal suspend fun importEntries(name: String, entries: Map<String, ByteArray>): AppMeta {
         if (entries.isEmpty()) throw ImportException(ImportException.Reason.NOT_A_ZIP)
@@ -107,6 +124,7 @@ class ImportExport(
     }.getOrNull() ?: uri.lastPathSegment?.substringAfterLast('/')
 
     companion object {
+        private val TEXT_FILE = Regex("""\.(html?|js|mjs|css|json|svg|txt|md)$""", RegexOption.IGNORE_CASE)
         private const val MAX_TOTAL_BYTES = 50L * 1024 * 1024
         const val DATA_FILE = "acornix-data.json"
         const val DATA_FILES_DIR = "acornix-files"
@@ -229,3 +247,6 @@ class SampleAppsInstaller(private val context: Context, private val repo: AppRep
         )
     }
 }
+
+/** A shared app read from its ZIP, not installed yet. */
+class ImportPreview(val name: String, internal val entries: Map<String, ByteArray>, val code: String)

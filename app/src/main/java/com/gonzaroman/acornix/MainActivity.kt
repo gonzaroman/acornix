@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -17,17 +16,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.lifecycleScope
-import com.gonzaroman.acornix.data.ImportException
 import com.gonzaroman.acornix.ui.AcornixApp
 import com.gonzaroman.acornix.ui.ExternalRequest
-import com.gonzaroman.acornix.ui.importErrorMessage
+import com.gonzaroman.acornix.ui.components.ImportReviewDialog
 import com.gonzaroman.acornix.ui.theme.AcornixTheme
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
     private var external by mutableStateOf<ExternalRequest?>(null)
+    /** A ZIP opened from another app, waiting for the user to review and install it. */
+    private var pendingImport by mutableStateOf<Uri?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -47,6 +45,7 @@ class MainActivity : ComponentActivity() {
                         external = external,
                         onExternalConsumed = { external = null },
                     )
+                    pendingImport?.let { uri -> ImportReviewDialog(uri) { pendingImport = null } }
                 }
             }
         }
@@ -70,18 +69,7 @@ class MainActivity : ComponentActivity() {
                 }
                 external = ExternalRequest(openAssistant = true, sharedText = text, sharedImage = image)
             }
-            Intent.ACTION_VIEW -> intent.data?.let { importZip(it) }
-        }
-    }
-
-    private fun importZip(uri: Uri) {
-        lifecycleScope.launch {
-            try {
-                val app = container.importExport.import(uri)
-                Toast.makeText(this@MainActivity, getString(R.string.import_done, app.name), Toast.LENGTH_LONG).show()
-            } catch (e: ImportException) {
-                Toast.makeText(this@MainActivity, importErrorMessage(this@MainActivity, e), Toast.LENGTH_LONG).show()
-            }
+            Intent.ACTION_VIEW -> intent.data?.let { pendingImport = it }
         }
     }
 
