@@ -158,7 +158,7 @@
     <string name="control_help_on_3">Android asks you to confirm: tap “Allow”. Done!</string>
     <string name="control_help_restricted_title">Greyed out or “Restricted setting”?</string>
     <string name="control_help_restricted_intro">Android 13 and later block this for apps installed from an APK file. You only have to unlock it once.</string>
-    <string name="control_help_restricted_1">You will see Acornix greyed out, and tapping it says “App was denied access”.</string>
+    <string name="control_help_restricted_1">Tap “Acornix total control” once even if it\'s greyed out (it says “App was denied access”). This is needed: until you try, Android doesn\'t show the option to unlock it.</string>
     <string name="control_help_restricted_2">Open Acornix\'s app info, tap ⋮ (top right) and choose “Allow restricted settings”. Confirm with your PIN or fingerprint.</string>
     <string name="control_help_restricted_3">Go back to Accessibility and turn it on as shown above.</string>
     <string name="control_help_brand_title">Xiaomi, Redmi and POCO</string>
@@ -462,4 +462,58 @@
     <string name="ideas_failed">Couldn\'t get new ideas right now. Try again in a moment.</string>
     <string name="settings_ai_ideas">✨ Ideas from the AI</string>
     <string name="settings_ai_ideas_desc">When creating, you can ask the AI for original ideas. Each new batch uses a few tokens of your API key. Off: only the built-in ideas, at no cost.</string>
+    <!-- What Acornix can do (tour) -->
+    <string name="tour_counter">%1$d of %2$d</string>
+    <string name="tour_skip">Skip</string>
+    <string name="tour_back">Back</string>
+    <string name="tour_next">Next</string>
+    <string name="tour_start">Start creating</string>
+    <string name="tour_settings">What Acornix can do</string>
+    <string name="tour_settings_desc">A quick tour of everything you can create and ask for</string>
+    <string name="tour_welcome_title">What Acornix can do</string>
+    <string name="tour_welcome_text">A one-minute look at everything you can do. Swipe to go on, or tap “Try it” on any page to go straight there.</string>
+    <string name="tour_create_title">Create anything you imagine</string>
+    <string name="tour_create_text">Describe an app or a game with words, your voice or a photo, and watch the AI write it live. Then improve it just by asking.</string>
+    <string-array name="tour_create_examples">
+        <item>A 3D drone racing game</item>
+        <item>A notes app with checklists</item>
+        <item>A piano with 4 instruments</item>
+    </string-array>
+    <string name="tour_create_button">Try it: create an app</string>
+    <string name="tour_ideas_title">Out of ideas?</string>
+    <string name="tour_ideas_text">Under your request you\'ll find ideas ready to tap. Want more? Tap “🎲 Ideas from the AI” and it invents new ones just for you.</string>
+    <string name="tour_ideas_button">See the ideas</string>
+    <string name="tour_apps_title">Like real apps</string>
+    <string name="tour_apps_text">Your creations open full screen, keep their data and every version, and can go on your home screen with their own icon.</string>
+    <string name="tour_apps_button">Open My apps</string>
+    <string name="tour_feature_title">Apps that use your phone</string>
+    <string name="tour_feature_text">Functionalities can turn on the flashlight, vibrate, speak out loud, send notifications and even ask your AI.</string>
+    <string-array name="tour_feature_examples">
+        <item>A workout coach that talks</item>
+        <item>Morse code with the flashlight</item>
+        <item>A translator that reads aloud</item>
+    </string-array>
+    <string name="tour_feature_button">Try it: create a functionality</string>
+    <string name="tour_assistant_title">Your assistant</string>
+    <string name="tour_assistant_text">Ask in your own words and it does it: alarms, timers, YouTube, Maps, the flashlight… It can also read and change your apps\' data.</string>
+    <string-array name="tour_assistant_examples">
+        <item>Set an alarm for 7:30</item>
+        <item>Search lo-fi music on YouTube</item>
+        <item>Add bread to my shopping list</item>
+    </string-array>
+    <string name="tour_assistant_button">Try it: ask the assistant</string>
+    <string name="tour_control_title">Total control</string>
+    <string name="tour_control_text">Turn it on and your phone does things by itself: it reads the screen and taps and types in other apps. It always asks before sending, paying or deleting.</string>
+    <string-array name="tour_control_examples">
+        <item>Find today\'s AI news and save it in my notes</item>
+        <item>Turn on dark mode</item>
+    </string-array>
+    <string name="tour_control_hint">To turn it on: Android Settings › Accessibility › scroll all the way down › Downloaded apps › Acornix total control. If it\'s greyed out, tap it once and then allow it from Acornix\'s app info (⋮ › Allow restricted settings).</string>
+    <string name="tour_control_button">How to turn it on</string>
+    <string name="tour_control_on">✅ Total control is on</string>
+    <string name="tour_os_title">AcornixOS</string>
+    <string name="tour_os_text">Your apps as a desktop, with windows, a Dock and a Launchpad. On a tablet it feels like a computer.</string>
+    <string name="tour_os_button">Open AcornixOS</string>
+    <string name="tour_end_title">Your imagination is the limit</string>
+    <string name="tour_end_text">Create anything you want. You can watch this tour again any time in Settings.</string>
 </resources>

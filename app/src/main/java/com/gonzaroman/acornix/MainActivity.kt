@@ -43,6 +43,7 @@ class MainActivity : ComponentActivity() {
                 } else {
                     AcornixApp(
                         startOnboarding = !s.onboardingDone,
+                        startTour = s.onboardingDone && !s.tourSeen,
                         external = external,
                         onExternalConsumed = { external = null },
                     )

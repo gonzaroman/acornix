@@ -157,7 +157,7 @@
     <string name="control_help_on_3">Android te pide confirmación: toca «Permitir». ¡Listo!</string>
     <string name="control_help_restricted_title">¿Sale en gris o dice «ajustes restringidos»?</string>
     <string name="control_help_restricted_intro">Android 13 y posteriores lo bloquean en las apps instaladas desde un archivo APK. Solo hay que desbloquearlo una vez.</string>
-    <string name="control_help_restricted_1">Verás Acornix en gris y, al tocarlo, dirá «Se ha denegado el acceso a la aplicación».</string>
+    <string name="control_help_restricted_1">Toca primero «Control total de Acornix» aunque esté en gris (dirá «Se ha denegado el acceso a la aplicación»). Hace falta: hasta que no lo intentas, Android no enseña la opción para desbloquearlo.</string>
     <string name="control_help_restricted_2">Abre la información de la app de Acornix, toca ⋮ (arriba a la derecha) y elige «Permitir ajustes restringidos». Confirma con tu PIN o tu huella.</string>
     <string name="control_help_restricted_3">Vuelve a Accesibilidad y actívalo como se explica arriba.</string>
     <string name="control_help_brand_title">Xiaomi, Redmi y POCO</string>
@@ -461,4 +461,58 @@
     <string name="ideas_failed">Ahora no se han podido traer ideas nuevas. Inténtalo dentro de un momento.</string>
     <string name="settings_ai_ideas">✨ Ideas de la IA</string>
     <string name="settings_ai_ideas_desc">Al crear, puedes pedirle a la IA ideas originales. Cada tanda nueva gasta unos pocos tokens de tu clave. Desactivado: solo las ideas de serie, sin coste.</string>
+    <!-- Qué puede hacer Acornix (recorrido) -->
+    <string name="tour_counter">%1$d de %2$d</string>
+    <string name="tour_skip">Saltar</string>
+    <string name="tour_back">Atrás</string>
+    <string name="tour_next">Siguiente</string>
+    <string name="tour_start">¡A crear!</string>
+    <string name="tour_settings">Qué puede hacer Acornix</string>
+    <string name="tour_settings_desc">Un recorrido rápido por todo lo que puedes crear y pedir</string>
+    <string name="tour_welcome_title">Qué puede hacer Acornix</string>
+    <string name="tour_welcome_text">En un minuto, todo lo que puedes hacer. Desliza para seguir, o toca «Probar» en cualquier página para ir directo.</string>
+    <string name="tour_create_title">Crea lo que imagines</string>
+    <string name="tour_create_text">Describe una app o un juego con palabras, con tu voz o con una foto, y mira cómo la IA lo escribe en directo. Luego mejóralo solo con pedirlo.</string>
+    <string-array name="tour_create_examples">
+        <item>Un juego de carreras de drones en 3D</item>
+        <item>Una app de notas con listas</item>
+        <item>Un piano con 4 instrumentos</item>
+    </string-array>
+    <string name="tour_create_button">Probar: crear una app</string>
+    <string name="tour_ideas_title">¿Sin ideas?</string>
+    <string name="tour_ideas_text">Debajo de tu petición tienes ideas listas para tocar. ¿Quieres más? Toca «🎲 Ideas de la IA» y se inventa otras nuevas para ti.</string>
+    <string name="tour_ideas_button">Ver las ideas</string>
+    <string name="tour_apps_title">Como apps de verdad</string>
+    <string name="tour_apps_text">Lo que creas se abre a pantalla completa, guarda sus datos y todas sus versiones, y puede ir a tu pantalla de inicio con su propio icono.</string>
+    <string name="tour_apps_button">Abrir Mis apps</string>
+    <string name="tour_feature_title">Apps que usan tu móvil</string>
+    <string name="tour_feature_text">Las funcionalidades pueden encender la linterna, vibrar, hablar en voz alta, mandar notificaciones e incluso preguntar a tu IA.</string>
+    <string-array name="tour_feature_examples">
+        <item>Un entrenador que habla</item>
+        <item>Código Morse con la linterna</item>
+        <item>Un traductor que lee en voz alta</item>
+    </string-array>
+    <string name="tour_feature_button">Probar: crear una funcionalidad</string>
+    <string name="tour_assistant_title">Tu asistente</string>
+    <string name="tour_assistant_text">Pídeselo con tus palabras y lo hace: alarmas, temporizadores, YouTube, Maps, la linterna… También lee y cambia los datos de tus apps.</string>
+    <string-array name="tour_assistant_examples">
+        <item>Pon una alarma a las 7:30</item>
+        <item>Busca música lo-fi en YouTube</item>
+        <item>Añade pan a mi lista de la compra</item>
+    </string-array>
+    <string name="tour_assistant_button">Probar: pedírselo al asistente</string>
+    <string name="tour_control_title">Control total</string>
+    <string name="tour_control_text">Actívalo y el móvil hace las cosas solo: lee la pantalla y toca y escribe en otras apps. Siempre pregunta antes de enviar, pagar o borrar.</string>
+    <string-array name="tour_control_examples">
+        <item>Busca las noticias de IA de hoy y guárdalas en mis notas</item>
+        <item>Pon el modo oscuro</item>
+    </string-array>
+    <string name="tour_control_hint">Para activarlo: Ajustes de Android › Accesibilidad › baja hasta el final › Aplicaciones descargadas › Control total de Acornix. Si sale en gris, tócalo una vez y luego permítelo en la información de la app de Acornix (⋮ › Permitir ajustes restringidos).</string>
+    <string name="tour_control_button">Cómo activarlo</string>
+    <string name="tour_control_on">✅ El control total está activado</string>
+    <string name="tour_os_title">AcornixOS</string>
+    <string name="tour_os_text">Tus apps como un escritorio, con ventanas, un Dock y un Launchpad. En una tablet parece un ordenador.</string>
+    <string name="tour_os_button">Abrir AcornixOS</string>
+    <string name="tour_end_title">Tu imaginación es el límite</string>
+    <string name="tour_end_text">Crea lo que quieras. Puedes volver a ver este recorrido cuando quieras en Ajustes.</string>
 </resources>

@@ -111,6 +111,16 @@ fun SettingsScreen(nav: NavHostController) {
     ) {
         Text(stringResource(R.string.tab_settings), style = MaterialTheme.typography.headlineMedium)
 
+        SettingsCard {
+            ListItem(
+                leadingContent = { Text("✨", fontSize = 22.sp) },
+                headlineContent = { Text(stringResource(R.string.tour_settings)) },
+                supportingContent = { Text(stringResource(R.string.tour_settings_desc)) },
+                modifier = Modifier.clickable { nav.navigate(Routes.TOUR) },
+                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+            )
+        }
+
         SectionTitle(stringResource(R.string.settings_ai))
         SettingsCard { ProviderEditor(s, modifier = Modifier.padding(16.dp)) }
 

@@ -80,6 +80,7 @@ import com.gonzaroman.acornix.web.AppLauncher
 @Composable
 fun AssistantScreen(
     controlMode: Boolean,
+    prompt: String? = null,
     external: ExternalRequest?,
     onExternalConsumed: () -> Unit,
     onOpenSettings: () -> Unit,
@@ -93,6 +94,11 @@ fun AssistantScreen(
     val listState = rememberLazyListState()
     val controlState by rememberControlState()
     val controlEnabled = controlState == ControlState.ON
+
+    // A suggestion from the tour: written in the box, ready to send.
+    LaunchedEffect(prompt) {
+        if (!prompt.isNullOrBlank() && input.isBlank()) input = prompt
+    }
 
     // Text or images shared from other apps land in the prompt bar.
     LaunchedEffect(external) {

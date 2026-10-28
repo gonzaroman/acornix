@@ -47,6 +47,9 @@ import com.gonzaroman.acornix.ui.data.DataScreen
 import com.gonzaroman.acornix.ui.editor.EditorScreen
 import com.gonzaroman.acornix.ui.home.HomeScreen
 import com.gonzaroman.acornix.ui.onboarding.OnboardingScreen
+import com.gonzaroman.acornix.ui.onboarding.TourScreen
+import com.gonzaroman.acornix.web.AcornixOsActivity
+import androidx.compose.ui.platform.LocalContext
 import com.gonzaroman.acornix.ui.settings.SettingsScreen
 import com.gonzaroman.acornix.ui.share.ShareCardScreen
 import com.gonzaroman.acornix.ui.tools.HealthScreen
@@ -59,7 +62,7 @@ import com.gonzaroman.acornix.ui.versions.VersionsScreen
 object Routes {
     const val HOME = "home"
     const val APPS = "apps"
-    const val ASSISTANT = "assistant?control={control}"
+    const val ASSISTANT = "assistant?control={control}&prompt={prompt}"
     const val SETTINGS = "settings"
     const val CREATE = "create?kind={kind}&improve={improve}"
     const val EDITOR = "editor/{id}"
@@ -71,10 +74,12 @@ object Routes {
     const val CONTROL_HELP = "control_help"
     const val STUDIO = "studio"
     const val ONBOARDING = "onboarding"
+    const val TOUR = "tour"
     const val DATA = "data/{id}"
     const val SHARE = "share/{id}"
 
-    fun assistant(control: Boolean = false) = "assistant?control=$control"
+    fun assistant(control: Boolean = false, prompt: String? = null) =
+        "assistant?control=$control" + (prompt?.let { "&prompt=${Uri.encode(it)}" } ?: "")
     fun create(feature: Boolean = false) = "create?kind=${if (feature) "feature" else "app"}"
     fun improve(appId: String) = "create?improve=${Uri.encode(appId)}"
     fun editor(appId: String) = "editor/${Uri.encode(appId)}"
@@ -98,6 +103,7 @@ data class ExternalRequest(val openAssistant: Boolean = false, val sharedText: S
 @Composable
 fun AcornixApp(
     startOnboarding: Boolean,
+    startTour: Boolean,
     external: ExternalRequest?,
     onExternalConsumed: () -> Unit,
 ) {
@@ -107,8 +113,11 @@ fun AcornixApp(
     val tabBase = route.substringBefore('?')
     val showBar = TABS.any { it.base == tabBase }
 
-    LaunchedEffect(startOnboarding) {
+    val context = LocalContext.current
+
+    LaunchedEffect(startOnboarding, startTour) {
         if (startOnboarding) nav.navigate(Routes.ONBOARDING) { launchSingleTop = true }
+        else if (startTour) nav.navigate(Routes.TOUR) { launchSingleTop = true }
     }
 
     LaunchedEffect(external) {
@@ -150,14 +159,33 @@ fun AcornixApp(
                         onControlHelp = { nav.navigate(Routes.CONTROL_HELP) },
                     )
                 }
+                composable(Routes.TOUR) {
+                    // Each "Try it" closes the tour and goes straight there.
+                    fun leaveTo(route: String?) {
+                        nav.popBackStack()
+                        if (route != null) nav.navigate(route)
+                    }
+                    TourScreen(
+                        onClose = { leaveTo(null) },
+                        onCreate = { feature -> leaveTo(Routes.create(feature)) },
+                        onApps = { nav.popBackStack(); nav.navigateTab(Routes.APPS) },
+                        onAssistant = { prompt -> nav.popBackStack(); nav.navigateTab(Routes.assistant(prompt = prompt)) },
+                        onControlHelp = { leaveTo(Routes.CONTROL_HELP) },
+                        onOs = { leaveTo(null); AcornixOsActivity.open(context) },
+                    )
+                }
                 composable(Routes.HOME) { HomeScreen(nav) }
                 composable(Routes.APPS) { AppsScreen(nav) }
                 composable(
                     Routes.ASSISTANT,
-                    arguments = listOf(navArgument("control") { type = NavType.BoolType; defaultValue = false }),
+                    arguments = listOf(
+                        navArgument("control") { type = NavType.BoolType; defaultValue = false },
+                        navArgument("prompt") { type = NavType.StringType; nullable = true; defaultValue = null },
+                    ),
                 ) { entry ->
                     AssistantScreen(
                         controlMode = entry.arguments?.getBoolean("control") ?: false,
+                        prompt = entry.arguments?.getString("prompt"),
                         external = external,
                         onExternalConsumed = onExternalConsumed,
                         onOpenSettings = { nav.navigateTab(Routes.SETTINGS) },
