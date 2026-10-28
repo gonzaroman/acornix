@@ -494,6 +494,14 @@
         <item>Un traductor que lee en voz alta</item>
     </string-array>
     <string name="tour_feature_button">Probar: crear una funcionalidad</string>
+    <string name="tour_ai_title">Apps con su propia IA</string>
+    <string name="tour_ai_text">Tus apps también pueden usar tu IA: entender una foto de la cámara, escribir, traducir, inventar cuentos o responder preguntas.</string>
+    <string-array name="tour_ai_examples">
+        <item>Hazle una foto a mi nevera y sugiéreme recetas</item>
+        <item>Identifica plantas con la cámara</item>
+        <item>Un generador de cuentos para dormir</item>
+    </string-array>
+    <string name="tour_ai_button">Probar: crear una app con IA</string>
     <string name="tour_assistant_title">Tu asistente</string>
     <string name="tour_assistant_text">Pídeselo con tus palabras y lo hace: alarmas, temporizadores, YouTube, Maps, la linterna… También lee y cambia los datos de tus apps.</string>
     <string-array name="tour_assistant_examples">

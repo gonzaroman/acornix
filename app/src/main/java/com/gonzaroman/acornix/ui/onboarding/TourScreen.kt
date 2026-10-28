@@ -76,6 +76,8 @@ private val PAGES = listOf(
         button = R.string.tour_apps_button, action = TourAction.APPS),
     TourPage("🧬", listOf(Color(0xFF0E5E86), Color(0xFF4FC3F7)), R.string.tour_feature_title, R.string.tour_feature_text,
         examples = R.array.tour_feature_examples, button = R.string.tour_feature_button, action = TourAction.FEATURE),
+    TourPage("🧠", listOf(Color(0xFF00695C), Color(0xFF26C6DA)), R.string.tour_ai_title, R.string.tour_ai_text,
+        examples = R.array.tour_ai_examples, button = R.string.tour_ai_button, action = TourAction.CREATE),
     TourPage("🤖", listOf(Color(0xFF8C2F5C), Color(0xFFF06292)), R.string.tour_assistant_title, R.string.tour_assistant_text,
         examples = R.array.tour_assistant_examples, button = R.string.tour_assistant_button, action = TourAction.ASSISTANT),
     TourPage("🖐️", listOf(Color(0xFF263238), Color(0xFF607D8B)), R.string.tour_control_title, R.string.tour_control_text,

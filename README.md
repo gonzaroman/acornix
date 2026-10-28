@@ -232,7 +232,12 @@ const { level, charging } = await Acornix.battery();
 const info = await Acornix.deviceInfo();
 await Acornix.share('Look what I made');
 await Acornix.openUrl('https://example.com');
-const answer = await Acornix.askAI('Give me a fun fact about acorns');
+
+// Your AI, inside the app (the user's own model and key)
+const fact = await Acornix.askAI('Give me a fun fact about acorns');
+const plant = await Acornix.askAI('What plant is this?', { images: [videoOrImgOrFile] }); // camera frame, <img>, file…
+const plan = await Acornix.askAI('Three dinners with rice and eggs', { json: true });      // → parsed JSON
+// options: { system, images (up to 4), json, quick: false for deep thinking }
 
 // Database (private to this app)
 const tasks = Acornix.db.collection('tasks');

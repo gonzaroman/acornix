@@ -40,6 +40,8 @@ object Prompts {
 
         $STORAGE_DOCS
 
+        $AI_DOCS
+
         ${format(language)}
     """.trimIndent()
 
@@ -53,6 +55,8 @@ object Prompts {
 
         $STORAGE_DOCS
 
+        $AI_DOCS
+
         ${format(language)}
     """.trimIndent()
 
@@ -64,6 +68,8 @@ object Prompts {
         ${if (isFeature) BRIDGE_DOCS else "- If the app needs phone features (vibration, flashlight, battery, speech…), it may use the window.Acornix bridge:\n$BRIDGE_DOCS"}
 
         $STORAGE_DOCS
+
+        $AI_DOCS
 
         ${format(language)}
     """.trimIndent()
@@ -127,6 +133,25 @@ object Prompts {
         - If window.Acornix is undefined (app opened outside Acornix), fall back to localStorage.
     """.trimIndent()
 
+    val AI_DOCS = """
+        AI INSIDE THE APP: `Acornix.askAI` asks the user's own AI model (the one set up in Acornix). Use it ONLY
+        when the app really needs intelligence: understanding a photo, writing or rewriting text, translating,
+        answering open questions, inventing stories, quizzes or recipes. Never for what plain code can do
+        (maths, sorting, fixed content, simple games).
+        - const text = await Acornix.askAI('Write a haiku about rain');              // -> a string
+        - await Acornix.askAI(question, { system: 'You are a friendly chef. Answer in Spanish.' })
+        - Photos: await Acornix.askAI('What plant is this?', { images: [photo] }); photo can be a File from
+          <input type="file" accept="image/*" capture="environment">, a data URL, an <img>, a <canvas>, or a live
+          <video> from navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }) (its current
+          frame is sent). Up to 4 images.
+        - Structured answers: const r = await Acornix.askAI('Three recipes with ' + items, { json: true,
+          system: 'Reply as {"recipes":[{"name":"","minutes":0,"steps":[""]}]}' });   // -> an already parsed object
+        - Answers take a few seconds: show a clear "thinking…" state, disable the button meanwhile and keep the
+          UI responsive. Answers are fast by default; pass { quick: false } only for tasks that need deep reasoning.
+        - It can fail (no AI set up, no internet, invalid JSON): use try/catch and show a friendly message with a
+          retry. If window.Acornix is undefined (opened outside Acornix), explain that the AI works inside Acornix.
+    """.trimIndent()
+
     val BRIDGE_DOCS = """
         PHONE BRIDGE: `window.Acornix` is available from the first line of your scripts. Every method returns a Promise:
         - Acornix.vibrate(ms)                      // or an array pattern [on, off, on, …]
@@ -141,7 +166,7 @@ object Prompts {
         - Acornix.deviceInfo()   -> {manufacturer, model, android, language, screenWidth, screenHeight}
         - Acornix.listApps()     -> [{id, name, emoji}]   // the user's Acornix apps
         - Acornix.openApp(nameOrId)
-        - Acornix.askAI(prompt, system?) -> string       // asks the user's configured AI model
+        - Acornix.askAI(prompt, options?)                // the user's own AI: see AI INSIDE THE APP
         Calls can fail (e.g. no flashlight): use try/catch and show a friendly message.
     """.trimIndent()
 

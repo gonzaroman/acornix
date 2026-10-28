@@ -495,6 +495,14 @@
         <item>A translator that reads aloud</item>
     </string-array>
     <string name="tour_feature_button">Try it: create a functionality</string>
+    <string name="tour_ai_title">Apps with their own AI</string>
+    <string name="tour_ai_text">Your apps can use your AI too: understand a photo from the camera, write, translate, invent stories or answer questions.</string>
+    <string-array name="tour_ai_examples">
+        <item>Take a photo of my fridge and suggest recipes</item>
+        <item>Identify plants with the camera</item>
+        <item>A bedtime story generator</item>
+    </string-array>
+    <string name="tour_ai_button">Try it: create an app with AI</string>
     <string name="tour_assistant_title">Your assistant</string>
     <string name="tour_assistant_text">Ask in your own words and it does it: alarms, timers, YouTube, Maps, the flashlight… It can also read and change your apps\' data.</string>
     <string-array name="tour_assistant_examples">

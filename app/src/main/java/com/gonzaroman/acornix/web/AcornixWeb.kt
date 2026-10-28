@@ -269,12 +269,15 @@ class AcornixJsBridge(
                 AppLauncher.open(context, app.id); JsonPrimitive(true)
             }
             "askAI" -> {
-                val system = str(1) ?: "You are a helpful assistant inside a mobile app. Answer concisely in the user's language."
-                try {
-                    JsonPrimitive(c.settings.activeProvider().streamText(system, str(0).orEmpty()).text)
+                val options = AskAiOptions.from(arg(1))
+                val images = options.images.map { AskAi.toImage(it) ?: throw IllegalArgumentException("Could not read the image") }
+                val text = try {
+                    c.settings.activeProvider().streamText(AskAi.system(options), str(0).orEmpty(), images, quick = options.quick).text
                 } catch (e: AiException) {
                     throw IllegalStateException(e.message)
                 }
+                if (options.json) AskAi.extractJson(text) ?: throw IllegalStateException("The AI didn't answer with valid JSON")
+                else JsonPrimitive(text)
             }
             else -> throw IllegalArgumentException("Unknown method: $method")
         }
@@ -297,6 +300,31 @@ class AcornixJsBridge(
                   nativeBridge.postMessage(JSON.stringify({ id: id, method: method, args: args || [] }));
                 });
               }
+              // Any picture an app may have, as a JPEG data URL no larger than the AI needs.
+              function imageToDataUrl(x) {
+                return new Promise(function (resolve, reject) {
+                  function draw(src, w, h) {
+                    try {
+                      var scale = Math.min(1, 1568 / Math.max(w, h)), c = document.createElement('canvas');
+                      c.width = Math.max(1, Math.round(w * scale)); c.height = Math.max(1, Math.round(h * scale));
+                      c.getContext('2d').drawImage(src, 0, 0, c.width, c.height);
+                      resolve(c.toDataURL('image/jpeg', 0.85));
+                    } catch (e) { reject(new Error('Could not read the image')); }
+                  }
+                  function load(url, revoke) {
+                    var img = new Image();
+                    img.onload = function () { draw(img, img.naturalWidth, img.naturalHeight); if (revoke) URL.revokeObjectURL(url); };
+                    img.onerror = function () { reject(new Error('Could not read the image')); };
+                    img.src = url;
+                  }
+                  if (typeof x === 'string') return load(x, false);
+                  if (typeof Blob !== 'undefined' && x instanceof Blob) return load(URL.createObjectURL(x), true);
+                  if (x && x.videoWidth) return draw(x, x.videoWidth, x.videoHeight);
+                  if (x && x.naturalWidth) return draw(x, x.naturalWidth, x.naturalHeight);
+                  if (x && x.width && x.height) return draw(x, x.width, x.height);
+                  reject(new Error('Could not read the image'));
+                });
+              }
               window.Acornix = {
                 vibrate: function (p) { return call('vibrate', [p]); },
                 flashlight: function (on) { return call('flashlight', [on !== false]); },
@@ -310,7 +338,14 @@ class AcornixJsBridge(
                 deviceInfo: function () { return call('deviceInfo'); },
                 listApps: function () { return call('listApps'); },
                 openApp: function (n) { return call('openApp', [String(n)]); },
-                askAI: function (p, s) { return call('askAI', [String(p), s || null]); },
+                askAI: function (p, o) {
+                  // The old form askAI(prompt, system) still works; images may be data URLs, files, <img>, <canvas> or a camera <video>.
+                  if (!o || typeof o !== 'object' || !o.images) return call('askAI', [String(p), o || null]);
+                  return Promise.all([].concat(o.images).slice(0, 4).map(imageToDataUrl)).then(function (images) {
+                    var copy = {}; for (var k in o) copy[k] = o[k]; copy.images = images;
+                    return call('askAI', [String(p), copy]);
+                  });
+                },
                 db: {
                   collection: function (name) {
                     name = String(name);
