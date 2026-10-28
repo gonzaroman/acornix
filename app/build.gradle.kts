@@ -15,8 +15,8 @@ android {
         applicationId = "com.gonzaroman.acornix"
         minSdk = 26
         targetSdk = 35
-        versionCode = 33
-        versionName = "2.2.1"
+        versionCode = 34
+        versionName = "2.2.2-beta1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
