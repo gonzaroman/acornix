@@ -467,6 +467,7 @@
     <string name="tour_back">Atrás</string>
     <string name="tour_next">Siguiente</string>
     <string name="tour_start">¡A crear!</string>
+    <string name="tour_section">Descubre Acornix</string>
     <string name="tour_settings">Qué puede hacer Acornix</string>
     <string name="tour_settings_desc">Un recorrido rápido por todo lo que puedes crear y pedir</string>
     <string name="tour_welcome_title">Qué puede hacer Acornix</string>

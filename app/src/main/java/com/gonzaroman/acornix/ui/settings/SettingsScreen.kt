@@ -227,13 +227,6 @@ fun SettingsScreen(nav: NavHostController) {
         SectionTitle(stringResource(R.string.settings_about))
         SettingsCard {
             ListItem(
-                leadingContent = { Text("✨", fontSize = 22.sp) },
-                headlineContent = { Text(stringResource(R.string.tour_settings)) },
-                supportingContent = { Text(stringResource(R.string.tour_settings_desc)) },
-                modifier = Modifier.clickable { nav.navigate(Routes.TOUR) },
-                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-            )
-            ListItem(
                 headlineContent = { Text("Acornix ${BuildConfig.VERSION_NAME}") },
                 supportingContent = { Text(stringResource(R.string.settings_about_text)) },
                 modifier = Modifier.clickable {
@@ -242,6 +235,17 @@ fun SettingsScreen(nav: NavHostController) {
                 colors = ListItemDefaults.colors(containerColor = Color.Transparent),
             )
             UpdateRow()
+        }
+
+        SectionTitle(stringResource(R.string.tour_section))
+        SettingsCard {
+            ListItem(
+                leadingContent = { Text("✨", fontSize = 22.sp) },
+                headlineContent = { Text(stringResource(R.string.tour_settings)) },
+                supportingContent = { Text(stringResource(R.string.tour_settings_desc)) },
+                modifier = Modifier.clickable { nav.navigate(Routes.TOUR) },
+                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+            )
         }
         Spacer(Modifier.height(24.dp))
     }
