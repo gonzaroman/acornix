@@ -46,7 +46,7 @@ No terminal, no server, no account. Everything you create lives on your phone.
 
 Type what you want, **create it from your voice** 🎙️ (voice to app, no typing needed) or attach a reference photo 📎 ("make an app like this"). Pick a type (game, utility, music…) or tap one of the ideas, and Acornix writes a complete, mobile-first web app **live in front of you**.
 
-**✨ Ideas from the AI.** Out of ideas? Your AI suggests original things to build, from sound toys and generative art to science simulations and odd little tools, following the type you picked. Tap one and the full request and the name are filled in for you; tap 🎲 for a new batch. Ideas are cached, so they only cost a few tokens now and then, and you can turn them off in Settings.
+**✨ Ideas.** Out of ideas? Create shows ready-made ideas for every type, from sound toys and generative art to science simulations and odd little tools. Tap one and the full request and the name are filled in for you. Tap 🎲 **Ideas from the AI** and your AI writes a fresh batch, idea by idea; its last ideas stay until you ask for more.
 
 When it's done you get an interactive preview, an **Open** button, an **Add to home screen** button and a suggested next improvement. Apply the suggestion or ask for your own changes ("add sound effects", "make the buttons bigger", "add a dark mode"). Every change is saved as a new version.
 
@@ -59,6 +59,10 @@ When it's done you get an interactive preview, an **Open** button, an **Add to h
 ### 🎮 An AI game builder
 
 Vibe coding a mobile game takes one sentence: *"a platformer with endless levels"*, *"a bowling game you play by swiping"*, *"a castle defense with bosses and an upgrade shop"*. Acornix builds it with touch controls, keeps your saves and high scores in the game's own database, and you can keep asking for more levels, sounds or power-ups.
+
+### 🧠 Apps with their own AI
+
+Ask for an app that thinks: *"take a photo of my fridge and suggest recipes"*, *"an English teacher I can chat with"*, *"point the camera at a plant and tell me what it is"*. The app uses **your own AI model**: it understands camera photos, answers as it writes, returns structured data and holds conversations that remember what you said, with a **New conversation** button to start over. Each app asks once before using your AI, since every answer spends tokens of your key; apps that use it show a 🧠 **AI** label, and you can switch it off any time.
 
 ### 📣 Share what you made
 
@@ -143,7 +147,7 @@ Each app runs on its own isolated origin, so apps never see each other's data.
 
 - **Full backup**: one ZIP with all your apps, their versions, data and files. Save it to Google Drive or anywhere else from the system picker, and restore it on any phone.
 - **Android backup**: your apps and data are also included in your Google account backup.
-- **Import** ZIPs shared by friends, including apps made with the original Termux version of acornix.
+- **Import** ZIPs shared by friends, including apps made with the original Termux version of acornix. Before installing one, **Review it with AI**: your AI reads its code and tells you if it sends data away, asks for passwords, hides code or abuses your AI.
 
 ### 📋 Manual studio: no API key needed
 
@@ -155,7 +159,7 @@ Acornix checks GitHub for new versions. When one comes out you'll see what's new
 
 ### And more
 
-**Phone status** (battery, memory, storage), Material You colors with light and dark themes, and an interface in **English and Spanish**. Generated apps follow your phone's language too.
+A **tour of everything Acornix can do** (Settings › Discover Acornix), **phone status** (battery, memory, storage), Material You colors with light and dark themes, and an interface in **English and Spanish**. Generated apps follow your phone's language too.
 
 <p align="center">
 <img src="docs/screenshots/home-dark.jpg" width="230" alt="Acornix home screen in dark mode">&nbsp;&nbsp;
@@ -213,6 +217,7 @@ Tap **▾** next to *Model* in Settings to load the models available to your acc
 - **Your API key** is encrypted with the Android Keystore and only ever sent to the provider you chose.
 - **Your apps and their data** stay on your phone, except for what you send to your AI provider when you create or improve something. Acornix has no servers, accounts or analytics.
 - **Each app is sandboxed** on its own origin with its own database. The phone bridge only answers that app's own pages.
+- **Apps ask before using your AI**, once per app, and you can change it in the app's options. Apps someone shares with you can be reviewed by your AI before you install them.
 - **The assistant asks first** before sending messages, calling, paying, buying or deleting. It never sees password fields, and a notification with a **Stop** button is shown while it works.
 
 ---
