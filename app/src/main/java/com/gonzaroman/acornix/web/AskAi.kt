@@ -25,9 +25,18 @@ data class AskAiOptions(
     val json: Boolean = false,
     /** Less deep thinking: apps want answers in seconds. On unless the app asks for quick: false. */
     val quick: Boolean = true,
+    /**
+     * Earlier turns of this conversation, oldest first. It only lives in the page (Acornix.ai.chat keeps it
+     * while the app is open) and is trimmed to the newest [MAX_HISTORY_MESSAGES] / [MAX_HISTORY_CHARS].
+     */
+    val history: List<ChatTurn> = emptyList(),
+    /** The page wants the text as it arrives (onText). */
+    val stream: Boolean = false,
 ) {
     companion object {
         const val MAX_IMAGES = 4
+        const val MAX_HISTORY_MESSAGES = 40
+        const val MAX_HISTORY_CHARS = 16_000
 
         fun from(arg: JsonElement?): AskAiOptions = when (arg) {
             is JsonPrimitive -> AskAiOptions(system = arg.contentOrNull?.takeIf { it.isNotBlank() })
@@ -39,11 +48,33 @@ data class AskAiOptions(
                     .take(MAX_IMAGES),
                 json = (arg["json"] as? JsonPrimitive)?.booleanOrNull == true,
                 quick = (arg["quick"] as? JsonPrimitive)?.booleanOrNull != false,
+                history = trimHistory((arg["history"] as? JsonArray).orEmpty().mapNotNull { el ->
+                    val o = el as? JsonObject ?: return@mapNotNull null
+                    val text = (o["text"] as? JsonPrimitive)?.contentOrNull?.takeIf { it.isNotBlank() } ?: return@mapNotNull null
+                    val fromAi = (o["role"] as? JsonPrimitive)?.contentOrNull in setOf("assistant", "ai", "model")
+                    ChatTurn(fromAi, text)
+                }),
+                stream = (arg["stream"] as? JsonPrimitive)?.booleanOrNull == true,
             )
             else -> AskAiOptions()
         }
+
+        /** Keeps the newest turns that fit, so a long chat never makes every question more expensive. */
+        fun trimHistory(turns: List<ChatTurn>): List<ChatTurn> {
+            val kept = ArrayDeque<ChatTurn>()
+            var chars = 0
+            for (turn in turns.asReversed()) {
+                if (kept.size >= MAX_HISTORY_MESSAGES || chars + turn.text.length > MAX_HISTORY_CHARS) break
+                kept.addFirst(turn)
+                chars += turn.text.length
+            }
+            return kept.toList()
+        }
     }
 }
+
+/** One message of an app's conversation with the AI. Only text: photos are sent once, with their question. */
+data class ChatTurn(val fromAi: Boolean, val text: String)
 
 object AskAi {
     const val DEFAULT_SYSTEM = "You are a helpful assistant inside a mobile app. Answer concisely in the user's language."
@@ -51,6 +82,19 @@ object AskAi {
     private const val MAX_SIDE = 1568
 
     fun system(options: AskAiOptions): String = (options.system ?: DEFAULT_SYSTEM) + if (options.json) JSON_RULE else ""
+
+    /**
+     * The question, with the conversation so far in front of it. A transcript in the prompt works the same
+     * with every provider, and its size is already capped by [AskAiOptions.trimHistory].
+     */
+    fun prompt(question: String, options: AskAiOptions): String {
+        if (options.history.isEmpty()) return question
+        return buildString {
+            append("Conversation so far (oldest first):\n")
+            options.history.forEach { append(if (it.fromAi) "You: " else "User: ").append(it.text.trim()).append("\n") }
+            append("\nThe user now says:\n").append(question)
+        }
+    }
 
     /** The JSON value in a model's answer, even if it came wrapped in a code fence or with text around it. */
     fun extractJson(text: String): JsonElement? {

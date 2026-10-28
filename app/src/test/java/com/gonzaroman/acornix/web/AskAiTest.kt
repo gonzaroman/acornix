@@ -56,4 +56,25 @@ class AskAiTest {
         assertNull(AskAi.splitDataUrl("https://example.com/a.png"))
         assertNull(AskAi.splitDataUrl("data:image/png;base64,"))
     }
+
+    @Test
+    fun historyAndStreamOptions() {
+        val o = opts("""{"stream":true,"history":[{"role":"user","text":"What is it?"},{"role":"assistant","text":"A TV"},{"role":"user","text":"  "}]}""")
+        assertTrue(o.stream)
+        assertEquals(listOf(ChatTurn(false, "What is it?"), ChatTurn(true, "A TV")), o.history)
+        val p = AskAi.prompt("How do I clean it?", o)
+        assertTrue(p.contains("User: What is it?\nYou: A TV"))
+        assertTrue(p.endsWith("The user now says:\nHow do I clean it?"))
+        assertEquals("Hi", AskAi.prompt("Hi", opts(null)))
+    }
+
+    @Test
+    fun longConversationsKeepOnlyTheNewestTurns() {
+        val many = (1..100).map { ChatTurn(it % 2 == 0, "message $it") }
+        val kept = AskAiOptions.trimHistory(many)
+        assertEquals(AskAiOptions.MAX_HISTORY_MESSAGES, kept.size)
+        assertEquals("message 100", kept.last().text)
+        val big = (1..10).map { ChatTurn(false, "x".repeat(5_000)) }
+        assertEquals(3, AskAiOptions.trimHistory(big).size) // 16,000 characters at most
+    }
 }

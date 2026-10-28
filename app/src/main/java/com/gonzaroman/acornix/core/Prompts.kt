@@ -146,6 +146,14 @@ object Prompts {
           frame is sent). Up to 4 images.
         - Structured answers: const r = await Acornix.askAI('Three recipes with ' + items, { json: true,
           system: 'Reply as {"recipes":[{"name":"","minutes":0,"steps":[""]}]}' });   // -> an already parsed object
+        - Long texts (stories, explanations, chat replies): show them as they are written with
+          { onText: t => el.textContent = t } (t is the whole text so far); the Promise still resolves with the end.
+        - Conversations (chats, tutors, role-play narrators, "and now without onions?"): const chat =
+          Acornix.ai.chat({ system: '…', history: saved }); const reply = await chat.ask(text, { onText }); it
+          remembers the earlier turns (Acornix sends only the newest ones). Save chat.history with Acornix.db after
+          every reply and pass it back as history when the app opens, so the conversation goes on like a messaging
+          app. ALWAYS include a clear "New conversation" button that calls chat.reset() and clears the saved
+          history and the messages on screen. Photos go only with the question they belong to.
         - Answers take a few seconds: show a clear "thinking…" state, disable the button meanwhile and keep the
           UI responsive. Answers are fast by default; pass { quick: false } only for tasks that need deep reasoning.
         - It can fail (no AI set up, no internet, invalid JSON): use try/catch and show a friendly message with a

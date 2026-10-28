@@ -237,7 +237,12 @@ await Acornix.openUrl('https://example.com');
 const fact = await Acornix.askAI('Give me a fun fact about acorns');
 const plant = await Acornix.askAI('What plant is this?', { images: [videoOrImgOrFile] }); // camera frame, <img>, file…
 const plan = await Acornix.askAI('Three dinners with rice and eggs', { json: true });      // → parsed JSON
-// options: { system, images (up to 4), json, quick: false for deep thinking }
+await Acornix.askAI('Tell me a story', { onText: t => story.textContent = t });     // text as it's written
+const chat = Acornix.ai.chat({ system: 'You are a friendly chef' });                      // remembers its turns
+await chat.ask('What can I cook with rice and eggs?');
+await chat.ask('And without onions?');            // knows which recipe
+// save chat.history with Acornix.db and pass it back: Acornix.ai.chat({ system, history }); chat.reset() starts over
+// options: { system, images (up to 4), json, onText, quick: false for deep thinking }
 
 // Database (private to this app)
 const tasks = Acornix.db.collection('tasks');

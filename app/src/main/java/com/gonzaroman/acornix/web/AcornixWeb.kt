@@ -169,8 +169,18 @@ class AcornixJsBridge(
             val method = (req["method"] as? JsonPrimitive)?.content.orEmpty()
             val args = (req["args"] as? JsonArray) ?: JsonArray(emptyList())
             scope.launch {
+                // Text that streams in (askAI with onText) goes to the page as it arrives, at most every 80 ms.
+                var lastSent = 0L
+                val partial: (String, Boolean) -> Unit = { text, force ->
+                    val now = System.currentTimeMillis()
+                    if (force || now - lastSent >= 80) {
+                        lastSent = now
+                        val msg = buildJsonObject { put("id", id); put("partial", text) }.toString()
+                        scope.launch { runCatching { reply.postMessage(msg) } }
+                    }
+                }
                 val response = try {
-                    buildJsonObject { put("id", id); put("ok", true); put("result", handle(method, args)) }
+                    buildJsonObject { put("id", id); put("ok", true); put("result", handle(method, args, partial)) }
                 } catch (e: Exception) {
                     buildJsonObject { put("id", id); put("ok", false); put("error", e.message ?: "Error") }
                 }
@@ -182,7 +192,7 @@ class AcornixJsBridge(
         }
     }
 
-    private suspend fun handle(method: String, args: JsonArray): JsonElement {
+    private suspend fun handle(method: String, args: JsonArray, partial: (String, Boolean) -> Unit = { _, _ -> }): JsonElement {
         val c = context.container
         val device = c.device
         fun arg(i: Int): JsonElement? = args.getOrNull(i)?.takeIf { it !is JsonNull }
@@ -271,8 +281,11 @@ class AcornixJsBridge(
             "askAI" -> {
                 val options = AskAiOptions.from(arg(1))
                 val images = options.images.map { AskAi.toImage(it) ?: throw IllegalArgumentException("Could not read the image") }
+                val sofar = StringBuilder()
                 val text = try {
-                    c.settings.activeProvider().streamText(AskAi.system(options), str(0).orEmpty(), images, quick = options.quick).text
+                    c.settings.activeProvider().streamText(AskAi.system(options), AskAi.prompt(str(0).orEmpty(), options), images, quick = options.quick) { delta ->
+                        if (options.stream) partial(sofar.append(delta).toString(), false)
+                    }.text.also { if (options.stream) partial(it, true) }
                 } catch (e: AiException) {
                     throw IllegalStateException(e.message)
                 }
@@ -291,12 +304,14 @@ class AcornixJsBridge(
               var nativeBridge = window.AcornixNative, pending = {}, seq = 0;
               nativeBridge.onmessage = function (e) {
                 var m; try { m = JSON.parse(e.data); } catch (err) { return; }
-                var p = pending[m.id]; if (!p) return; delete pending[m.id];
+                var p = pending[m.id]; if (!p) return;
+                if (m.partial !== undefined) { if (p.onText) { try { p.onText(m.partial); } catch (err) {} } return; }
+                delete pending[m.id];
                 if (m.ok) p.resolve(m.result); else p.reject(new Error(m.error));
               };
-              function call(method, args) {
+              function call(method, args, onText) {
                 return new Promise(function (resolve, reject) {
-                  var id = ++seq; pending[id] = { resolve: resolve, reject: reject };
+                  var id = ++seq; pending[id] = { resolve: resolve, reject: reject, onText: onText };
                   nativeBridge.postMessage(JSON.stringify({ id: id, method: method, args: args || [] }));
                 });
               }
@@ -325,6 +340,19 @@ class AcornixJsBridge(
                   reject(new Error('Could not read the image'));
                 });
               }
+              // askAI(prompt, system) still works; options: { system, images, json, quick, history, onText }.
+              function askAI(p, o) {
+                if (!o || typeof o !== 'object') return call('askAI', [String(p), o || null]);
+                var copy = {}, k;
+                for (k in o) if (k !== 'onText' && k !== 'images') copy[k] = o[k];
+                var onText = typeof o.onText === 'function' ? o.onText : null;
+                if (onText) copy.stream = true;
+                var images = o.images ? [].concat(o.images).slice(0, 4) : [];
+                return Promise.all(images.map(imageToDataUrl)).then(function (urls) {
+                  if (urls.length) copy.images = urls;
+                  return call('askAI', [String(p), copy], onText);
+                });
+              }
               window.Acornix = {
                 vibrate: function (p) { return call('vibrate', [p]); },
                 flashlight: function (on) { return call('flashlight', [on !== false]); },
@@ -338,13 +366,29 @@ class AcornixJsBridge(
                 deviceInfo: function () { return call('deviceInfo'); },
                 listApps: function () { return call('listApps'); },
                 openApp: function (n) { return call('openApp', [String(n)]); },
-                askAI: function (p, o) {
-                  // The old form askAI(prompt, system) still works; images may be data URLs, files, <img>, <canvas> or a camera <video>.
-                  if (!o || typeof o !== 'object' || !o.images) return call('askAI', [String(p), o || null]);
-                  return Promise.all([].concat(o.images).slice(0, 4).map(imageToDataUrl)).then(function (images) {
-                    var copy = {}; for (var k in o) copy[k] = o[k]; copy.images = images;
-                    return call('askAI', [String(p), copy]);
-                  });
+                askAI: askAI,
+                ai: {
+                  // A conversation that remembers its own turns while the app is open (never saved, trimmed by Acornix).
+                  chat: function (base) {
+                    base = base || {};
+                    // A conversation saved by the app can be picked up again: chat({ history: saved }).
+                    var history = Array.isArray(base.history) ? base.history.slice() : [];
+                    return {
+                      ask: function (text, extra) {
+                        var o = {}, k;
+                        for (k in base) if (k !== 'history') o[k] = base[k];
+                        for (k in (extra || {})) o[k] = extra[k];
+                        o.history = history.slice(-40);
+                        return askAI(text, o).then(function (answer) {
+                          history.push({ role: 'user', text: String(text) });
+                          history.push({ role: 'assistant', text: typeof answer === 'string' ? answer : JSON.stringify(answer) });
+                          return answer;
+                        });
+                      },
+                      get history() { return history.slice(); },
+                      reset: function () { history = []; }
+                    };
+                  }
                 },
                 db: {
                   collection: function (name) {
