@@ -123,6 +123,7 @@ fun HomeScreen(nav: NavHostController) {
                     SectionTile("📋", stringResource(R.string.section_studio), stringResource(R.string.section_studio_desc),
                         MaterialTheme.colorScheme.surfaceContainerHighest, Modifier.weight(1f)) { nav.navigate(Routes.STUDIO) }
                 }
+                ExploreBanner { nav.navigate(Routes.EXPLORE) }
             }
         }
 
@@ -214,6 +215,23 @@ private fun SectionTile(emoji: String, title: String, subtitle: String, color: C
             Text(title, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(subtitle, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+        }
+    }
+}
+
+/** The way into the community gallery, full width under the tiles. */
+@Composable
+private fun ExploreBanner(onClick: () -> Unit) {
+    Surface(onClick = onClick, shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.secondaryContainer, modifier = Modifier.fillMaxWidth()) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text("🌍", fontSize = 32.sp)
+            Spacer(Modifier.width(14.dp))
+            Column(Modifier.weight(1f)) {
+                Text(stringResource(R.string.explore_home_title), style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.explore_home_desc), style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+            }
+            Icon(Icons.AutoMirrored.Rounded.ArrowForward, null)
         }
     }
 }

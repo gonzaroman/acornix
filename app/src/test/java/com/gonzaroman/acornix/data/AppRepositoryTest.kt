@@ -97,4 +97,27 @@ class AppRepositoryTest {
         assertEquals("✈️", AppRepository.guessEmoji("An airplane game", AppKind.APP))
         assertEquals("🎹", AppRepository.guessEmoji("Un juego de música", AppKind.APP))
     }
+
+    @Test
+    fun copiesGetNumberedNamesAndTrialsStayHidden() = runTest {
+        val repo = AppRepository(tmp.root)
+        repo.create("Notes", "<html>a</html>")
+        assertEquals("Notes 2", repo.uniqueName("Notes"))
+        assertEquals("notes 2", repo.uniqueName("notes")) // taken names are found ignoring case
+        repo.create("Notes 2", "<html>b</html>")
+        assertEquals("Notes 3", repo.uniqueName("Notes"))
+        assertEquals("Piano", repo.uniqueName(" Piano "))
+
+        File(repo.dir(AppRepository.TRIAL_PREFIX + "x"), "index.html").apply { parentFile!!.mkdirs() }.writeText("<html/>")
+        repo.refresh()
+        assertEquals(listOf("Notes", "Notes 2"), repo.apps.value.map { it.name }.sorted())
+    }
+
+    @Test
+    fun galleryOriginIsKept() = runTest {
+        val repo = AppRepository(tmp.root)
+        val app = repo.create("Notes", "<html>a</html>")
+        repo.edit(app.id) { it.copy(source = AppSource("notes", 2, "gonzaroman")) }
+        assertEquals(AppSource("notes", 2, "gonzaroman"), AppRepository(tmp.root).also { it.refresh() }.get(app.id)?.source)
+    }
 }

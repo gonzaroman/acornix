@@ -73,6 +73,10 @@ Made something cool? Tap **Share** and Acornix builds a card with **your app run
 <img src="docs/screenshots/ai-ideas.jpg" width="300" alt="App and game ideas suggested by the AI">
 </p>
 
+### 🌍 Community apps
+
+**Explore** apps and games other people made with Acornix: search them, see the request that created each one, **try them without installing**, install them with one tap or **remix** them with your own AI. Every app is reviewed before it's published, shows what it uses (your AI, the camera, the internet…) and gets updates from its author. They live in [acornix-apps](https://github.com/gonzaroman/acornix-apps), under the MIT license.
+
 ### 🧬 Functionalities: apps that use your phone
 
 Functionalities are apps that talk to your device through a built-in JavaScript bridge, `window.Acornix`. They can vibrate, switch the flashlight on, speak out loud, read the battery, send notifications, share, copy, open other apps and even **ask the AI** from inside the app. Some examples: a big SOS button, a battery dashboard, a pocket translator that speaks, a Pomodoro timer that vibrates.
@@ -147,7 +151,7 @@ Each app runs on its own isolated origin, so apps never see each other's data.
 
 - **Full backup**: one ZIP with all your apps, their versions, data and files. Save it to Google Drive or anywhere else from the system picker, and restore it on any phone.
 - **Android backup**: your apps and data are also included in your Google account backup.
-- **Import** ZIPs shared by friends, including apps made with the original Termux version of acornix. Before installing one, **Review it with AI**: your AI reads its code and tells you if it sends data away, asks for passwords, hides code or abuses your AI.
+- **Import** ZIPs shared by friends, including apps made with the original Termux version of acornix. If you already have an app with that name, install it as a copy or put it in place of yours, keeping your data. Before installing one, **Review it with AI**: your AI reads its code and tells you if it sends data away, asks for passwords, hides code or abuses your AI.
 
 ### 📋 Manual studio: no API key needed
 

@@ -2,6 +2,8 @@ package com.gonzaroman.acornix
 
 import android.app.Application
 import android.content.Context
+import coil.ImageLoader
+import coil.ImageLoaderFactory
 import com.gonzaroman.acornix.agent.AgentTools
 import com.gonzaroman.acornix.agent.AssistantController
 import com.gonzaroman.acornix.core.AppGenerator
@@ -32,6 +34,7 @@ class AppContainer(context: Context) {
     val device = DeviceActions(context)
     val aiPermissions = com.gonzaroman.acornix.data.AiPermissions(context)
     val appReview = com.gonzaroman.acornix.core.AppReview(settings)
+    val gallery = com.gonzaroman.acornix.data.Gallery(context.filesDir, apps, importExport, aiPermissions)
     val generator = AppGenerator(settings, apps, data)
     val ideas = IdeaGenerator(settings, java.io.File(context.filesDir, "ideas.json")) {
         context.assets.open("ideas/default_ideas.json").bufferedReader().use { it.readText() }
@@ -51,7 +54,7 @@ class AppContainer(context: Context) {
     }
 }
 
-class AcornixApplication : Application() {
+class AcornixApplication : Application(), ImageLoaderFactory {
     lateinit var container: AppContainer
         private set
 
@@ -59,6 +62,10 @@ class AcornixApplication : Application() {
         super.onCreate()
         container = AppContainer(this).also { it.start() }
     }
+
+    // Gallery screenshots stay on disk even if GitHub says they expire, so the gallery looks right offline.
+    // Their URLs carry the app's version, so a new version still gets its new screenshot.
+    override fun newImageLoader(): ImageLoader = ImageLoader.Builder(this).respectCacheHeaders(false).build()
 }
 
 val Context.container: AppContainer

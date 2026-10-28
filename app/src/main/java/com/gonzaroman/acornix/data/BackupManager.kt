@@ -47,7 +47,7 @@ class BackupManager(
 
     internal suspend fun write(out: OutputStream): Result {
         val ids = withContext(Dispatchers.IO) {
-            repo.root.listFiles { f -> f.isDirectory && File(f, AppRepository.INDEX).exists() }.orEmpty().map { it.name }.sorted()
+            repo.root.listFiles { f -> f.isDirectory && !AppRepository.isTrial(f.name) && File(f, AppRepository.INDEX).exists() }.orEmpty().map { it.name }.sorted()
         }
         val exports = ids.associateWith { id -> if (data.hasData(id)) data.export(id) else null }
         withContext(Dispatchers.IO) {

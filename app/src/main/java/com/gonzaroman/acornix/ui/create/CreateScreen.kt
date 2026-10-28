@@ -108,9 +108,10 @@ import androidx.compose.material3.Surface
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateScreen(nav: NavHostController, feature: Boolean, improveAppId: String?) {
+fun CreateScreen(nav: NavHostController, feature: Boolean, improveAppId: String?, prompt: String? = null) {
     val context = LocalContext.current
-    val vm: CreateViewModel = viewModel { CreateViewModel(context.container, feature, improveAppId) }
+    // A prompt (e.g. "Create something like this" in the gallery) starts in the request box.
+    val vm: CreateViewModel = viewModel { CreateViewModel(context.container, feature, improveAppId, prompt.orEmpty()) }
     val ui by vm.ui.collectAsState()
 
     val title = when {

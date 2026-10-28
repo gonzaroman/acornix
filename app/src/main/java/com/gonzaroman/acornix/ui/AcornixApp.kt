@@ -45,6 +45,8 @@ import com.gonzaroman.acornix.ui.assistant.AssistantScreen
 import com.gonzaroman.acornix.ui.create.CreateScreen
 import com.gonzaroman.acornix.ui.data.DataScreen
 import com.gonzaroman.acornix.ui.editor.EditorScreen
+import com.gonzaroman.acornix.ui.explore.ExploreScreen
+import com.gonzaroman.acornix.ui.explore.GalleryAppScreen
 import com.gonzaroman.acornix.ui.home.HomeScreen
 import com.gonzaroman.acornix.ui.onboarding.OnboardingScreen
 import com.gonzaroman.acornix.ui.onboarding.TourScreen
@@ -64,7 +66,7 @@ object Routes {
     const val APPS = "apps"
     const val ASSISTANT = "assistant?control={control}&prompt={prompt}"
     const val SETTINGS = "settings"
-    const val CREATE = "create?kind={kind}&improve={improve}"
+    const val CREATE = "create?kind={kind}&improve={improve}&prompt={prompt}"
     const val EDITOR = "editor/{id}"
     const val VERSIONS = "versions/{id}"
     const val VERSIONS_HUB = "versions"
@@ -77,15 +79,19 @@ object Routes {
     const val TOUR = "tour"
     const val DATA = "data/{id}"
     const val SHARE = "share/{id}"
+    const val EXPLORE = "explore"
+    const val GALLERY_APP = "gallery/{id}"
 
     fun assistant(control: Boolean = false, prompt: String? = null) =
         "assistant?control=$control" + (prompt?.let { "&prompt=${Uri.encode(it)}" } ?: "")
-    fun create(feature: Boolean = false) = "create?kind=${if (feature) "feature" else "app"}"
+    fun create(feature: Boolean = false, prompt: String? = null) =
+        "create?kind=${if (feature) "feature" else "app"}" + (prompt?.let { "&prompt=${Uri.encode(it)}" } ?: "")
     fun improve(appId: String) = "create?improve=${Uri.encode(appId)}"
     fun editor(appId: String) = "editor/${Uri.encode(appId)}"
     fun versions(appId: String) = "versions/${Uri.encode(appId)}"
     fun data(appId: String) = "data/${Uri.encode(appId)}"
     fun share(appId: String) = "share/${Uri.encode(appId)}"
+    fun galleryApp(id: String) = "gallery/${Uri.encode(id)}"
 }
 
 private data class Tab(val route: String, val base: String, val label: Int, val icon: ImageVector, val selectedIcon: ImageVector)
@@ -198,12 +204,14 @@ fun AcornixApp(
                     arguments = listOf(
                         navArgument("kind") { type = NavType.StringType; defaultValue = "app" },
                         navArgument("improve") { type = NavType.StringType; nullable = true; defaultValue = null },
+                        navArgument("prompt") { type = NavType.StringType; nullable = true; defaultValue = null },
                     ),
                 ) { entry ->
                     CreateScreen(
                         nav = nav,
                         feature = entry.arguments?.getString("kind") == "feature",
                         improveAppId = entry.arguments?.getString("improve"),
+                        prompt = entry.arguments?.getString("prompt"),
                     )
                 }
                 composable(Routes.EDITOR) { entry -> EditorScreen(nav, entry.arguments?.getString("id").orEmpty()) }
@@ -216,6 +224,8 @@ fun AcornixApp(
                 composable(Routes.HELP) { HelpScreen(nav) }
                 composable(Routes.CONTROL_HELP) { ControlHelpScreen(nav) }
                 composable(Routes.STUDIO) { StudioScreen(nav) }
+                composable(Routes.EXPLORE) { ExploreScreen(nav) }
+                composable(Routes.GALLERY_APP) { entry -> GalleryAppScreen(nav, entry.arguments?.getString("id").orEmpty()) }
             }
         }
     }

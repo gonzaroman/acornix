@@ -63,14 +63,7 @@ class ImportExport(
             context.contentResolver.openInputStream(uri)?.use { readZip(it) }
                 ?: throw ImportException(ImportException.Reason.NOT_A_ZIP)
         }
-        if (entries.isEmpty()) throw ImportException(ImportException.Reason.NOT_A_ZIP)
-        val prefix = findAppRoot(entries.keys)
-        if (prefix == null) {
-            val isPlugin = entries.any { (path, bytes) ->
-                path.endsWith("main.py") && String(bytes).let { "config =" in it || "config=" in it }
-            }
-            throw ImportException(if (isPlugin) ImportException.Reason.PYTHON_PLUGIN else ImportException.Reason.NO_INDEX)
-        }
+        val prefix = appRoot(entries)
         // The code the AI reviews: every text file of the app, index.html first.
         val code = entries.filterKeys { it.startsWith(prefix) && TEXT_FILE.containsMatchIn(it) && !it.endsWith(DATA_FILE) }
             .entries.sortedBy { if (it.key.endsWith("index.html")) 0 else 1 }
@@ -78,33 +71,25 @@ class ImportExport(
         return ImportPreview(name, entries, code)
     }
 
-    suspend fun install(preview: ImportPreview): AppMeta = importEntries(preview.name, preview.entries)
+    /** Installs the shared app as a new app called [name] (by default the ZIP's name). */
+    suspend fun install(preview: ImportPreview, name: String = preview.name): AppMeta = importEntries(name, preview.entries)
+
+    /**
+     * Puts the shared app's code in place of an existing app's. Its data stays, and its current code
+     * stays in the version history.
+     */
+    suspend fun replace(id: String, entries: Map<String, ByteArray>, note: String): AppMeta {
+        val prefix = appRoot(entries)
+        // index.html goes through update(), which keeps the version history.
+        val code = String(entries.getValue("${prefix}index.html"))
+        writeEntries(id, entries.filterKeys { it != "${prefix}index.html" }, prefix)
+        return repo.update(id, code, note)
+    }
 
     internal suspend fun importEntries(name: String, entries: Map<String, ByteArray>): AppMeta {
-        if (entries.isEmpty()) throw ImportException(ImportException.Reason.NOT_A_ZIP)
-        val prefix = findAppRoot(entries.keys)
-        if (prefix == null) {
-            val isPlugin = entries.any { (path, bytes) ->
-                path.endsWith("main.py") && String(bytes).let { "config =" in it || "config=" in it }
-            }
-            throw ImportException(if (isPlugin) ImportException.Reason.PYTHON_PLUGIN else ImportException.Reason.NO_INDEX)
-        }
+        val prefix = appRoot(entries)
         val id = repo.uniqueId(name)
-        withContext(Dispatchers.IO) {
-            val dir = repo.dir(id).apply { mkdirs() }
-            val canonicalRoot = dir.canonicalPath + File.separator
-            entries.forEach { (path, bytes) ->
-                if (!path.startsWith(prefix)) return@forEach
-                val relative = path.removePrefix(prefix)
-                val first = relative.split('/').first()
-                if (relative.isEmpty() || first in AppRepository.INTERNAL_FILES || first == DATA_FILE || first == DATA_FILES_DIR) return@forEach
-                val out = File(dir, relative)
-                // Zip-slip protection.
-                if (!out.canonicalPath.startsWith(canonicalRoot)) return@forEach
-                out.parentFile?.mkdirs()
-                out.writeBytes(bytes)
-            }
-        }
+        writeEntries(id, entries, prefix)
         val meta = repo.adopt(id, name, AppKind.APP)
         // Data exported together with the app (a shared game save, a list…).
         entries["${prefix}$DATA_FILE"]?.let { bytes ->
@@ -115,6 +100,33 @@ class ImportExport(
             data.saveFile(id, path.substringAfterLast('/'), bytes)
         }
         return meta
+    }
+
+    private fun appRoot(entries: Map<String, ByteArray>): String {
+        if (entries.isEmpty()) throw ImportException(ImportException.Reason.NOT_A_ZIP)
+        return findAppRoot(entries.keys) ?: run {
+            val isPlugin = entries.any { (path, bytes) ->
+                path.endsWith("main.py") && String(bytes).let { "config =" in it || "config=" in it }
+            }
+            throw ImportException(if (isPlugin) ImportException.Reason.PYTHON_PLUGIN else ImportException.Reason.NO_INDEX)
+        }
+    }
+
+    /** Writes the app's own files into its folder: not Acornix's internal files, not its exported data. */
+    private suspend fun writeEntries(id: String, entries: Map<String, ByteArray>, prefix: String) = withContext(Dispatchers.IO) {
+        val dir = repo.dir(id).apply { mkdirs() }
+        val canonicalRoot = dir.canonicalPath + File.separator
+        entries.forEach { (path, bytes) ->
+            if (!path.startsWith(prefix)) return@forEach
+            val relative = path.removePrefix(prefix)
+            val first = relative.split('/').first()
+            if (relative.isEmpty() || first in AppRepository.INTERNAL_FILES || first == DATA_FILE || first == DATA_FILES_DIR) return@forEach
+            val out = File(dir, relative)
+            // Zip-slip protection.
+            if (!out.canonicalPath.startsWith(canonicalRoot)) return@forEach
+            out.parentFile?.mkdirs()
+            out.writeBytes(bytes)
+        }
     }
 
     private fun displayName(uri: Uri): String? = runCatching {

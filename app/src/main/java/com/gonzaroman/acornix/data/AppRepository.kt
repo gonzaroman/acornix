@@ -30,9 +30,15 @@ data class AppMeta(
     val versionCount: Int = 1,
     /** How long the AI took to write the first version, for the share card. 0 = unknown. */
     val buildSeconds: Int = 0,
+    /** Where it came from, for apps installed from the community gallery. */
+    val source: AppSource? = null,
     /** The code calls the user's AI (read from index.html, never saved). */
     @kotlinx.serialization.Transient val usesAi: Boolean = false,
 )
+
+/** An app installed from the community gallery: which one, and which version of it. */
+@Serializable
+data class AppSource(val gallery: String, val version: Int, val author: String = "")
 
 @Serializable
 data class VersionInfo(
@@ -60,7 +66,7 @@ class AppRepository(
     val apps: StateFlow<List<AppMeta>> = _apps.asStateFlow()
 
     suspend fun refresh() = withContext(Dispatchers.IO) {
-        _apps.value = root.listFiles { f -> f.isDirectory }.orEmpty()
+        _apps.value = root.listFiles { f -> f.isDirectory && !isTrial(f.name) }.orEmpty()
             .mapNotNull { readMeta(it) }
             .sortedByDescending { maxOf(it.updatedAt, it.lastOpenedAt) }
     }
@@ -147,6 +153,26 @@ class AppRepository(
         refresh()
     }
 
+    /** Changes the app's metadata (not its code). */
+    suspend fun edit(id: String, change: (AppMeta) -> AppMeta) {
+        mutex.withLock {
+            withContext(Dispatchers.IO) { readMeta(dir(id))?.let { writeMeta(change(it)) } }
+        }
+        refresh()
+    }
+
+    /** The app with this name, ignoring case, if there is one. */
+    fun findByName(name: String): AppMeta? = _apps.value.firstOrNull { it.name.equals(name.trim(), ignoreCase = true) }
+
+    /** "Notes", or "Notes 2", "Notes 3"… when that name is taken, so copies can be told apart. */
+    fun uniqueName(name: String): String {
+        val base = name.trim()
+        if (findByName(base) == null) return base
+        var i = 2
+        while (findByName("$base $i") != null) i++
+        return "$base $i"
+    }
+
     suspend fun markOpened(id: String) {
         mutex.withLock {
             withContext(Dispatchers.IO) {
@@ -226,6 +252,9 @@ class AppRepository(
         private val AI_CALL = Regex("""\baskAI\b|\bai\.chat\b""")
 
         const val APPS_DIR = "my_apps"
+        /** Gallery apps being tried without installing live in folders starting with this. They never show up as apps. */
+        const val TRIAL_PREFIX = "_try_"
+        fun isTrial(id: String) = id.startsWith(TRIAL_PREFIX)
         const val INDEX = "index.html"
         const val META = "acornix.json"
         const val THUMBNAIL = "thumbnail.jpg"

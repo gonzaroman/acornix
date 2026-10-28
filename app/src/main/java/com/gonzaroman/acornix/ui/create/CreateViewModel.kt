@@ -27,6 +27,8 @@ class CreateViewModel(
     private val c: AppContainer,
     private val feature: Boolean,
     improveAppId: String?,
+    /** Text the request box starts with. */
+    initialIdea: String = "",
 ) : ViewModel() {
 
     private val _ui = MutableStateFlow<CreateUi>(CreateUi.Form)
@@ -36,7 +38,7 @@ class CreateViewModel(
     var improveTarget: AppMeta? = improveAppId?.let { c.apps.get(it) }
         private set
 
-    var lastIdea: String = ""
+    var lastIdea: String = initialIdea
         private set
 
     private var lastRequest: GenerationRequest? = null

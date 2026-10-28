@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.gonzaroman.acornix.R
 import com.gonzaroman.acornix.container
 import com.gonzaroman.acornix.core.AppReviewResult
+import com.gonzaroman.acornix.data.AppMeta
 import com.gonzaroman.acornix.data.ImportException
 import com.gonzaroman.acornix.data.ImportPreview
 import com.gonzaroman.acornix.ui.importErrorMessage
@@ -55,6 +56,7 @@ fun ImportReviewDialog(uri: Uri, onDone: () -> Unit) {
     var reviewError by remember { mutableStateOf<String?>(null) }
     var installing by remember { mutableStateOf(false) }
     var canReview by remember { mutableStateOf(false) }
+    var clash by remember { mutableStateOf<AppMeta?>(null) }
 
     LaunchedEffect(uri) {
         try {
@@ -67,17 +69,31 @@ fun ImportReviewDialog(uri: Uri, onDone: () -> Unit) {
     }
     val p = preview ?: return
 
-    fun install() {
+    /** [replace]: the user's app with the same name, to put this one in its place. */
+    fun install(replace: AppMeta? = null) {
+        clash = null
         installing = true
         scope.launch {
             try {
-                val app = c.importExport.install(p)
+                val app = if (replace != null) c.importExport.replace(replace.id, p.entries, "Replaced with a shared app")
+                else c.importExport.install(p, c.apps.uniqueName(p.name))
                 Toast.makeText(context, context.getString(R.string.import_done, app.name), Toast.LENGTH_LONG).show()
             } catch (e: ImportException) {
                 Toast.makeText(context, importErrorMessage(context, e), Toast.LENGTH_LONG).show()
             }
             onDone()
         }
+    }
+
+    clash?.let { existing ->
+        NameClashDialog(
+            name = existing.name,
+            copyName = c.apps.uniqueName(p.name),
+            onCopy = { install() },
+            onReplace = { install(replace = existing) },
+            onDismiss = { clash = null },
+        )
+        return
     }
 
     AlertDialog(
@@ -113,7 +129,7 @@ fun ImportReviewDialog(uri: Uri, onDone: () -> Unit) {
             }
         },
         confirmButton = {
-            TextButton(onClick = { install() }, enabled = !reviewing && !installing) {
+            TextButton(onClick = { c.apps.findByName(p.name)?.let { clash = it } ?: install() }, enabled = !reviewing && !installing) {
                 Text(stringResource(if (review?.verdict == "danger") R.string.import_install_anyway else R.string.import_install))
             }
         },

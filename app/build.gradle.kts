@@ -18,6 +18,10 @@ android {
         versionCode = 37
         versionName = "2.3.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // The community gallery (gonzaroman/acornix-apps). Override with -PacornixGalleryUrl=… to test a copy.
+        val galleryUrl = (project.findProperty("acornixGalleryUrl") as String?)
+            ?: "https://raw.githubusercontent.com/gonzaroman/acornix-apps/main"
+        buildConfigField("String", "GALLERY_URL", "\"$galleryUrl\"")
     }
 
     // Release signing comes from a keystore kept OUTSIDE the repository. Override the location with
