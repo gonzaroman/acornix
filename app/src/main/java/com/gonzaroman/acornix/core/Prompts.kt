@@ -127,6 +127,10 @@ object Prompts {
           await Acornix.db.set('highScore', 1200), await Acornix.db.remove(key).
         - Files (photos, audio, drawings, exports): const f = await Acornix.files.save('photo.jpg', blobOrDataUrl)
           -> {name, url, size}; use f.url in <img src>. await Acornix.files.list(); await Acornix.files.remove(name).
+          files.save keeps the file inside the app. When the user saves or downloads a photo, video, drawing, recording
+          or document they made, also put it on the phone: await Acornix.files.export('drawing.png', blobOrDataUrlOrCanvas)
+          puts it in the gallery (images, videos), Music or Downloads and tells the user where; export('photo.jpg') with no
+          data exports a file already saved. await Acornix.files.share(name, data) opens the share sheet (WhatsApp, email…).
         - Load saved data when the app starts and save right after every change (no "save" button needed).
         - The assistant can also change this data: listen to window.addEventListener('acornixdata', reload)
           and refresh what you show.

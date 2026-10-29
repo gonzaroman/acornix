@@ -19,6 +19,8 @@ import com.gonzaroman.acornix.ai.AiException
 import com.gonzaroman.acornix.container
 import com.gonzaroman.acornix.data.AppDataStore
 import com.gonzaroman.acornix.data.DocQuery
+import com.gonzaroman.acornix.device.MediaExport
+import com.gonzaroman.acornix.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
@@ -192,6 +194,20 @@ class AcornixJsBridge(
         }
     }
 
+    /** A file to hand to the phone: the bytes sent by the page, or the app's own saved file with that name. */
+    private suspend fun fileArgs(rawName: String, payload: String?): Pair<String, ByteArray> {
+        val name = AppDataStore.cleanFileName(rawName)
+        val bytes = if (payload != null) {
+            Base64.decode(payload.substringAfter("base64,", payload), Base64.DEFAULT)
+        } else {
+            val file = java.io.File(context.container.data.filesDir(appId), name)
+            if (!file.isFile) throw IllegalArgumentException("No saved file called $name")
+            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { file.readBytes() }
+        }
+        if (bytes.size > MAX_EXPORT_BYTES) throw IllegalArgumentException("File too large (max ${MAX_EXPORT_BYTES / 1024 / 1024} MB)")
+        return name to bytes
+    }
+
     private suspend fun handle(method: String, args: JsonArray, partial: (String, Boolean) -> Unit = { _, _ -> }): JsonElement {
         val c = context.container
         val device = c.device
@@ -234,6 +250,27 @@ class AcornixJsBridge(
                 }
             }
             "files.remove" -> JsonPrimitive(data.deleteFile(appId, req(0, "name")))
+            // ----- Files for the rest of the phone: the gallery, Downloads, other apps -----
+            "files.export" -> {
+                val (name, bytes) = fileArgs(req(0, "name"), str(1))
+                if (!c.media.canSave) {
+                    // Android 8 and 9: the share sheet lets the user pick where it goes.
+                    buildJsonObject { put("name", name); put("shared", c.media.shareBytes(name, bytes)) }
+                } else {
+                    val f = c.media.save(name, bytes)
+                    val where = when (MediaExport.folderFor(MediaExport.mimeFor(f.name))) {
+                        MediaExport.PICTURES, MediaExport.MOVIES -> R.string.saved_to_gallery
+                        MediaExport.MUSIC -> R.string.saved_to_music
+                        else -> R.string.saved_to_downloads
+                    }
+                    device.toast(context.getString(where, f.name))
+                    buildJsonObject { put("name", f.name); put("folder", f.folder); put("uri", f.uri.toString()) }
+                }
+            }
+            "files.share" -> {
+                val (name, bytes) = fileArgs(req(0, "name"), str(1))
+                JsonPrimitive(c.media.shareBytes(name, bytes))
+            }
 
             "vibrate" -> {
                 val a = arg(0)
@@ -303,6 +340,8 @@ class AcornixJsBridge(
     }
 
     companion object {
+        private const val MAX_EXPORT_BYTES = 50 * 1024 * 1024
+
         /** Injected before any page script runs; builds the Promise-based API on top of AcornixNative. */
         val SHIM = """
             (function () {
@@ -345,6 +384,21 @@ class AcornixJsBridge(
                   if (x && x.width && x.height) return draw(x, x.width, x.height);
                   reject(new Error('Could not read the image'));
                 });
+              }
+              // Files travel as data URLs; a Blob is read first. No data means the app's saved file of that name.
+              function withFile(method, name, data) {
+                var send = function (d) { return call(method, [String(name), d]); };
+                if (data === undefined || data === null) return send(null);
+                if (typeof Blob !== 'undefined' && data instanceof Blob) {
+                  return new Promise(function (resolve, reject) {
+                    var r = new FileReader();
+                    r.onload = function () { send(r.result).then(resolve, reject); };
+                    r.onerror = function () { reject(r.error); };
+                    r.readAsDataURL(data);
+                  });
+                }
+                if (data && typeof data.toDataURL === 'function') return send(data.toDataURL(/\.png$/i.test(name) ? 'image/png' : 'image/jpeg', 0.92));
+                return send(String(data));
               }
               // askAI(prompt, system) still works; options: { system, images, json, quick, history, onText }.
               function askAI(p, o) {
@@ -416,21 +470,13 @@ class AcornixJsBridge(
                   remove: function (k) { return call('kv.remove', [String(k)]); }
                 },
                 files: {
-                  save: function (name, data) {
-                    var send = function (d) { return call('files.save', [String(name), d]); };
-                    if (typeof Blob !== 'undefined' && data instanceof Blob) {
-                      return new Promise(function (resolve, reject) {
-                        var r = new FileReader();
-                        r.onload = function () { send(r.result).then(resolve, reject); };
-                        r.onerror = function () { reject(r.error); };
-                        r.readAsDataURL(data);
-                      });
-                    }
-                    return send(String(data));
-                  },
+                  save: function (name, data) { return withFile('files.save', name, data); },
                   list: function () { return call('files.list'); },
                   remove: function (name) { return call('files.remove', [String(name)]); },
-                  url: function (name) { return '/_files/' + encodeURIComponent(name); }
+                  url: function (name) { return '/_files/' + encodeURIComponent(name); },
+                  // To the phone's gallery (photos, videos), Music or Downloads; without data, a file saved with save().
+                  export: function (name, data) { return withFile('files.export', name, data); },
+                  share: function (name, data) { return withFile('files.share', name, data); }
                 }
               };
               window.dispatchEvent(new Event('acornixready'));

@@ -681,4 +681,7 @@
     <string name="community_tour_safe_text">Solo se publica el código de la app, nunca tus datos. Cada app dice qué usa (tu IA, la cámara, internet…) y puedes denunciar cualquiera que no cumpla las normas. Todas son de código abierto, con licencia MIT.</string>
     <string name="community_tour_start">¡A explorar!</string>
     <string name="publish_category_pick">Elige una categoría</string>
+    <string name="saved_to_gallery">Guardado en tu galería: %1$s</string>
+    <string name="saved_to_music">Guardado en Música › Acornix: %1$s</string>
+    <string name="saved_to_downloads">Guardado en Descargas › Acornix: %1$s</string>
 </resources>

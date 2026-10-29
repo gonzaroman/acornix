@@ -682,4 +682,7 @@
     <string name="community_tour_safe_text">Only the app\'s code is published, never your data. Every app shows what it uses (your AI, the camera, the internet…), and you can report any app that breaks the rules. They\'re all open source, under the MIT license.</string>
     <string name="community_tour_start">Start exploring</string>
     <string name="publish_category_pick">Choose a category</string>
+    <string name="saved_to_gallery">Saved to your gallery: %1$s</string>
+    <string name="saved_to_music">Saved to Music › Acornix: %1$s</string>
+    <string name="saved_to_downloads">Saved to Downloads › Acornix: %1$s</string>
 </resources>

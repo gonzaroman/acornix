@@ -265,6 +265,9 @@ const best = await Acornix.db.get('highScore');
 // Files (photos, drawings, exports…)
 const file = await Acornix.files.save('photo.jpg', blob);          // Blob or data URL → {name, url, size}
 document.querySelector('img').src = file.url;
+await Acornix.files.export('photo.jpg', blob);       // to the phone's gallery (videos too; other files go to Downloads)
+await Acornix.files.export('photo.jpg');             // or a file you already saved
+await Acornix.files.share('photo.jpg', canvas);      // share sheet: WhatsApp, email… (Blob, data URL or <canvas>)
 
 // Refresh when the assistant changes your data
 window.addEventListener('acornixdata', () => reload());

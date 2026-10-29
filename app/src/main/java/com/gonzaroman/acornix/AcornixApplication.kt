@@ -16,6 +16,7 @@ import com.gonzaroman.acornix.data.SampleAppsInstaller
 import com.gonzaroman.acornix.data.SettingsRepository
 import com.gonzaroman.acornix.data.UpdateChecker
 import com.gonzaroman.acornix.device.DeviceActions
+import com.gonzaroman.acornix.device.MediaExport
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -32,6 +33,7 @@ class AppContainer(context: Context) {
     val backups = BackupManager(context, apps, data)
     val updates = UpdateChecker(context)
     val device = DeviceActions(context)
+    val media = MediaExport(context)
     val aiPermissions = com.gonzaroman.acornix.data.AiPermissions(context)
     val appReview = com.gonzaroman.acornix.core.AppReview(settings)
     val gallery = com.gonzaroman.acornix.data.Gallery(context.filesDir, apps, importExport, aiPermissions)
