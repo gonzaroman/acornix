@@ -39,6 +39,10 @@ data class GalleryApp(
     val size: Long = 0,
     /** SHA-256 of index.html. */
     val sha256: String = "",
+    /** Times its ZIP was downloaded (installs, updates and tries), counted once a day. */
+    val downloads: Long = 0,
+    /** Downloads in the last week, for "Trending". */
+    val trending: Long = 0,
 )
 
 @Serializable
@@ -59,6 +63,8 @@ class Gallery(
     private val importExport: ImportExport,
     private val aiPermissions: AiPermissions,
     private val baseUrl: String = BuildConfig.GALLERY_URL.trimEnd('/'),
+    /** Where each app's ZIP is. Downloading it from there is what counts as a download. */
+    private val zipUrl: String = "$REPO_URL/releases/download/apps",
     private val http: OkHttpClient = HttpClients.default,
 ) {
     private val cacheFile = File(filesDir, "gallery/catalog.json")
@@ -93,11 +99,14 @@ class Gallery(
 
     fun hasUpdate(app: GalleryApp): Boolean = installed(app)?.source?.let { it.version < app.version } == true
 
-    /** Installs it as a new app ("Notes 2" if there is already a "Notes"). */
-    suspend fun install(app: GalleryApp): AppMeta {
+    /**
+     * Installs it as a new app ("Notes 2" if there is already a "Notes"). A [remix] is the user's own app
+     * from then on: it doesn't remember the gallery app, so it gets no updates and publishes as a new app.
+     */
+    suspend fun install(app: GalleryApp, remix: Boolean = false): AppMeta {
         val files = download(app)
         val meta = importExport.importEntries(apps.uniqueName(app.name), files)
-        apps.edit(meta.id) { describe(it, app) }
+        apps.edit(meta.id) { describe(it, app).let { m -> if (remix) m.copy(source = null) else m } }
         return apps.get(meta.id) ?: meta
     }
 
@@ -139,7 +148,20 @@ class Gallery(
         source = AppSource(app.id, app.version, app.author),
     )
 
-    private suspend fun download(app: GalleryApp): Map<String, ByteArray> {
+    /** The app's files: from its ZIP, which counts the download, or else file by file. */
+    private suspend fun download(app: GalleryApp): Map<String, ByteArray> =
+        runCatching { downloadZip(app) }.getOrNull() ?: downloadFiles(app)
+
+    private suspend fun downloadZip(app: GalleryApp): Map<String, ByteArray>? {
+        val entries = ImportExport.readZip(get("$zipUrl/${app.id}.zip").inputStream())
+        val index = entries[AppRepository.INDEX] ?: return null
+        // A ZIP that doesn't match the catalog yet (it's being updated) falls back to the files.
+        if (app.sha256.isNotEmpty() && sha256(index) != app.sha256.lowercase()) return null
+        if (entries.keys.any { !SAFE_PATH.matches(it) || ".." in it.split('/') }) return null
+        return entries
+    }
+
+    private suspend fun downloadFiles(app: GalleryApp): Map<String, ByteArray> {
         val files = app.files.ifEmpty { listOf(AppRepository.INDEX) }
         require(AppRepository.INDEX in files) { "The app has no index.html" }
         var total = 0L
@@ -170,18 +192,26 @@ class Gallery(
         private val SAFE_PATH = Regex("""[A-Za-z0-9._-]+(/[A-Za-z0-9._-]+)*""")
         private val json = Json { ignoreUnknownKeys = true }
 
-        val CATEGORIES = listOf("games", "tools", "creative", "health", "learning")
-
         fun parse(text: String): GalleryCatalog = json.decodeFromString(GalleryCatalog.serializer(), text)
 
-        /** Featured apps first, then the newest. */
-        fun sorted(apps: List<GalleryApp>): List<GalleryApp> =
-            apps.sortedWith(compareByDescending<GalleryApp> { it.featured }.thenByDescending { it.added }.thenBy { it.name.lowercase() })
+        enum class Sort { POPULAR, TRENDING, NEW, FEATURED }
+
+        /** Ties (like no downloads yet) fall back to featured, then newest, then name. */
+        fun sorted(apps: List<GalleryApp>, sort: Sort = Sort.POPULAR): List<GalleryApp> {
+            val rest = compareByDescending<GalleryApp> { it.featured }.thenByDescending { it.added }.thenBy { it.name.lowercase() }
+            val order = when (sort) {
+                Sort.POPULAR -> compareByDescending<GalleryApp> { it.downloads }.then(rest)
+                Sort.TRENDING -> compareByDescending<GalleryApp> { it.trending }.thenByDescending { it.downloads }.then(rest)
+                Sort.NEW -> compareByDescending<GalleryApp> { it.added }.thenBy { it.name.lowercase() }
+                Sort.FEATURED -> compareByDescending<GalleryApp> { it.featured }.thenByDescending { it.downloads }.then(rest)
+            }
+            return apps.sortedWith(order)
+        }
 
         /** [filter] is a category, "ai" for apps that use the AI, or null for all. */
-        fun search(apps: List<GalleryApp>, query: String, filter: String?): List<GalleryApp> {
+        fun search(apps: List<GalleryApp>, query: String, filter: String?, sort: Sort = Sort.POPULAR): List<GalleryApp> {
             val words = query.trim().lowercase().split(Regex("\\s+")).filter { it.isNotEmpty() }
-            return sorted(apps).filter { app ->
+            return sorted(apps, sort).filter { app ->
                 (filter == null || app.category == filter || (filter == "ai" && "ai" in app.tags)) &&
                     words.all { w -> listOf(app.name, app.description, app.prompt, app.author).any { it.lowercase().contains(w) } }
             }

@@ -11,9 +11,9 @@ class GalleryTest {
           {"id": "notes", "name": "Notes", "category": "tools", "description": "Checklists and pinned notes",
            "prompt": "A professional notes app", "author": "gonzaroman", "added": "2026-10-28", "featured": true},
           {"id": "chef", "name": "Pocket Chef", "category": "tools", "description": "Recipes from a photo of your fridge",
-           "author": "maria", "added": "2026-11-02", "tags": ["ai", "camera"], "version": 3},
+           "author": "maria", "added": "2026-11-02", "tags": ["ai", "camera"], "version": 3, "downloads": 40, "trending": 30},
           {"id": "bowling", "name": "Bowling", "category": "games", "description": "Swipe to throw",
-           "author": "gonzaroman", "added": "2026-10-20", "tags": ["phone"]}
+           "author": "gonzaroman", "added": "2026-10-20", "tags": ["phone"], "downloads": 120, "trending": 5}
         ]}
         """.trimIndent(),
     )
@@ -28,16 +28,23 @@ class GalleryTest {
     }
 
     @Test
-    fun featuredFirstThenNewest() {
-        assertEquals(listOf("notes", "chef", "bowling"), Gallery.sorted(catalog.apps).map { it.id })
+    fun sortOrders() {
+        fun ids(sort: Gallery.Companion.Sort) = Gallery.sorted(catalog.apps, sort).map { it.id }
+        assertEquals(listOf("bowling", "chef", "notes"), ids(Gallery.Companion.Sort.POPULAR))
+        assertEquals(listOf("chef", "bowling", "notes"), ids(Gallery.Companion.Sort.TRENDING))
+        assertEquals(listOf("chef", "notes", "bowling"), ids(Gallery.Companion.Sort.NEW))
+        assertEquals(listOf("notes", "bowling", "chef"), ids(Gallery.Companion.Sort.FEATURED))
+        // No downloads yet: featured, then newest.
+        val fresh = catalog.apps.map { it.copy(downloads = 0, trending = 0) }
+        assertEquals(listOf("notes", "chef", "bowling"), Gallery.sorted(fresh).map { it.id })
     }
 
     @Test
     fun searchAndFilters() {
         assertEquals(listOf("chef"), Gallery.search(catalog.apps, "", "ai").map { it.id })
-        assertEquals(listOf("notes", "chef"), Gallery.search(catalog.apps, "", "tools").map { it.id })
+        assertEquals(listOf("chef", "notes"), Gallery.search(catalog.apps, "", "tools").map { it.id })
         assertEquals(listOf("chef"), Gallery.search(catalog.apps, "FRIDGE photo", null).map { it.id })
-        assertEquals(listOf("notes", "bowling"), Gallery.search(catalog.apps, "gonzaroman", null).map { it.id })
+        assertEquals(listOf("bowling", "notes"), Gallery.search(catalog.apps, "gonzaroman", null).map { it.id })
         assertTrue(Gallery.search(catalog.apps, "spaceship", null).isEmpty())
     }
 

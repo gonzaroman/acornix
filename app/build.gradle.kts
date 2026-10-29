@@ -22,6 +22,9 @@ android {
         val galleryUrl = (project.findProperty("acornixGalleryUrl") as String?)
             ?: "https://raw.githubusercontent.com/gonzaroman/acornix-apps/main"
         buildConfigField("String", "GALLERY_URL", "\"$galleryUrl\"")
+        // Public client id of the "Acornix Gallery" GitHub App, used to sign in and publish apps.
+        val githubClientId = (project.findProperty("acornixGithubClientId") as String?) ?: "Iv23li4ftp0U2LGF6ovd"
+        buildConfigField("String", "GITHUB_CLIENT_ID", "\"$githubClientId\"")
     }
 
     // Release signing comes from a keystore kept OUTSIDE the repository. Override the location with

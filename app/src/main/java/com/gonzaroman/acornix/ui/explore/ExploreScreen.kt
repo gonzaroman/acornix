@@ -81,13 +81,16 @@ import com.gonzaroman.acornix.ui.components.formatBytes
 import com.gonzaroman.acornix.web.AppLauncher
 import kotlinx.coroutines.launch
 
-private val CATEGORY_LABELS = mapOf(
-    "games" to R.string.explore_cat_games,
-    "tools" to R.string.explore_cat_tools,
-    "creative" to R.string.explore_cat_creative,
-    "health" to R.string.explore_cat_health,
-    "learning" to R.string.explore_cat_learning,
+private val SORTS = listOf(
+    Gallery.Companion.Sort.POPULAR to R.string.explore_sort_popular,
+    Gallery.Companion.Sort.TRENDING to R.string.explore_sort_trending,
+    Gallery.Companion.Sort.NEW to R.string.explore_sort_new,
+    Gallery.Companion.Sort.FEATURED to R.string.explore_sort_featured,
 )
+
+/** "1.2K", "1,2 mil"… in the phone's language. */
+fun compactCount(n: Long): String =
+    android.icu.text.CompactDecimalFormat.getInstance(java.util.Locale.getDefault(), android.icu.text.CompactDecimalFormat.CompactStyle.SHORT).format(n)
 
 /** The community gallery: search, filter by category and open an app's page. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -98,15 +101,16 @@ fun ExploreScreen(nav: NavHostController) {
     val installed by c.apps.apps.collectAsState()
     var query by rememberSaveable { mutableStateOf("") }
     var filter by rememberSaveable { mutableStateOf<String?>(null) }
+    var sort by rememberSaveable { mutableStateOf(Gallery.Companion.Sort.POPULAR) }
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) { c.gallery.refresh() }
 
     val all = state.catalog?.apps.orEmpty()
     // Only the categories that have apps, plus "with AI" when some app uses it.
-    val filters = Gallery.CATEGORIES.filter { cat -> all.any { it.category == cat } } +
+    val filters = CATEGORIES.map { it.id }.filter { cat -> all.any { it.category == cat } } +
         listOfNotNull("ai".takeIf { all.any { "ai" in it.tags } })
-    val shown = Gallery.search(all, query, filter)
+    val shown = Gallery.search(all, query, filter, sort)
 
     Scaffold(
         topBar = {
@@ -147,13 +151,25 @@ fun ExploreScreen(nav: NavHostController) {
                                 shape = RoundedCornerShape(28.dp),
                                 modifier = Modifier.fillMaxWidth(),
                             )
+                            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                SORTS.forEach { (s, label) ->
+                                    TextButton(
+                                        onClick = { sort = s },
+                                        colors = if (sort == s) androidx.compose.material3.ButtonDefaults.textButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                        ) else androidx.compose.material3.ButtonDefaults.textButtonColors(
+                                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        ),
+                                    ) { Text(stringResource(label), fontWeight = if (sort == s) FontWeight.SemiBold else FontWeight.Normal) }
+                                }
+                            }
                             Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 FilterChip(selected = filter == null, onClick = { filter = null }, label = { Text(stringResource(R.string.explore_all)) })
                                 filters.forEach { f ->
                                     FilterChip(
                                         selected = filter == f,
                                         onClick = { filter = if (filter == f) null else f },
-                                        label = { Text(stringResource(CATEGORY_LABELS[f] ?: R.string.explore_cat_ai)) },
+                                        label = { Text(category(f)?.let { "${it.emoji} " + stringResource(it.label) } ?: stringResource(R.string.explore_cat_ai)) },
                                     )
                                 }
                             }
@@ -210,7 +226,13 @@ private fun GalleryCard(app: GalleryApp, screenshot: String, mine: AppMeta?, onC
                 modifier = Modifier.height(34.dp),
             )
             Spacer(Modifier.height(4.dp))
-            Text(stringResource(R.string.explore_by, app.author), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.explore_by, app.author), style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                if (app.downloads > 0) {
+                    Text("⬇ " + compactCount(app.downloads), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
         }
     }
 }
@@ -264,7 +286,7 @@ fun GalleryAppScreen(nav: NavHostController, id: String) {
     }
 
     fun installNew(a: GalleryApp, openImprove: Boolean) = run {
-        val meta = c.gallery.install(a)
+        val meta = c.gallery.install(a, remix = openImprove)
         Toast.makeText(context, context.getString(R.string.gallery_done, meta.name), Toast.LENGTH_SHORT).show()
         if (openImprove) nav.navigate(Routes.improve(meta.id))
     }
@@ -312,8 +334,12 @@ fun GalleryAppScreen(nav: NavHostController, id: String) {
                 Column(Modifier.weight(1f)) {
                     Text(app.name, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold)
                     Text(stringResource(R.string.explore_by, app.author), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
-                    CATEGORY_LABELS[app.category]?.let {
-                        Text(stringResource(it), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    val details = listOfNotNull(
+                        category(app.category)?.let { "${it.emoji} " + stringResource(it.label) },
+                        app.downloads.takeIf { it > 0 }?.let { stringResource(R.string.explore_downloads, compactCount(it)) },
+                    )
+                    if (details.isNotEmpty()) {
+                        Text(details.joinToString(" · "), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }

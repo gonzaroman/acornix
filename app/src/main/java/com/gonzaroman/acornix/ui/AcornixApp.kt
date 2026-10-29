@@ -47,6 +47,7 @@ import com.gonzaroman.acornix.ui.data.DataScreen
 import com.gonzaroman.acornix.ui.editor.EditorScreen
 import com.gonzaroman.acornix.ui.explore.ExploreScreen
 import com.gonzaroman.acornix.ui.explore.GalleryAppScreen
+import com.gonzaroman.acornix.ui.explore.PublishScreen
 import com.gonzaroman.acornix.ui.home.HomeScreen
 import com.gonzaroman.acornix.ui.onboarding.OnboardingScreen
 import com.gonzaroman.acornix.ui.onboarding.TourScreen
@@ -81,6 +82,7 @@ object Routes {
     const val SHARE = "share/{id}"
     const val EXPLORE = "explore"
     const val GALLERY_APP = "gallery/{id}"
+    const val PUBLISH = "publish/{id}"
 
     fun assistant(control: Boolean = false, prompt: String? = null) =
         "assistant?control=$control" + (prompt?.let { "&prompt=${Uri.encode(it)}" } ?: "")
@@ -92,6 +94,7 @@ object Routes {
     fun data(appId: String) = "data/${Uri.encode(appId)}"
     fun share(appId: String) = "share/${Uri.encode(appId)}"
     fun galleryApp(id: String) = "gallery/${Uri.encode(id)}"
+    fun publish(appId: String) = "publish/${Uri.encode(appId)}"
 }
 
 private data class Tab(val route: String, val base: String, val label: Int, val icon: ImageVector, val selectedIcon: ImageVector)
@@ -226,6 +229,7 @@ fun AcornixApp(
                 composable(Routes.STUDIO) { StudioScreen(nav) }
                 composable(Routes.EXPLORE) { ExploreScreen(nav) }
                 composable(Routes.GALLERY_APP) { entry -> GalleryAppScreen(nav, entry.arguments?.getString("id").orEmpty()) }
+                composable(Routes.PUBLISH) { entry -> PublishScreen(nav, entry.arguments?.getString("id").orEmpty()) }
             }
         }
     }

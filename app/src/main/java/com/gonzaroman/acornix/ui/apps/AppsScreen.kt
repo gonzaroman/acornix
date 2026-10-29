@@ -32,6 +32,7 @@ import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.DriveFileRenameOutline
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.Public
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material.icons.rounded.Storage
@@ -198,6 +199,7 @@ fun AppActionsSheet(app: AppMeta, nav: NavHostController, onDismiss: () -> Unit)
             onDismiss()
         }
         SheetAction(Icons.Rounded.Share, stringResource(R.string.action_share_social)) { onDismiss(); nav.navigate(Routes.share(app.id)) }
+        SheetAction(Icons.Rounded.Public, stringResource(R.string.action_publish)) { onDismiss(); nav.navigate(Routes.publish(app.id)) }
         SheetAction(Icons.Rounded.Archive, stringResource(R.string.action_share)) {
             scope.launch {
                 if (c.data.hasData(app.id)) askData = true else { shareAppZip(context, app, false); onDismiss() }

@@ -35,6 +35,8 @@ class AppContainer(context: Context) {
     val aiPermissions = com.gonzaroman.acornix.data.AiPermissions(context)
     val appReview = com.gonzaroman.acornix.core.AppReview(settings)
     val gallery = com.gonzaroman.acornix.data.Gallery(context.filesDir, apps, importExport, aiPermissions)
+    val github = com.gonzaroman.acornix.data.GitHubAccount(context)
+    val publisher = com.gonzaroman.acornix.data.Publisher(apps, github)
     val generator = AppGenerator(settings, apps, data)
     val ideas = IdeaGenerator(settings, java.io.File(context.filesDir, "ideas.json")) {
         context.assets.open("ideas/default_ideas.json").bufferedReader().use { it.readText() }
