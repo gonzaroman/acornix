@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val settings by container.settings.settings.collectAsState(initial = null)
             val s = settings
-            AcornixTheme(mode = s?.theme ?: com.gonzaroman.acornix.data.ThemeMode.SYSTEM, dynamicColor = s?.dynamicColor ?: true) {
+            AcornixTheme(mode = s?.theme ?: com.gonzaroman.acornix.data.ThemeMode.LIGHT, dynamicColor = s?.dynamicColor ?: true) {
                 if (s == null) {
                     Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background))
                 } else {

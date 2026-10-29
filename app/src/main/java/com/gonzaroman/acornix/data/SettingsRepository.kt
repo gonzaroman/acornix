@@ -55,7 +55,8 @@ data class Settings(
     val communityTourSeen: Boolean = false,
     val appLanguage: AppLanguage = AppLanguage.AUTO,
     val speakReplies: Boolean = false,
-    val theme: ThemeMode = ThemeMode.SYSTEM,
+    /** Light unless the user picks another one in Settings. */
+    val theme: ThemeMode = ThemeMode.LIGHT,
     val dynamicColor: Boolean = true,
     /** Ideas written by the AI in "Need ideas?"; off shows the fixed examples and spends nothing. */
     val aiIdeas: Boolean = true,
@@ -99,7 +100,7 @@ class SettingsRepository(private val context: Context) {
         communityTourSeen = this[K.communityTourSeen] ?: false,
         appLanguage = AppLanguage.entries.firstOrNull { it.id == this[K.appLanguage] } ?: AppLanguage.AUTO,
         speakReplies = this[K.speakReplies] ?: false,
-        theme = runCatching { ThemeMode.valueOf(this[K.theme] ?: "SYSTEM") }.getOrDefault(ThemeMode.SYSTEM),
+        theme = runCatching { ThemeMode.valueOf(this[K.theme] ?: "LIGHT") }.getOrDefault(ThemeMode.LIGHT),
         dynamicColor = this[K.dynamicColor] ?: true,
         aiIdeas = this[K.aiIdeas] ?: true,
     )

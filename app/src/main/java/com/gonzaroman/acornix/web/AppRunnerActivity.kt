@@ -112,7 +112,7 @@ class AppRunnerActivity : ComponentActivity() {
         root.addView(ComposeView(this).apply {
             setContent {
                 val settings by container.settings.settings.collectAsState(initial = null)
-                AcornixTheme(mode = settings?.theme ?: ThemeMode.SYSTEM, dynamicColor = settings?.dynamicColor ?: true) {
+                AcornixTheme(mode = settings?.theme ?: ThemeMode.LIGHT, dynamicColor = settings?.dynamicColor ?: true) {
                     trialUi?.let { ui ->
                         TrialPrompt(
                             ui,
