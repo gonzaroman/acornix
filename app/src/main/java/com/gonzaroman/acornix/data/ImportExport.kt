@@ -203,7 +203,8 @@ class ImportExport(
 /**
  * Installs the bundled example apps on first launch, and later replaces their code when a new
  * release ships rebuilt versions ([SAMPLES_VERSION]). The previous code stays in each app's version
- * history; samples the user deleted are not brought back.
+ * history; samples the user deleted are not brought back. Samples no longer bundled stay on phones
+ * that already have them.
  */
 class SampleAppsInstaller(private val context: Context, private val repo: AppRepository) {
 
@@ -246,10 +247,8 @@ class SampleAppsInstaller(private val context: Context, private val repo: AppRep
         const val SAMPLES_VERSION = 2
         const val UPDATE_NOTE = "Acornix 2.0: rebuilt example (responsive, saves data)"
         val NAMES = mapOf(
-            "superM" to "Super M",
             "castle defense" to "Castle Defense",
             "imc" to "IMC",
-            "matrixCamera" to "Matrix Camera",
             "droneRace" to "Neon Drone Race",
             "notes" to "Notes",
             "kaleidoscope" to "Neon Kaleidoscope",

@@ -175,12 +175,12 @@ A **tour of everything Acornix can do** (Settings › Discover Acornix), **phone
 
 ## 🎮 Games and apps included
 
-Acornix comes with fourteen example apps. Eight were rebuilt for 2.0: they all work offline, adapt to any screen in portrait or landscape, and save their data with `Acornix.db`.
+Acornix comes with twelve example apps. Six were rebuilt for 2.0: they all work offline, adapt to any screen in portrait or landscape, and save their data with `Acornix.db`.
 
-| | | | |
-|:---:|:---:|:---:|:---:|
-| <img src="docs/screenshots/app-calculator.jpg" width="170" alt="Calculator app included in Acornix"><br>**Calculator**<br><sub>History saved, proper operator precedence</sub> | <img src="docs/screenshots/app-bmi.jpg" width="170" alt="BMI calculator app included in Acornix"><br>**BMI**<br><sub>Gauge, healthy range and progress chart</sub> | <img src="docs/screenshots/app-drummer.jpg" width="170" alt="Drum machine app included in Acornix"><br>**Drummer**<br><sub>8 pads, 16-step sequencer, saved beats</sub> | <img src="docs/screenshots/app-matrix.jpg" width="170" alt="Matrix camera app included in Acornix"><br>**Matrix Camera**<br><sub>Live Matrix / ASCII / halftone camera</sub> |
-| <img src="docs/screenshots/app-bowling.jpg" width="170" alt="Bowling game included in Acornix"><br>**Bowling**<br><sub>Swipe to throw, hook spin, real scoring</sub> | <img src="docs/screenshots/app-piano.jpg" width="170" alt="Piano app included in Acornix"><br>**Piano**<br><sub>4 instruments, multitouch, recordings</sub> | <img src="docs/screenshots/app-castle.jpg" width="170" alt="Castle defense game included in Acornix"><br>**Castle Defense**<br><sub>Waves, bosses and an upgrade shop</sub> | <img src="docs/screenshots/app-superm.jpg" width="170" alt="Platformer game included in Acornix"><br>**Super M**<br><sub>Platformer with endless levels</sub> |
+| | | |
+|:---:|:---:|:---:|
+| <img src="docs/screenshots/app-calculator.jpg" width="170" alt="Calculator app included in Acornix"><br>**Calculator**<br><sub>History saved, proper operator precedence</sub> | <img src="docs/screenshots/app-bmi.jpg" width="170" alt="BMI calculator app included in Acornix"><br>**BMI**<br><sub>Gauge, healthy range and progress chart</sub> | <img src="docs/screenshots/app-drummer.jpg" width="170" alt="Drum machine app included in Acornix"><br>**Drummer**<br><sub>8 pads, 16-step sequencer, saved beats</sub> |
+| <img src="docs/screenshots/app-bowling.jpg" width="170" alt="Bowling game included in Acornix"><br>**Bowling**<br><sub>Swipe to throw, hook spin, real scoring</sub> | <img src="docs/screenshots/app-piano.jpg" width="170" alt="Piano app included in Acornix"><br>**Piano**<br><sub>4 instruments, multitouch, recordings</sub> | <img src="docs/screenshots/app-castle.jpg" width="170" alt="Castle defense game included in Acornix"><br>**Castle Defense**<br><sub>Waves, bosses and an upgrade shop</sub> |
 
 The other six were made with AI on a phone, each from a single request and one improvement, for our step-by-step videos, and they are included exactly as they came out. Reef Aquarium loads its 3D engine from the internet.
 
@@ -301,7 +301,7 @@ app/src/main/java/com/gonzaroman/acornix/
 ├── agent/     Assistant tools and conversation loop
 ├── web/       Full-screen app runner, per-app origins, window.Acornix bridge
 └── ui/        Jetpack Compose screens (Material 3)
-app/src/main/assets/sample_apps/   The fourteen example apps
+app/src/main/assets/sample_apps/   The twelve example apps
 ```
 
 **Tech:** Kotlin, Jetpack Compose and Material 3, OkHttp, kotlinx.serialization, DataStore, SQLite, AndroidX WebKit, Coil, and the official Anthropic Java SDK.
