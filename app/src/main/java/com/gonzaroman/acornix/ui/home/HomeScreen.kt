@@ -245,7 +245,7 @@ private fun ExploreBanner(onClick: () -> Unit) {
             Column(Modifier.weight(1f)) {
                 Text(stringResource(R.string.explore_home_title), style = MaterialTheme.typography.titleMedium)
                 Text(stringResource(R.string.explore_home_desc), style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f))
             }
             Icon(Icons.AutoMirrored.Rounded.ArrowForward, null)
         }
