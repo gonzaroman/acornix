@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Button
@@ -78,6 +79,7 @@ import com.gonzaroman.acornix.data.AppMeta
 import com.gonzaroman.acornix.data.Gallery
 import com.gonzaroman.acornix.data.GalleryApp
 import com.gonzaroman.acornix.ui.Routes
+import com.gonzaroman.acornix.ui.navigateTab
 import com.gonzaroman.acornix.ui.components.EmptyState
 import com.gonzaroman.acornix.ui.components.NameClashDialog
 import com.gonzaroman.acornix.ui.components.formatBytes
@@ -118,7 +120,11 @@ fun ExploreScreen(nav: NavHostController) {
     var ai by rememberSaveable { mutableStateOf(Gallery.Companion.Ai.ANY) }
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(Unit) { c.gallery.refresh() }
+    LaunchedEffect(Unit) {
+        // The first time, explain how the gallery works; the ⓘ button shows it again.
+        if (!c.settings.current().communityTourSeen) nav.navigate(Routes.COMMUNITY_TOUR)
+        c.gallery.refresh()
+    }
 
     val all = state.catalog?.apps.orEmpty()
     // Only the categories that have apps.
@@ -130,6 +136,9 @@ fun ExploreScreen(nav: NavHostController) {
             TopAppBar(
                 title = { Text(stringResource(R.string.explore_title)) },
                 navigationIcon = { IconButton(onClick = { nav.popBackStack() }) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, stringResource(R.string.back)) } },
+                actions = {
+                    IconButton(onClick = { nav.navigate(Routes.COMMUNITY_TOUR) }) { Icon(Icons.Outlined.Info, stringResource(R.string.explore_help)) }
+                },
             )
         },
     ) { padding ->
@@ -231,7 +240,7 @@ private fun GalleryCard(app: GalleryApp, screenshot: String, mine: AppMeta?, onC
                 else -> "✓ " + stringResource(R.string.explore_installed)
             }
             Row(Modifier.padding(8.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                if ("ai" in app.tags) Badge("🧠 AI")
+                if ("ai" in app.tags) Badge(stringResource(R.string.uses_ai_chip))
                 badge?.let { Badge(it) }
             }
         }
@@ -284,6 +293,7 @@ fun GalleryAppScreen(nav: NavHostController, id: String) {
     val c = context.container
     val state by c.gallery.state.collectAsState()
     val apps by c.apps.apps.collectAsState()
+    val settings by c.settings.settings.collectAsState(initial = null)
     val scope = rememberCoroutineScope()
     var working by remember { mutableStateOf(false) }
     var clash by remember { mutableStateOf<AppMeta?>(null) }
@@ -390,6 +400,16 @@ fun GalleryAppScreen(nav: NavHostController, id: String) {
                         ) { Text(stringResource(R.string.gallery_remix), maxLines = 1, overflow = TextOverflow.Ellipsis) }
                     }
                     Text(stringResource(R.string.gallery_remix_hint), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+
+            // Apps that use the AI do nothing useful until one is connected: say so before installing.
+            if ("ai" in app.tags && settings?.config()?.isUsable == false) {
+                Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
+                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Text(stringResource(R.string.gallery_needs_ai), style = MaterialTheme.typography.bodyMedium)
+                        FilledTonalButton(onClick = { nav.navigateTab(Routes.SETTINGS) }) { Text(stringResource(R.string.ai_missing_connect)) }
+                    }
                 }
             }
 

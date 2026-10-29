@@ -52,6 +52,7 @@ data class Settings(
     val onboardingDone: Boolean = false,
     /** The "What Acornix can do" tour was shown (once, after onboarding or after updating). */
     val tourSeen: Boolean = false,
+    val communityTourSeen: Boolean = false,
     val appLanguage: AppLanguage = AppLanguage.AUTO,
     val speakReplies: Boolean = false,
     val theme: ThemeMode = ThemeMode.SYSTEM,
@@ -74,6 +75,7 @@ class SettingsRepository(private val context: Context) {
         val customBaseUrl = stringPreferencesKey("custom_base_url")
         val onboardingDone = booleanPreferencesKey("onboarding_done")
         val tourSeen = booleanPreferencesKey("tour_seen")
+        val communityTourSeen = booleanPreferencesKey("community_tour_seen")
         val appLanguage = stringPreferencesKey("app_language")
         val speakReplies = booleanPreferencesKey("speak_replies")
         val theme = stringPreferencesKey("theme")
@@ -94,6 +96,7 @@ class SettingsRepository(private val context: Context) {
         customBaseUrl = this[K.customBaseUrl].orEmpty(),
         onboardingDone = this[K.onboardingDone] ?: false,
         tourSeen = this[K.tourSeen] ?: false,
+        communityTourSeen = this[K.communityTourSeen] ?: false,
         appLanguage = AppLanguage.entries.firstOrNull { it.id == this[K.appLanguage] } ?: AppLanguage.AUTO,
         speakReplies = this[K.speakReplies] ?: false,
         theme = runCatching { ThemeMode.valueOf(this[K.theme] ?: "SYSTEM") }.getOrDefault(ThemeMode.SYSTEM),
@@ -112,6 +115,7 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setOnboardingDone() = context.dataStore.edit { it[K.onboardingDone] = true }
     suspend fun setTourSeen() = context.dataStore.edit { it[K.tourSeen] = true }
+    suspend fun setCommunityTourSeen() = context.dataStore.edit { it[K.communityTourSeen] = true }
     suspend fun setAppLanguage(lang: AppLanguage) = context.dataStore.edit { it[K.appLanguage] = lang.id }
     suspend fun setSpeakReplies(on: Boolean) = context.dataStore.edit { it[K.speakReplies] = on }
     suspend fun setTheme(mode: ThemeMode) = context.dataStore.edit { it[K.theme] = mode.name }

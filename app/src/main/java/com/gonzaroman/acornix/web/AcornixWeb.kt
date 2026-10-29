@@ -279,6 +279,9 @@ class AcornixJsBridge(
                 AppLauncher.open(context, app.id); JsonPrimitive(true)
             }
             "askAI" -> {
+                if (!AiPermissionPrompt.ensureConfigured(context, appId)) {
+                    throw IllegalStateException("No AI is set up yet. Connect your AI in Acornix › Settings.")
+                }
                 if (!AiPermissionPrompt.ensure(context, appId)) {
                     throw IllegalStateException("You haven't allowed this app to use your AI. You can allow it in its options in Acornix (long-press the app).")
                 }

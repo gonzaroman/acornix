@@ -146,6 +146,7 @@ fun PublishScreen(nav: NavHostController, appId: String) {
                     val code = c.github.start()
                     deviceCode = code
                     c.github.await(code)
+                    com.gonzaroman.acornix.ui.share.SupportPrefs(context).askStarAfterGitHubSignIn()
                     deviceCode = null
                     send()
                 } catch (e: CancellationException) {

@@ -14,7 +14,10 @@ import com.gonzaroman.acornix.R
 
 const val GITHUB_URL = "https://github.com/gonzaroman/acornix"
 
-/** Remembers that we already asked for a GitHub star: it is asked once, never again. */
+/**
+ * Remembers that we already asked for a GitHub star: it is asked once, never again, except once more
+ * after the first GitHub sign-in, since then we know they have an account to give it with.
+ */
 class SupportPrefs(context: Context) {
     private val prefs = context.getSharedPreferences("support", Context.MODE_PRIVATE)
 
@@ -22,8 +25,22 @@ class SupportPrefs(context: Context) {
 
     fun markStarAsked() = prefs.edit().putBoolean(KEY_STAR_ASKED, true).apply()
 
+    /** Just signed in with GitHub: ask for a star the next time Acornix opens, if that wasn't done already. */
+    fun askStarAfterGitHubSignIn() {
+        if (!prefs.getBoolean(KEY_GITHUB_STAR_ASKED, false)) prefs.edit().putBoolean(KEY_GITHUB_STAR_PENDING, true).apply()
+    }
+
+    /** True only once: on the first launch after that sign-in. */
+    fun takeStarAfterGitHubSignIn(): Boolean {
+        if (!prefs.getBoolean(KEY_GITHUB_STAR_PENDING, false)) return false
+        prefs.edit().putBoolean(KEY_GITHUB_STAR_PENDING, false).putBoolean(KEY_GITHUB_STAR_ASKED, true).apply()
+        return true
+    }
+
     private companion object {
         const val KEY_STAR_ASKED = "star_asked"
+        const val KEY_GITHUB_STAR_PENDING = "github_star_pending"
+        const val KEY_GITHUB_STAR_ASKED = "github_star_asked"
     }
 }
 

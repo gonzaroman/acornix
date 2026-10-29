@@ -19,6 +19,8 @@ import androidx.compose.ui.Modifier
 import com.gonzaroman.acornix.ui.AcornixApp
 import com.gonzaroman.acornix.ui.ExternalRequest
 import com.gonzaroman.acornix.ui.components.ImportReviewDialog
+import com.gonzaroman.acornix.ui.share.StarDialog
+import com.gonzaroman.acornix.ui.share.SupportPrefs
 import com.gonzaroman.acornix.ui.theme.AcornixTheme
 
 class MainActivity : ComponentActivity() {
@@ -26,11 +28,16 @@ class MainActivity : ComponentActivity() {
     private var external by mutableStateOf<ExternalRequest?>(null)
     /** A ZIP opened from another app, waiting for the user to review and install it. */
     private var pendingImport by mutableStateOf<Uri?>(null)
+    /** First launch after signing in with GitHub: a good moment to ask for a star. */
+    private var askStar by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        if (savedInstanceState == null) handleIntent(intent)
+        if (savedInstanceState == null) {
+            handleIntent(intent)
+            askStar = SupportPrefs(this).takeStarAfterGitHubSignIn()
+        }
 
         setContent {
             val settings by container.settings.settings.collectAsState(initial = null)
@@ -46,6 +53,7 @@ class MainActivity : ComponentActivity() {
                         onExternalConsumed = { external = null },
                     )
                     pendingImport?.let { uri -> ImportReviewDialog(uri) { pendingImport = null } }
+                    if (askStar && s.onboardingDone) StarDialog(onDismiss = { askStar = false })
                 }
             }
         }
@@ -60,6 +68,7 @@ class MainActivity : ComponentActivity() {
         intent ?: return
         when (intent.action) {
             ACTION_OPEN_ASSISTANT -> external = ExternalRequest(openAssistant = true)
+            ACTION_OPEN_SETTINGS -> external = ExternalRequest(openSettings = true)
             Intent.ACTION_SEND -> {
                 val text = intent.getStringExtra(Intent.EXTRA_TEXT)
                 val image = if (Build.VERSION.SDK_INT >= 33) {
@@ -75,5 +84,6 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         const val ACTION_OPEN_ASSISTANT = "com.gonzaroman.acornix.OPEN_ASSISTANT"
+        const val ACTION_OPEN_SETTINGS = "com.gonzaroman.acornix.OPEN_SETTINGS"
     }
 }

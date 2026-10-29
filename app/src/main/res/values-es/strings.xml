@@ -535,6 +535,11 @@
     <string name="ai_permission_allowed">Permitido</string>
     <string name="ai_permission_denied">No permitido</string>
     <string name="ai_permission_unasked">Preguntará la primera vez</string>
+    <string name="ai_missing_title">«%1$s» usa IA</string>
+    <string name="ai_missing_text">Para funcionar necesita tu IA. Conéctala en Ajustes: eliges un proveedor y pegas tu clave.</string>
+    <string name="ai_missing_connect">Conectar mi IA</string>
+    <string name="ai_missing_later">Ahora no</string>
+    <string name="gallery_needs_ai">🧠 Esta app necesita tu IA y aún no la has conectado.</string>
     <!-- Revisar una app compartida antes de instalarla -->
     <string name="import_review_title">¿Instalar «%1$s»?</string>
     <string name="import_review_warning">Esta app la ha creado otra persona. Instálala solo si confías en quien te la pasa: lo haces bajo tu responsabilidad. Tu IA puede revisar su código antes.</string>
@@ -654,5 +659,21 @@
     <string name="explore_sort_new">Nuevas</string>
     <string name="explore_sort_featured">Destacadas</string>
     <string name="explore_downloads">%1$s descargas</string>
+    <string name="explore_help">Cómo funciona</string>
+    <string name="community_tour_welcome_title">Apps de la comunidad</string>
+    <string name="community_tour_welcome_text">Apps y juegos que ha creado otra gente con Acornix. Descárgalos gratis y comparte también los tuyos con todo el mundo.</string>
+    <string name="community_tour_find_title">Encuentra lo que te guste</string>
+    <string name="community_tour_find_text">Busca por nombre, ordena por Populares, Tendencia, Nuevas o Destacadas, y filtra por categoría.</string>
+    <string name="community_tour_find_hint">🧠 Algunas apps usan tu IA. Elige «Sin IA» para ver solo las que funcionan sin conectarla.</string>
+    <string name="community_tour_get_title">Pruébalas e instálalas</string>
+    <string name="community_tour_get_text">Toca una app para ver qué hace, qué usa y la petición que la creó. Luego elige:</string>
+    <string name="community_tour_get_hint">▶️ Probar sin instalar: la abre al momento.\n⬇️ Instalar: se queda en Mis apps, como las tuyas.\n✨ Hacer tu versión: instala una copia que puedes cambiar con tu IA.</string>
+    <string name="community_tour_share_title">Comparte tus apps</string>
+    <string name="community_tour_share_text">En Mis apps, mantén pulsada una app tuya y elige «Publicar en la comunidad». Añade una descripción y una categoría, y envíala.</string>
+    <string name="community_tour_share_hint">Necesitas una cuenta gratis de GitHub: Acornix te muestra un código corto, lo escribes en github.com/login/device y listo. Cada app se revisa antes de aparecer aquí.</string>
+    <string name="community_tour_share_button">Ir a Mis apps</string>
+    <string name="community_tour_safe_title">Seguras y abiertas</string>
+    <string name="community_tour_safe_text">Solo se publica el código de la app, nunca tus datos. Cada app dice qué usa (tu IA, la cámara, internet…) y puedes denunciar cualquiera que no cumpla las normas. Todas son de código abierto, con licencia MIT.</string>
+    <string name="community_tour_start">¡A explorar!</string>
     <string name="publish_category_pick">Elige una categoría</string>
 </resources>

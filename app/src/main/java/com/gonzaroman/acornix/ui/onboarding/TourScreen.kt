@@ -88,11 +88,21 @@ private val PAGES = listOf(
     TourPage("🚀", listOf(Color(0xFF6A1B9A), Color(0xFFFF7043)), R.string.tour_end_title, R.string.tour_end_text),
 )
 
+private val COMMUNITY_PAGES = listOf(
+    TourPage("🌍", listOf(Color(0xFF0D47A1), Color(0xFF26A69A)), R.string.community_tour_welcome_title, R.string.community_tour_welcome_text),
+    TourPage("🔍", listOf(Color(0xFF4527A0), Color(0xFF7E57C2)), R.string.community_tour_find_title, R.string.community_tour_find_text,
+        hint = R.string.community_tour_find_hint),
+    TourPage("⬇️", listOf(Color(0xFF1E6B4E), Color(0xFF55C59B)), R.string.community_tour_get_title, R.string.community_tour_get_text,
+        hint = R.string.community_tour_get_hint),
+    TourPage("📤", listOf(Color(0xFFB8860B), Color(0xFFF2C94C)), R.string.community_tour_share_title, R.string.community_tour_share_text,
+        hint = R.string.community_tour_share_hint, button = R.string.community_tour_share_button, action = TourAction.APPS),
+    TourPage("🛡️", listOf(Color(0xFF263238), Color(0xFF607D8B)), R.string.community_tour_safe_title, R.string.community_tour_safe_text),
+)
+
 /**
  * "What Acornix can do": a short swipeable tour shown once after onboarding (and once after updating),
  * and any time from Settings. Each page has a button that goes straight to trying it.
  */
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TourScreen(
     onClose: () -> Unit,
@@ -103,19 +113,48 @@ fun TourScreen(
     onOs: () -> Unit,
 ) {
     val context = LocalContext.current
-    val pager = rememberPagerState { PAGES.size }
-    val scope = rememberCoroutineScope()
-    val controlOn = rememberControlState().value == ControlState.ON
     val assistantExamples = stringArrayResource(R.array.tour_assistant_examples)
-    val last = pager.currentPage == PAGES.lastIndex
 
     // Seen once it opens, so leaving with "Try it" or Back doesn't bring it back.
     LaunchedEffect(Unit) { context.container.settings.setTourSeen() }
 
+    Tour(PAGES, R.string.tour_start, onClose) { action ->
+        when (action) {
+            TourAction.CREATE, TourAction.IDEAS -> onCreate(false)
+            TourAction.FEATURE -> onCreate(true)
+            TourAction.APPS -> onApps()
+            TourAction.ASSISTANT -> onAssistant(assistantExamples.first())
+            TourAction.CONTROL -> onControlHelp()
+            TourAction.OS -> onOs()
+            TourAction.NONE -> Unit
+        }
+    }
+}
+
+/**
+ * How the community gallery works: finding, trying and installing apps, and publishing your own.
+ * Shown the first time Explore opens, and from its ⓘ button.
+ */
+@Composable
+fun CommunityTourScreen(onClose: () -> Unit, onApps: () -> Unit) {
+    val context = LocalContext.current
+    LaunchedEffect(Unit) { context.container.settings.setCommunityTourSeen() }
+    Tour(COMMUNITY_PAGES, R.string.community_tour_start, onClose) { action -> if (action == TourAction.APPS) onApps() }
+}
+
+/** The swipeable pages, with a counter, Skip, dots, Back / Next and [finish] on the last page. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun Tour(pages: List<TourPage>, @StringRes finish: Int, onClose: () -> Unit, onAction: (TourAction) -> Unit) {
+    val pager = rememberPagerState { pages.size }
+    val scope = rememberCoroutineScope()
+    val controlOn = rememberControlState().value == ControlState.ON
+    val last = pager.currentPage == pages.lastIndex
+
     Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).safeDrawingPadding()) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(
-                stringResource(R.string.tour_counter, pager.currentPage + 1, PAGES.size),
+                stringResource(R.string.tour_counter, pager.currentPage + 1, pages.size),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(start = 8.dp).weight(1f),
@@ -124,7 +163,7 @@ fun TourScreen(
         }
 
         HorizontalPager(state = pager, modifier = Modifier.weight(1f)) { index ->
-            val page = PAGES[index]
+            val page = pages[index]
             Column(
                 Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 28.dp, vertical = 12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -170,17 +209,7 @@ fun TourScreen(
                     if (page.action == TourAction.CONTROL && controlOn) {
                         Text(stringResource(R.string.tour_control_on), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
                     } else {
-                        FilledTonalButton(onClick = {
-                            when (page.action) {
-                                TourAction.CREATE, TourAction.IDEAS -> onCreate(false)
-                                TourAction.FEATURE -> onCreate(true)
-                                TourAction.APPS -> onApps()
-                                TourAction.ASSISTANT -> onAssistant(assistantExamples.first())
-                                TourAction.CONTROL -> onControlHelp()
-                                TourAction.OS -> onOs()
-                                TourAction.NONE -> Unit
-                            }
-                        }) { Text(stringResource(label)) }
+                        FilledTonalButton(onClick = { onAction(page.action) }) { Text(stringResource(label)) }
                     }
                 }
             }
@@ -188,7 +217,7 @@ fun TourScreen(
 
         Row(Modifier.fillMaxWidth().padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.weight(1f)) {
-                repeat(PAGES.size) { i ->
+                repeat(pages.size) { i ->
                     val color by animateColorAsState(
                         if (pager.currentPage == i) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
                         label = "dot",
@@ -203,7 +232,7 @@ fun TourScreen(
                 }
             }
             if (last) {
-                Button(onClick = onClose) { Text(stringResource(R.string.tour_start)) }
+                Button(onClick = onClose) { Text(stringResource(finish)) }
             } else {
                 Button(onClick = { scope.launch { pager.animateScrollToPage(pager.currentPage + 1) } }) {
                     Text(stringResource(R.string.tour_next))

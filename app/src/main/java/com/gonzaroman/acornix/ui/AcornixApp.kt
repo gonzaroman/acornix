@@ -50,6 +50,7 @@ import com.gonzaroman.acornix.ui.explore.GalleryAppScreen
 import com.gonzaroman.acornix.ui.explore.PublishScreen
 import com.gonzaroman.acornix.ui.home.HomeScreen
 import com.gonzaroman.acornix.ui.onboarding.OnboardingScreen
+import com.gonzaroman.acornix.ui.onboarding.CommunityTourScreen
 import com.gonzaroman.acornix.ui.onboarding.TourScreen
 import com.gonzaroman.acornix.web.AcornixOsActivity
 import androidx.compose.ui.platform.LocalContext
@@ -81,6 +82,7 @@ object Routes {
     const val DATA = "data/{id}"
     const val SHARE = "share/{id}"
     const val EXPLORE = "explore"
+    const val COMMUNITY_TOUR = "community_tour"
     const val GALLERY_APP = "gallery/{id}"
     const val PUBLISH = "publish/{id}"
 
@@ -107,7 +109,12 @@ private val TABS = listOf(
 )
 
 /** Things other apps hand to Acornix (share sheet, notification taps). */
-data class ExternalRequest(val openAssistant: Boolean = false, val sharedText: String? = null, val sharedImage: Uri? = null)
+data class ExternalRequest(
+    val openAssistant: Boolean = false,
+    val sharedText: String? = null,
+    val sharedImage: Uri? = null,
+    val openSettings: Boolean = false,
+)
 
 @Composable
 fun AcornixApp(
@@ -130,7 +137,10 @@ fun AcornixApp(
     }
 
     LaunchedEffect(external) {
-        if (external != null && (external.openAssistant || external.sharedText != null || external.sharedImage != null)) {
+        if (external?.openSettings == true) {
+            nav.navigateTab(Routes.SETTINGS)
+            onExternalConsumed()
+        } else if (external != null && (external.openAssistant || external.sharedText != null || external.sharedImage != null)) {
             nav.navigate(Routes.assistant()) { launchSingleTop = true }
         }
     }
@@ -228,6 +238,12 @@ fun AcornixApp(
                 composable(Routes.CONTROL_HELP) { ControlHelpScreen(nav) }
                 composable(Routes.STUDIO) { StudioScreen(nav) }
                 composable(Routes.EXPLORE) { ExploreScreen(nav) }
+                composable(Routes.COMMUNITY_TOUR) {
+                    CommunityTourScreen(
+                        onClose = { nav.popBackStack() },
+                        onApps = { nav.popBackStack(); nav.navigateTab(Routes.APPS) },
+                    )
+                }
                 composable(Routes.GALLERY_APP) { entry -> GalleryAppScreen(nav, entry.arguments?.getString("id").orEmpty()) }
                 composable(Routes.PUBLISH) { entry -> PublishScreen(nav, entry.arguments?.getString("id").orEmpty()) }
             }

@@ -536,6 +536,11 @@
     <string name="ai_permission_allowed">Allowed</string>
     <string name="ai_permission_denied">Not allowed</string>
     <string name="ai_permission_unasked">It will ask the first time</string>
+    <string name="ai_missing_title">“%1$s” uses AI</string>
+    <string name="ai_missing_text">To work, it needs your AI. Connect one in Settings: choose a provider and paste your API key.</string>
+    <string name="ai_missing_connect">Connect my AI</string>
+    <string name="ai_missing_later">Not now</string>
+    <string name="gallery_needs_ai">🧠 This app needs your AI, and you haven\'t connected one yet.</string>
     <!-- Reviewing a shared app before installing it -->
     <string name="import_review_title">Install “%1$s”?</string>
     <string name="import_review_warning">This app was made by someone else. Install it only if you trust who shared it: you do it at your own risk. Your AI can review its code first.</string>
@@ -655,5 +660,21 @@
     <string name="explore_sort_new">New</string>
     <string name="explore_sort_featured">Featured</string>
     <string name="explore_downloads">%1$s downloads</string>
+    <string name="explore_help">How it works</string>
+    <string name="community_tour_welcome_title">Community apps</string>
+    <string name="community_tour_welcome_text">Apps and games other people made with Acornix. Download them for free, and share yours with everyone.</string>
+    <string name="community_tour_find_title">Find what you like</string>
+    <string name="community_tour_find_text">Search by name, sort by Popular, Trending, New or Featured, and filter by category.</string>
+    <string name="community_tour_find_hint">🧠 Some apps use your AI. Pick “No AI” to see only the ones that work without connecting one.</string>
+    <string name="community_tour_get_title">Try them and install them</string>
+    <string name="community_tour_get_text">Tap an app to see what it does, what it uses and the request that created it. Then choose:</string>
+    <string name="community_tour_get_hint">▶️ Try without installing: opens it right away.\n⬇️ Install: it stays in My apps, like your own.\n✨ Make your version: installs a copy you can change with your AI.</string>
+    <string name="community_tour_share_title">Share your apps</string>
+    <string name="community_tour_share_text">In My apps, long-press one of your apps and choose “Publish to the community”. Add a description and a category, and send it.</string>
+    <string name="community_tour_share_hint">You need a free GitHub account: Acornix shows a short code, you enter it at github.com/login/device, and that\'s it. Every app is reviewed before it appears here.</string>
+    <string name="community_tour_share_button">Go to My apps</string>
+    <string name="community_tour_safe_title">Safe and open</string>
+    <string name="community_tour_safe_text">Only the app\'s code is published, never your data. Every app shows what it uses (your AI, the camera, the internet…), and you can report any app that breaks the rules. They\'re all open source, under the MIT license.</string>
+    <string name="community_tour_start">Start exploring</string>
     <string name="publish_category_pick">Choose a category</string>
 </resources>
