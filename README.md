@@ -75,7 +75,7 @@ Made something cool? Tap **Share** and Acornix builds a card with **your app run
 
 ### 🌍 Community apps
 
-**Explore** apps and games other people made with Acornix: search them, see the request that created each one, **try them without installing**, install them with one tap or **remix** them with your own AI. Every app is reviewed before it's published, shows what it uses (your AI, the camera, the internet…) and gets updates from its author. They live in [acornix-apps](https://github.com/gonzaroman/acornix-apps), under the MIT license.
+**Explore** apps and games other people made with Acornix: search them, filter by category or by whether they need your AI, see the request that created each one, **try them without installing**, install them with one tap or **remix** them with your own AI. Every app is reviewed before it's published, shows what it uses (your AI, the camera, the internet…) and gets updates from its author. They live in [acornix-apps](https://github.com/gonzaroman/acornix-apps), under the MIT license.
 
 ### 🧬 Functionalities: apps that use your phone
 

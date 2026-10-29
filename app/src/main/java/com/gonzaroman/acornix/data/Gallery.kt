@@ -33,6 +33,8 @@ data class GalleryApp(
     val added: String = "",
     val updated: String = "",
     val featured: Boolean = false,
+    /** Made by Acornix itself: shown as "by Acornix" instead of the GitHub account that published it. */
+    val official: Boolean = false,
     /** What the code uses: ai, phone, camera, microphone, internet. */
     val tags: List<String> = emptyList(),
     val files: List<String> = listOf(AppRepository.INDEX),
@@ -208,12 +210,16 @@ class Gallery(
             return apps.sortedWith(order)
         }
 
-        /** [filter] is a category, "ai" for apps that use the AI, or null for all. */
-        fun search(apps: List<GalleryApp>, query: String, filter: String?, sort: Sort = Sort.POPULAR): List<GalleryApp> {
+        /** Apps that use the user's AI only work for people who set one up, so they can be told apart. */
+        enum class Ai { ANY, WITH, WITHOUT }
+
+        /** [category] is a category id, or null for all. */
+        fun search(apps: List<GalleryApp>, query: String, category: String?, sort: Sort = Sort.POPULAR, ai: Ai = Ai.ANY): List<GalleryApp> {
             val words = query.trim().lowercase().split(Regex("\\s+")).filter { it.isNotEmpty() }
             return sorted(apps, sort).filter { app ->
-                (filter == null || app.category == filter || (filter == "ai" && "ai" in app.tags)) &&
-                    words.all { w -> listOf(app.name, app.description, app.prompt, app.author).any { it.lowercase().contains(w) } }
+                (category == null || app.category == category) &&
+                    (ai == Ai.ANY || ("ai" in app.tags) == (ai == Ai.WITH)) &&
+                    words.all { w -> listOfNotNull(app.name, app.description, app.prompt, app.author, "acornix".takeIf { app.official }).any { it.lowercase().contains(w) } }
             }
         }
 

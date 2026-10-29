@@ -556,12 +556,15 @@
     <string name="explore_home_desc">Apps other people made. Try them, install them or make your own version.</string>
     <string name="explore_search">Search apps</string>
     <string name="explore_all">All</string>
-    <string name="explore_cat_ai">🧠 With AI</string>
+    <string name="explore_ai_any">All</string>
+    <string name="explore_ai_with">🧠 With AI</string>
+    <string name="explore_ai_without">No AI</string>
     <string name="explore_failed">Couldn\'t load the gallery. Check your connection.</string>
     <string name="explore_offline">No connection: showing the last copy you downloaded.</string>
     <string name="explore_retry">Try again</string>
     <string name="explore_empty">No apps match your search.</string>
     <string name="explore_by">by @%1$s</string>
+    <string name="explore_by_acornix">by Acornix</string>
     <string name="explore_installed">Installed</string>
     <string name="explore_has_update">Update</string>
     <string name="gallery_install">Install</string>

@@ -36,6 +36,9 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -88,6 +91,16 @@ private val SORTS = listOf(
     Gallery.Companion.Sort.FEATURED to R.string.explore_sort_featured,
 )
 
+private val AI_FILTERS = listOf(
+    Gallery.Companion.Ai.ANY to R.string.explore_ai_any,
+    Gallery.Companion.Ai.WITH to R.string.explore_ai_with,
+    Gallery.Companion.Ai.WITHOUT to R.string.explore_ai_without,
+)
+
+@Composable
+private fun byline(app: GalleryApp) =
+    if (app.official) stringResource(R.string.explore_by_acornix) else stringResource(R.string.explore_by, app.author)
+
 /** "1.2K", "1,2 mil"… in the phone's language. */
 fun compactCount(n: Long): String =
     android.icu.text.CompactDecimalFormat.getInstance(java.util.Locale.getDefault(), android.icu.text.CompactDecimalFormat.CompactStyle.SHORT).format(n)
@@ -102,15 +115,15 @@ fun ExploreScreen(nav: NavHostController) {
     var query by rememberSaveable { mutableStateOf("") }
     var filter by rememberSaveable { mutableStateOf<String?>(null) }
     var sort by rememberSaveable { mutableStateOf(Gallery.Companion.Sort.POPULAR) }
+    var ai by rememberSaveable { mutableStateOf(Gallery.Companion.Ai.ANY) }
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) { c.gallery.refresh() }
 
     val all = state.catalog?.apps.orEmpty()
-    // Only the categories that have apps, plus "with AI" when some app uses it.
-    val filters = CATEGORIES.map { it.id }.filter { cat -> all.any { it.category == cat } } +
-        listOfNotNull("ai".takeIf { all.any { "ai" in it.tags } })
-    val shown = Gallery.search(all, query, filter, sort)
+    // Only the categories that have apps.
+    val filters = CATEGORIES.map { it.id }.filter { cat -> all.any { it.category == cat } }
+    val shown = Gallery.search(all, query, filter, sort, ai)
 
     Scaffold(
         topBar = {
@@ -163,13 +176,20 @@ fun ExploreScreen(nav: NavHostController) {
                                     ) { Text(stringResource(label), fontWeight = if (sort == s) FontWeight.SemiBold else FontWeight.Normal) }
                                 }
                             }
+                            SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+                                AI_FILTERS.forEachIndexed { i, (option, label) ->
+                                    SegmentedButton(ai == option, { ai = option }, SegmentedButtonDefaults.itemShape(i, AI_FILTERS.size), icon = {}) {
+                                        Text(stringResource(label), maxLines = 1)
+                                    }
+                                }
+                            }
                             Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 FilterChip(selected = filter == null, onClick = { filter = null }, label = { Text(stringResource(R.string.explore_all)) })
                                 filters.forEach { f ->
                                     FilterChip(
                                         selected = filter == f,
                                         onClick = { filter = if (filter == f) null else f },
-                                        label = { Text(category(f)?.let { "${it.emoji} " + stringResource(it.label) } ?: stringResource(R.string.explore_cat_ai)) },
+                                        label = { Text(category(f)?.let { "${it.emoji} " + stringResource(it.label) }.orEmpty()) },
                                     )
                                 }
                             }
@@ -227,7 +247,7 @@ private fun GalleryCard(app: GalleryApp, screenshot: String, mine: AppMeta?, onC
             )
             Spacer(Modifier.height(4.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.explore_by, app.author), style = MaterialTheme.typography.labelSmall,
+                Text(byline(app), style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
                 if (app.downloads > 0) {
                     Text("⬇ " + compactCount(app.downloads), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -333,7 +353,7 @@ fun GalleryAppScreen(nav: NavHostController, id: String) {
                 Spacer(Modifier.width(16.dp))
                 Column(Modifier.weight(1f)) {
                     Text(app.name, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold)
-                    Text(stringResource(R.string.explore_by, app.author), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+                    Text(byline(app), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
                     val details = listOfNotNull(
                         category(app.category)?.let { "${it.emoji} " + stringResource(it.label) },
                         app.downloads.takeIf { it > 0 }?.let { stringResource(R.string.explore_downloads, compactCount(it)) },

@@ -9,7 +9,7 @@ class GalleryTest {
         """
         {"version": 1, "future": "ignored", "apps": [
           {"id": "notes", "name": "Notes", "category": "tools", "description": "Checklists and pinned notes",
-           "prompt": "A professional notes app", "author": "gonzaroman", "added": "2026-10-28", "featured": true},
+           "prompt": "A professional notes app", "author": "gonzaroman", "added": "2026-10-28", "featured": true, "official": true},
           {"id": "chef", "name": "Pocket Chef", "category": "tools", "description": "Recipes from a photo of your fridge",
            "author": "maria", "added": "2026-11-02", "tags": ["ai", "camera"], "version": 3, "downloads": 40, "trending": 30},
           {"id": "bowling", "name": "Bowling", "category": "games", "description": "Swipe to throw",
@@ -41,11 +41,14 @@ class GalleryTest {
 
     @Test
     fun searchAndFilters() {
-        assertEquals(listOf("chef"), Gallery.search(catalog.apps, "", "ai").map { it.id })
+        assertEquals(listOf("chef"), Gallery.search(catalog.apps, "", null, ai = Gallery.Companion.Ai.WITH).map { it.id })
+        assertEquals(listOf("bowling", "notes"), Gallery.search(catalog.apps, "", null, ai = Gallery.Companion.Ai.WITHOUT).map { it.id })
+        assertEquals(listOf("notes"), Gallery.search(catalog.apps, "", "tools", ai = Gallery.Companion.Ai.WITHOUT).map { it.id })
         assertEquals(listOf("chef", "notes"), Gallery.search(catalog.apps, "", "tools").map { it.id })
         assertEquals(listOf("chef"), Gallery.search(catalog.apps, "FRIDGE photo", null).map { it.id })
         assertEquals(listOf("bowling", "notes"), Gallery.search(catalog.apps, "gonzaroman", null).map { it.id })
         assertTrue(Gallery.search(catalog.apps, "spaceship", null).isEmpty())
+        assertEquals(listOf("notes"), Gallery.search(catalog.apps, "acornix", null).map { it.id })
     }
 
     @Test
