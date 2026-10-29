@@ -250,9 +250,10 @@ private fun GalleryCard(app: GalleryApp, screenshot: String, mine: AppMeta?, onC
                 app.description,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                // Always two lines tall at the phone's font size, so cards line up and nothing is clipped.
+                minLines = 2,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.height(34.dp),
             )
             Spacer(Modifier.height(4.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {

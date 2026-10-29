@@ -11,12 +11,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -118,13 +121,13 @@ fun HomeScreen(nav: NavHostController) {
 
         item {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     SectionTile("🧬", stringResource(R.string.section_feature), stringResource(R.string.section_feature_desc),
                         MaterialTheme.colorScheme.secondaryContainer, Modifier.weight(1f)) { nav.navigate(Routes.create(feature = true)) }
                     SectionTile("🤖", stringResource(R.string.section_control), stringResource(R.string.section_control_desc),
                         MaterialTheme.colorScheme.tertiaryContainer, Modifier.weight(1f)) { nav.navigateTab(Routes.assistant(control = true)) }
                 }
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     SectionTile("📱", stringResource(R.string.section_apps), pluralStringResource(R.plurals.section_apps_desc, apps.size, apps.size),
                         MaterialTheme.colorScheme.primaryContainer, Modifier.weight(1f)) { nav.navigateTab(Routes.APPS) }
                     SectionTile("📋", stringResource(R.string.section_studio), stringResource(R.string.section_studio_desc),
@@ -212,15 +215,16 @@ private fun HeroCard(onClick: () -> Unit) {
 private fun SectionTile(emoji: String, title: String, subtitle: String, color: Color, modifier: Modifier, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
-        modifier = modifier.height(140.dp),
+        // Grows with large fonts instead of cutting the text; both tiles of a row stay the same height.
+        modifier = modifier.fillMaxHeight().heightIn(min = 140.dp),
         shape = MaterialTheme.shapes.large,
         color = color,
     ) {
         Column(Modifier.padding(16.dp)) {
             Text(emoji, fontSize = 32.sp)
             Spacer(Modifier.weight(1f))
-            Text(title, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(subtitle, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis,
+            Text(title, style = MaterialTheme.typography.titleMedium, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Text(subtitle, style = MaterialTheme.typography.bodySmall, maxLines = 3, overflow = TextOverflow.Ellipsis,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
         }
     }
