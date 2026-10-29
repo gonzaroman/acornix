@@ -590,6 +590,11 @@
     <string name="gallery_report">Denunciar</string>
     <string name="gallery_working">Descargando…</string>
     <string name="gallery_done">«%1$s» ya está en Mis apps</string>
+    <string name="trial_banner_title">¿Te gusta «%1$s»?</string>
+    <string name="trial_banner_text">Instálala para tenerla siempre en Mis apps.</string>
+    <string name="trial_exit_title">¿Guardas «%1$s»?</string>
+    <string name="trial_exit_text">La estabas probando. Instálala para tenerla en Mis apps cuando quieras.</string>
+    <string name="trial_exit_leave">Salir sin instalar</string>
     <string name="gallery_updated">«%1$s» actualizada</string>
     <string name="gallery_failed">No se pudo descargar la app. Revisa la conexión.</string>
     <string name="gallery_not_found">Esta app ya no está en la galería.</string>

@@ -1,5 +1,12 @@
 package com.gonzaroman.acornix.ui.home
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -222,7 +229,16 @@ private fun SectionTile(emoji: String, title: String, subtitle: String, color: C
 /** The way into the community gallery, full width under the tiles. */
 @Composable
 private fun ExploreBanner(onClick: () -> Unit) {
-    Surface(onClick = onClick, shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.secondaryContainer, modifier = Modifier.fillMaxWidth()) {
+    // A light runs around the border so the community gallery doesn't go unnoticed.
+    val spin = rememberInfiniteTransition(label = "explore")
+    val angle by spin.animateFloat(0f, 360f, infiniteRepeatable(tween(3200, easing = LinearEasing)), label = "angle")
+    val shape = MaterialTheme.shapes.large
+    Box(
+        Modifier.fillMaxWidth().clip(shape).drawBehind {
+            rotate(angle) { drawCircle(Brush.sweepGradient(EXPLORE_GLOW), radius = size.maxDimension) }
+        }.padding(3.dp),
+    ) {
+    Surface(onClick = onClick, shape = shape, color = MaterialTheme.colorScheme.secondaryContainer, modifier = Modifier.fillMaxWidth()) {
         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             Text("🌍", fontSize = 32.sp)
             Spacer(Modifier.width(14.dp))
@@ -234,7 +250,10 @@ private fun ExploreBanner(onClick: () -> Unit) {
             Icon(Icons.AutoMirrored.Rounded.ArrowForward, null)
         }
     }
+    }
 }
+
+private val EXPLORE_GLOW = listOf(Color.Transparent, Color.Transparent, Color(0xFF7CF0FF), Color(0xFFB18CFF), Color(0xFFFF7AD9), Color.Transparent)
 
 @Composable
 private fun ToolRow(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit) {

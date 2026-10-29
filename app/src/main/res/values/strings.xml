@@ -591,6 +591,11 @@
     <string name="gallery_report">Report</string>
     <string name="gallery_working">Downloading…</string>
     <string name="gallery_done">“%1$s” is in My apps</string>
+    <string name="trial_banner_title">Do you like “%1$s”?</string>
+    <string name="trial_banner_text">Install it to keep it in My apps.</string>
+    <string name="trial_exit_title">Keep “%1$s”?</string>
+    <string name="trial_exit_text">You were trying it. Install it to find it in My apps whenever you want.</string>
+    <string name="trial_exit_leave">Leave without installing</string>
     <string name="gallery_updated">“%1$s” updated</string>
     <string name="gallery_failed">Couldn\'t download the app. Check your connection.</string>
     <string name="gallery_not_found">This app is no longer in the gallery.</string>

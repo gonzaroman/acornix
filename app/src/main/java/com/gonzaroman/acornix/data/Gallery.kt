@@ -120,6 +120,21 @@ class Gallery(
         return apps.get(id) ?: error("App not found: $id")
     }
 
+    /** Installs the app being tried from its files on the phone, so it isn't downloaded (and counted) twice. */
+    suspend fun installTrial(trialId: String, app: GalleryApp): AppMeta {
+        val dir = apps.dir(trialId)
+        val files = withContext(Dispatchers.IO) {
+            dir.walkTopDown()
+                .onEnter { it == dir || it.name !in AppRepository.INTERNAL_FILES }
+                .filter { it.isFile && it.name !in AppRepository.INTERNAL_FILES }
+                .associate { it.relativeTo(dir).invariantSeparatorsPath to it.readBytes() }
+        }
+        val meta = importExport.importEntries(apps.uniqueName(app.name), files)
+        apps.edit(meta.id) { describe(it, app) }
+        withContext(Dispatchers.IO) { apps.thumbnailFile(trialId).takeIf { it.exists() }?.copyTo(apps.thumbnailFile(meta.id), overwrite = true) }
+        return apps.get(meta.id) ?: meta
+    }
+
     /** Copies it to a hidden folder to run it without installing. Returns the id to open. */
     suspend fun prepareTrial(app: GalleryApp): String {
         val files = download(app)
