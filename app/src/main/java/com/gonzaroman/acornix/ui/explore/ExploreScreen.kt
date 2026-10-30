@@ -64,6 +64,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -247,7 +248,7 @@ private fun GalleryCard(app: GalleryApp, screenshot: String, mine: AppMeta?, onC
         Column(Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
             Text("${app.emoji} ${app.name}", style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(
-                app.description,
+                app.description(LocalConfiguration.current.locales[0].language),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 // Always two lines tall at the phone's font size, so cards line up and nothing is clipped.
@@ -416,7 +417,7 @@ fun GalleryAppScreen(nav: NavHostController, id: String) {
 
             Screenshot(c.gallery.screenshotUrl(app), Modifier.fillMaxWidth().aspectRatio(0.75f).clip(MaterialTheme.shapes.large))
 
-            Text(app.description, style = MaterialTheme.typography.bodyLarge)
+            Text(app.description(LocalConfiguration.current.locales[0].language), style = MaterialTheme.typography.bodyLarge)
 
             if (app.prompt.isNotBlank()) {
                 Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.secondaryContainer) {

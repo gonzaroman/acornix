@@ -232,6 +232,7 @@ Every app made with Acornix can use this API, and so can your own HTML apps impo
 
 ```js
 // Phone
+Acornix.language;                           // 'es', 'en'…: the language picked in Acornix, to show your app in it
 await Acornix.vibrate(200);                 // or a pattern: [100, 50, 100]
 await Acornix.flashlight(true);
 await Acornix.speak('Hello!', 'en-US');

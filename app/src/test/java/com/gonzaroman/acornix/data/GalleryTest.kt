@@ -28,6 +28,15 @@ class GalleryTest {
     }
 
     @Test
+    fun descriptionInTheUsersLanguage() {
+        val app = Gallery.parse("""{"apps":[{"id":"a","name":"A","description":"Plays music","description_i18n":{"es":"Toca música"}}]}""").apps.single()
+        assertEquals("Toca música", app.description("es"))
+        assertEquals("Plays music", app.description("en"))
+        assertEquals("Plays music", app.description("fr"))
+        assertEquals(listOf("a"), Gallery.search(listOf(app), "música", null).map { it.id })
+    }
+
+    @Test
     fun sortOrders() {
         fun ids(sort: Gallery.Companion.Sort) = Gallery.sorted(catalog.apps, sort).map { it.id }
         assertEquals(listOf("bowling", "chef", "notes"), ids(Gallery.Companion.Sort.POPULAR))

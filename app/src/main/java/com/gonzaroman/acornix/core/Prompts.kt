@@ -36,7 +36,9 @@ object Prompts {
     fun createApp(language: String) = """
         You are an expert web developer who builds delightful mobile web apps and games.
         $MOBILE_RULES
-        - All visible UI text must be in $language.
+        - Bilingual: every visible text in Spanish AND English, in one object like const T = { es: {...}, en: {...} }, picking
+          const L = ((window.Acornix && Acornix.language) || navigator.language || 'en').toLowerCase().startsWith('es') ? 'es' : 'en'.
+          $language is the user's language, so make sure that version reads naturally. Content the user writes is never translated.
 
         $STORAGE_DOCS
 
@@ -49,7 +51,9 @@ object Prompts {
         You are an expert web developer building an Acornix "functionality": a mobile web app that can
         use the phone's capabilities through the JavaScript bridge described below.
         $MOBILE_RULES
-        - All visible UI text must be in $language.
+        - Bilingual: every visible text in Spanish AND English, in one object like const T = { es: {...}, en: {...} }, picking
+          const L = ((window.Acornix && Acornix.language) || navigator.language || 'en').toLowerCase().startsWith('es') ? 'es' : 'en'.
+          $language is the user's language, so make sure that version reads naturally. Content the user writes is never translated.
 
         $BRIDGE_DOCS
 
@@ -64,7 +68,9 @@ object Prompts {
         You are a senior web developer improving an existing mobile web app.
         Apply the requested change and keep everything else working. Return the COMPLETE updated file.
         $MOBILE_RULES
-        - All visible UI text must be in $language.
+        - Bilingual: every visible text in Spanish AND English, in one object like const T = { es: {...}, en: {...} }, picking
+          const L = ((window.Acornix && Acornix.language) || navigator.language || 'en').toLowerCase().startsWith('es') ? 'es' : 'en'.
+          $language is the user's language, so make sure that version reads naturally. Content the user writes is never translated.
         ${if (isFeature) BRIDGE_DOCS else "- If the app needs phone features (vibration, flashlight, battery, speech…), it may use the window.Acornix bridge:\n$BRIDGE_DOCS"}
 
         $STORAGE_DOCS
@@ -99,7 +105,7 @@ object Prompts {
         appendLine("Create a mobile web app: ${idea.ifBlank { "<describe your app here>" }}")
         appendLine()
         appendLine(MOBILE_RULES)
-        appendLine("- All visible UI text must be in $language.")
+        appendLine("- Bilingual: every visible text in Spanish and English in an object const T = { es: {...}, en: {...} }, picking const L = ((window.Acornix && Acornix.language) || navigator.language || 'en').toLowerCase().startsWith('es') ? 'es' : 'en'. $language is the user's language.")
         if (isFeature) {
             appendLine()
             appendLine(BRIDGE_DOCS)

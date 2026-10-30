@@ -123,7 +123,7 @@ object AcornixWebView {
 
             override fun onPageStarted(view: WebView, url: String?, favicon: android.graphics.Bitmap?) {
                 if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT) && url?.startsWith(origin(appId)) == true) {
-                    view.evaluateJavascript(AcornixJsBridge.SHIM, null)
+                    view.evaluateJavascript(AcornixJsBridge.script(context), null)
                 }
             }
 
@@ -190,7 +190,7 @@ class AcornixJsBridge(
             }
         }
         if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
-            WebViewCompat.addDocumentStartJavaScript(webView, SHIM, setOf(origin))
+            WebViewCompat.addDocumentStartJavaScript(webView, script(context), setOf(origin))
         }
     }
 
@@ -341,6 +341,19 @@ class AcornixJsBridge(
 
     companion object {
         private const val MAX_EXPORT_BYTES = 50 * 1024 * 1024
+
+        /** The language chosen in Acornix ("es", "en"…), or the phone's when it is set to automatic. */
+        fun language(context: Context): String {
+            val setting = runCatching { kotlinx.coroutines.runBlocking { context.container.settings.current().appLanguage } }.getOrNull()
+            return when (setting) {
+                com.gonzaroman.acornix.data.AppLanguage.SPANISH -> "es"
+                com.gonzaroman.acornix.data.AppLanguage.ENGLISH -> "en"
+                else -> java.util.Locale.getDefault().language
+            }
+        }
+
+        /** The shim plus Acornix.language, so apps can show their text in the language picked in Acornix. */
+        fun script(context: Context): String = SHIM + "\nif (window.Acornix) window.Acornix.language = '" + language(context).filter { it.isLetter() }.take(8) + "';"
 
         /** Injected before any page script runs; builds the Promise-based API on top of AcornixNative. */
         val SHIM = """

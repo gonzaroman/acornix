@@ -30,6 +30,8 @@ data class PublishDraft(
     val category: String,
     val description: String,
     val prompt: String,
+    /** The description in another language, {"en": "..."}, so the gallery can show it to more people. */
+    val descriptionI18n: Map<String, String> = emptyMap(),
 )
 
 /**
@@ -144,6 +146,7 @@ class Publisher(
                 put("emoji", d.emoji)
                 put("category", d.category)
                 put("description", d.description)
+                if (d.descriptionI18n.isNotEmpty()) put("description_i18n", buildJsonObject { d.descriptionI18n.forEach { (k, v) -> put(k, v) } })
                 put("prompt", d.prompt)
                 put("language", java.util.Locale.getDefault().language)
                 put("gist", gistId)

@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
@@ -24,6 +25,8 @@ data class GalleryApp(
     val emoji: String = "🌰",
     val category: String = "",
     val description: String = "",
+    /** The description in other languages, {"es": "..."}; see [description]. */
+    @SerialName("description_i18n") val descriptionI18n: Map<String, String> = emptyMap(),
     /** The request that created it. */
     val prompt: String = "",
     /** GitHub user name. */
@@ -45,7 +48,10 @@ data class GalleryApp(
     val downloads: Long = 0,
     /** Downloads in the last week, for "Trending". */
     val trending: Long = 0,
-)
+) {
+    /** The description in [language] ("es", "en"…) when there is one, otherwise the author's. */
+    fun description(language: String): String = descriptionI18n[language]?.takeIf { it.isNotBlank() } ?: description
+}
 
 @Serializable
 data class GalleryCatalog(val version: Int = 1, val apps: List<GalleryApp> = emptyList())
@@ -234,7 +240,7 @@ class Gallery(
             return sorted(apps, sort).filter { app ->
                 (category == null || app.category == category) &&
                     (ai == Ai.ANY || ("ai" in app.tags) == (ai == Ai.WITH)) &&
-                    words.all { w -> listOfNotNull(app.name, app.description, app.prompt, app.author, "acornix".takeIf { app.official }).any { it.lowercase().contains(w) } }
+                    words.all { w -> (listOfNotNull(app.name, app.description, app.prompt, app.author, "acornix".takeIf { app.official }) + app.descriptionI18n.values).any { it.lowercase().contains(w) } }
             }
         }
 

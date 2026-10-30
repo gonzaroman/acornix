@@ -127,7 +127,7 @@ fun PublishScreen(nav: NavHostController, appId: String) {
                 try {
                     val draft = start.copy(name = name.trim(), emoji = emoji.trim().ifEmpty { meta.emoji }, category = category.orEmpty(),
                         description = description.trim(), prompt = prompt.trim())
-                    sentUrl = c.publisher.publish(appId, draft)
+                    sentUrl = c.publisher.publish(appId, draft.copy(descriptionI18n = translateDescription(c, draft.description)))
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {
@@ -330,4 +330,22 @@ private fun CategoryPicker(selected: String?, onPick: (String) -> Unit) {
             }
         }
     }
+}
+
+/**
+ * The description in the other gallery language (Spanish or English), written by the user's AI so people
+ * who speak it see what the app does. Without an AI, or if it fails, the app is published without it.
+ */
+private suspend fun translateDescription(c: com.gonzaroman.acornix.AppContainer, text: String): Map<String, String> {
+    if (text.isBlank()) return emptyMap()
+    val to = if (java.util.Locale.getDefault().language == "es") "en" else "es"
+    val name = if (to == "es") "Spanish (Spain)" else "English"
+    return runCatching {
+        val out = c.settings.activeProvider().streamText(
+            "You translate short app store descriptions into natural, friendly $name. Keep it about the same length. Reply with the translation only.",
+            text,
+            quick = true,
+        ) { }.text.trim().trim('"')
+        if (out.isBlank() || out.length > 300) emptyMap() else mapOf(to to out)
+    }.getOrDefault(emptyMap())
 }
