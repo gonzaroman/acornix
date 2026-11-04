@@ -30,6 +30,7 @@ object Prompts {
         - Save anything the user would not want to lose with Acornix.db (see DATA STORAGE).
         - Avoid external dependencies; if one is essential, load it from a well-known CDN (cdnjs, jsdelivr, unpkg).
         - Never use alert()/prompt()/confirm(); build in-page UI instead.
+        - The phone's location is available with navigator.geolocation (Acornix asks the user the first time); if it is denied or fails, let the user type a city instead.
         - The code must be complete and working: no placeholders, no "TODO", no omitted parts.
     """.trimIndent()
 

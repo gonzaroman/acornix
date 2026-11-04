@@ -13,7 +13,7 @@ import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
 class ImportException(val reason: Reason) : Exception(reason.name) {
-    enum class Reason { NOT_A_ZIP, PYTHON_PLUGIN, NO_INDEX }
+    enum class Reason { NOT_A_ZIP, PYTHON_PLUGIN, NO_INDEX, UNREADABLE }
 }
 
 /**
@@ -60,8 +60,15 @@ class ImportExport(
         val fileName = displayName(uri) ?: "imported.zip"
         val name = AppRepository.prettyName(fileName.substringBeforeLast('.'))
         val entries = withContext(Dispatchers.IO) {
-            context.contentResolver.openInputStream(uri)?.use { readZip(it) }
-                ?: throw ImportException(ImportException.Reason.NOT_A_ZIP)
+            // The app that sent it may not have given Acornix access to the file.
+            val input = try {
+                context.contentResolver.openInputStream(uri)
+            } catch (e: SecurityException) {
+                throw ImportException(ImportException.Reason.UNREADABLE)
+            } catch (e: java.io.FileNotFoundException) {
+                throw ImportException(ImportException.Reason.UNREADABLE)
+            }
+            input?.use { readZip(it) } ?: throw ImportException(ImportException.Reason.NOT_A_ZIP)
         }
         val prefix = appRoot(entries)
         // The code the AI reviews: every text file of the app, index.html first.

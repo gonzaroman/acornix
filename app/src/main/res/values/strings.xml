@@ -36,6 +36,7 @@
     <string name="section_studio_desc">Use any AI, no API key</string>
     <string name="home_recent">Recent</string>
     <string name="see_all">See all</string>
+    <string name="home_try_apps">Try these apps</string>
     <string name="home_tools">Tools</string>
     <string name="tool_os">AcornixOS</string>
     <string name="tool_os_desc">Your phone as a computer: windows, Dock and Launchpad</string>
@@ -282,6 +283,7 @@
     <string name="import_error_zip">That file is not a valid ZIP.</string>
     <string name="import_error_plugin">That\'s a Python plugin from acornix for Termux. Android apps need an index.html.</string>
     <string name="import_error_index">The ZIP has no index.html.</string>
+    <string name="import_error_unreadable">Acornix can\'t open that file. Share it again, or open it from Backups &amp; sharing.</string>
     <string name="export_title">Export</string>
     <string name="export_save">Save ZIP</string>
     <string name="export_done">ZIP saved</string>

@@ -92,6 +92,15 @@ class AppRepositoryTest {
     }
 
     @Test
+    fun emojiFromTheAppsOwnTitle() {
+        assertEquals("🍜", AppRepository.emojiInCode("<title>Menu</title><h1>🍜 <span id=\"t\"></span></h1>"))
+        assertEquals("🏎️", AppRepository.emojiInCode("<title>🏎️ Neon Drone Race</title><h1>🚀</h1>"))
+        assertEquals("✨", AppRepository.emojiInCode("<title>Glow ✨</title>"))
+        assertEquals(null, AppRepository.emojiInCode("<title>Notes © 2026 → go</title><h1>Notes</h1>"))
+        assertEquals(null, AppRepository.emojiInCode("<p>🎉</p>"))
+    }
+
+    @Test
     fun emojiPrefersTheLongestKeyword() {
         assertEquals("🪐", AppRepository.guessEmoji("Planetas en contratiempo", AppKind.APP))
         assertEquals("✈️", AppRepository.guessEmoji("An airplane game", AppKind.APP))

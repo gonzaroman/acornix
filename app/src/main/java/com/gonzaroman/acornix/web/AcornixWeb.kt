@@ -92,6 +92,7 @@ object AcornixWebView {
             javaScriptEnabled = true
             domStorageEnabled = true
             mediaPlaybackRequiresUserGesture = false
+            setGeolocationEnabled(true)
             allowFileAccess = false
             allowContentAccess = false
             loadWithOverviewMode = true

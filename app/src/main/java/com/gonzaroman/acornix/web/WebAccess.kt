@@ -21,7 +21,7 @@ import androidx.core.content.FileProvider
 import java.io.File
 
 /**
- * Camera, microphone and file picking for generated apps, shared by every WebView of an activity
+ * Camera, microphone, location and file picking for generated apps, shared by every WebView of an activity
  * (the full-screen runner and each AcornixOS window). Create it while the activity is being
  * constructed: it registers activity result launchers.
  */
@@ -45,6 +45,16 @@ class WebAccess(private val activity: ComponentActivity) {
         fileCallback = null
         cameraFile = null
     }
+
+    /** A page asking for navigator.geolocation, waiting for the location permission. */
+    private var pendingGeo: Pair<String, GeolocationPermissions.Callback>? = null
+
+    private val locationPermission = activity.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+        pendingGeo?.let { (origin, callback) -> callback.invoke(origin, hasLocation(), false) }
+        pendingGeo = null
+    }
+
+    private fun hasLocation() = LOCATION.any { hasPermission(it) }
 
     private val cameraPermission = activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) {
         pendingCapture?.let { launchChooser(it) }
@@ -147,7 +157,14 @@ class WebAccess(private val activity: ComponentActivity) {
         }
 
         override fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback) {
-            callback.invoke(origin, false, false)
+            // Only apps served by Acornix ask; the phone's own dialog says it is Acornix that wants it.
+            if (hasLocation()) return callback.invoke(origin, true, false)
+            pendingGeo?.let { (o, c) -> c.invoke(o, false, false) }
+            pendingGeo = origin to callback
+            runCatching { locationPermission.launch(LOCATION) }.onFailure {
+                pendingGeo = null
+                callback.invoke(origin, false, false)
+            }
         }
 
         override fun onConsoleMessage(message: ConsoleMessage): Boolean {
@@ -159,5 +176,6 @@ class WebAccess(private val activity: ComponentActivity) {
     private companion object {
         val IMAGE_EXTENSIONS = setOf(".jpg", ".jpeg", ".png", ".webp", ".gif", ".heic")
         val VIDEO_EXTENSIONS = setOf(".mp4", ".webm", ".mov", ".3gp")
+        val LOCATION = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
     }
 }

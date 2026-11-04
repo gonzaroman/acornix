@@ -28,6 +28,14 @@ class PublisherTest {
     }
 
     @Test
+    fun languageFromTheHtmlTag() {
+        assertEquals("en", Publisher.languageOf("<!doctype html>\n<html lang=\"en-GB\">"))
+        assertEquals("es", Publisher.languageOf("<HTML class='x' LANG='ES'>"))
+        assertEquals(null, Publisher.languageOf("<html><body>"))
+        assertTrue(Publisher.issueBody(draft.copy(language = "fr"), "abc123", "u").contains("\"language\": \"fr\""))
+    }
+
+    @Test
     fun galleryIdsUseDashes() {
         assertEquals("mi-piano", Publisher.galleryId("Mi Piano"))
         assertEquals("cafe-con-leche", Publisher.galleryId("Café con leche!"))

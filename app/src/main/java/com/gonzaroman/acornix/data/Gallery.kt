@@ -231,6 +231,16 @@ class Gallery(
             return apps.sortedWith(order)
         }
 
+        /**
+         * "Try these apps" on Home: some featured apps mixed with random ones, so it isn't always the same
+         * list. Apps the user already has are left out.
+         */
+        fun picks(apps: List<GalleryApp>, installed: Set<String>, random: kotlin.random.Random, count: Int = 10): List<GalleryApp> {
+            val (featured, rest) = apps.filter { it.id !in installed }.partition { it.featured }
+            val fromFeatured = featured.shuffled(random).take(count / 2)
+            return (fromFeatured + rest.shuffled(random).take(count - fromFeatured.size)).shuffled(random)
+        }
+
         /** Apps that use the user's AI only work for people who set one up, so they can be told apart. */
         enum class Ai { ANY, WITH, WITHOUT }
 

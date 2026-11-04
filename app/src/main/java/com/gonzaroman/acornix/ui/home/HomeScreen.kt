@@ -76,6 +76,15 @@ import com.gonzaroman.acornix.ui.navigateTab
 import com.gonzaroman.acornix.web.AcornixOsActivity
 import com.gonzaroman.acornix.web.AppLauncher
 import java.util.Calendar
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
+import com.gonzaroman.acornix.data.Gallery
+import com.gonzaroman.acornix.data.GalleryApp
+import kotlin.random.Random
 
 @Composable
 fun HomeScreen(nav: NavHostController) {
@@ -85,6 +94,17 @@ fun HomeScreen(nav: NavHostController) {
     val apps by c.apps.apps.collectAsState()
     val update by c.updates.available.collectAsState()
     val config = settings?.config()
+    val gallery by c.gallery.state.collectAsState()
+
+    LaunchedEffect(Unit) { if (c.gallery.state.value.catalog == null) c.gallery.refresh() }
+    // A new mix each time Acornix opens, kept while moving around the app.
+    val seed = rememberSaveable { Random.nextInt() }
+    val hasCatalog = gallery.catalog != null
+    val mix = remember(hasCatalog, seed) {
+        Gallery.picks(gallery.catalog?.apps.orEmpty(), apps.mapNotNull { it.source?.gallery }.toSet(), Random(seed))
+    }
+    // Installed from here: it leaves the list without reshuffling the rest.
+    val picks = mix.filter { app -> apps.none { it.source?.gallery == app.id } }
 
     LazyColumn(
         Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.statusBars),
@@ -117,6 +137,8 @@ fun HomeScreen(nav: NavHostController) {
 
         update?.let { info -> item(key = "update") { UpdateCard(info) } }
 
+        item { ExploreBanner { nav.navigate(Routes.EXPLORE) } }
+
         item { HeroCard(onClick = { nav.navigate(Routes.create()) }) }
 
         item {
@@ -133,7 +155,19 @@ fun HomeScreen(nav: NavHostController) {
                     SectionTile("📋", stringResource(R.string.section_studio), stringResource(R.string.section_studio_desc),
                         MaterialTheme.colorScheme.surfaceContainerHighest, Modifier.weight(1f)) { nav.navigate(Routes.STUDIO) }
                 }
-                ExploreBanner { nav.navigate(Routes.EXPLORE) }
+            }
+        }
+
+        if (picks.isNotEmpty()) {
+            item(key = "picks") {
+                SectionTitle(stringResource(R.string.home_try_apps)) {
+                    androidx.compose.material3.TextButton(onClick = { nav.navigate(Routes.EXPLORE) }) { Text(stringResource(R.string.see_all)) }
+                }
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    items(picks, key = { it.id }) { app ->
+                        PickCard(app, c.gallery.screenshotUrl(app), Modifier.width(140.dp)) { nav.navigate(Routes.galleryApp(app.id)) }
+                    }
+                }
             }
         }
 
@@ -230,7 +264,7 @@ private fun SectionTile(emoji: String, title: String, subtitle: String, color: C
     }
 }
 
-/** The way into the community gallery, full width under the tiles. */
+/** The way into the community gallery, full width at the top. */
 @Composable
 private fun ExploreBanner(onClick: () -> Unit) {
     // A light runs around the border so the community gallery doesn't go unnoticed.
@@ -254,6 +288,32 @@ private fun ExploreBanner(onClick: () -> Unit) {
             Icon(Icons.AutoMirrored.Rounded.ArrowForward, null)
         }
     }
+    }
+}
+
+/** A community app to try: its screenshot and name, opening its page in the gallery. */
+@Composable
+private fun PickCard(app: GalleryApp, screenshot: String, modifier: Modifier, onClick: () -> Unit) {
+    Card(
+        onClick = onClick,
+        modifier = modifier,
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+    ) {
+        AsyncImage(
+            model = screenshot,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            alignment = Alignment.TopCenter,
+            modifier = Modifier.fillMaxWidth().aspectRatio(0.8f).background(MaterialTheme.colorScheme.surfaceContainerHighest),
+        )
+        Text(
+            "${app.emoji} ${app.name}",
+            style = MaterialTheme.typography.labelLarge,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+        )
     }
 }
 

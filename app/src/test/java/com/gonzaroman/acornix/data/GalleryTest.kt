@@ -37,6 +37,18 @@ class GalleryTest {
     }
 
     @Test
+    fun picksMixFeaturedAndRandomAppsTheUserDoesntHave() {
+        val apps = (1..20).map { GalleryApp(id = "a$it", name = "A$it", featured = it <= 6) }
+        val picks = Gallery.picks(apps, installed = setOf("a1", "a7"), random = kotlin.random.Random(1))
+        assertEquals(10, picks.size)
+        assertEquals(10, picks.map { it.id }.toSet().size)
+        assertTrue(picks.none { it.id == "a1" || it.id == "a7" })
+        assertEquals(5, picks.count { it.featured })
+        assertTrue(Gallery.picks(apps, emptySet(), kotlin.random.Random(2)) != Gallery.picks(apps, emptySet(), kotlin.random.Random(3)))
+        assertEquals(2, Gallery.picks(apps.take(2), emptySet(), kotlin.random.Random(1)).size)
+    }
+
+    @Test
     fun sortOrders() {
         fun ids(sort: Gallery.Companion.Sort) = Gallery.sorted(catalog.apps, sort).map { it.id }
         assertEquals(listOf("bowling", "chef", "notes"), ids(Gallery.Companion.Sort.POPULAR))

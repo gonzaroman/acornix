@@ -32,6 +32,8 @@ data class PublishDraft(
     val prompt: String,
     /** The description in another language, {"en": "..."}, so the gallery can show it to more people. */
     val descriptionI18n: Map<String, String> = emptyMap(),
+    /** The app's language ("en", "es"…), from <html lang> or else the phone's. */
+    val language: String = java.util.Locale.getDefault().language,
 )
 
 /**
@@ -50,13 +52,16 @@ class Publisher(
     fun draft(meta: AppMeta): PublishDraft {
         val login = account.login.value
         val mine = meta.source?.takeIf { login != null && it.author.equals(login, ignoreCase = true) }
+        val code = runCatching { apps.indexFile(meta.id).readText() }.getOrDefault("")
         return PublishDraft(
             id = mine?.gallery ?: galleryId(meta.name),
             name = meta.name,
-            emoji = meta.emoji,
+            // An emoji guessed from the name (🌰, or 📷 for anything with a camera) is worse than the app's own.
+            emoji = AppRepository.emojiInCode(code) ?: meta.emoji,
             category = "",
             description = "",
             prompt = meta.description.take(MAX_PROMPT),
+            language = languageOf(code) ?: java.util.Locale.getDefault().language,
         )
     }
 
@@ -135,6 +140,10 @@ class Publisher(
         private val TEXT_FILE = Regex("""\.(html?|js|mjs|css|json|svg|txt|md)$""", RegexOption.IGNORE_CASE)
         private val json = Json { prettyPrint = true }
 
+        /** <html lang="en-GB"> -> "en". */
+        fun languageOf(html: String): String? =
+            Regex("""<html[^>]*\slang\s*=\s*["']?([a-zA-Z]{2,3})""", RegexOption.IGNORE_CASE).find(html.take(5000))?.groupValues?.get(1)?.lowercase()
+
         /** "Mi Piano" -> "mi-piano": the gallery's ids use dashes. */
         fun galleryId(name: String) = AppRepository.slug(name).replace('_', '-')
 
@@ -148,7 +157,7 @@ class Publisher(
                 put("description", d.description)
                 if (d.descriptionI18n.isNotEmpty()) put("description_i18n", buildJsonObject { d.descriptionI18n.forEach { (k, v) -> put(k, v) } })
                 put("prompt", d.prompt)
-                put("language", java.util.Locale.getDefault().language)
+                put("language", d.language)
                 put("gist", gistId)
                 put("acornix", BuildConfig.VERSION_NAME)
             }

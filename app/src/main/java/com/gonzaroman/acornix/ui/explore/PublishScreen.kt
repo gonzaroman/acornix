@@ -126,7 +126,8 @@ fun PublishScreen(nav: NavHostController, appId: String) {
             scope.launch {
                 try {
                     val draft = start.copy(name = name.trim(), emoji = emoji.trim().ifEmpty { meta.emoji }, category = category.orEmpty(),
-                        description = description.trim(), prompt = prompt.trim())
+                        // Imported apps have no request; the description is the closest thing to one for "Make your version".
+                        description = description.trim(), prompt = prompt.trim().ifEmpty { description.trim() })
                     sentUrl = c.publisher.publish(appId, draft.copy(descriptionI18n = translateDescription(c, draft.description)))
                 } catch (e: CancellationException) {
                     throw e

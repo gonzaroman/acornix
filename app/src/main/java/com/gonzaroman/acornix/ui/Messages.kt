@@ -11,6 +11,7 @@ fun importErrorMessage(context: Context, e: ImportException): String = context.g
         ImportException.Reason.NOT_A_ZIP -> R.string.import_error_zip
         ImportException.Reason.PYTHON_PLUGIN -> R.string.import_error_plugin
         ImportException.Reason.NO_INDEX -> R.string.import_error_index
+        ImportException.Reason.UNREADABLE -> R.string.import_error_unreadable
     },
 )
 

@@ -104,7 +104,7 @@ class AppRepository(
                 createdAt = now,
                 updatedAt = now,
                 name = name.trim().ifEmpty { id },
-                emoji = emoji ?: guessEmoji("$name $description", kind),
+                emoji = emoji ?: emojiInCode(code) ?: guessEmoji("$name $description", kind),
                 kind = kind,
                 description = description.take(500),
                 buildSeconds = buildSeconds,
@@ -193,7 +193,7 @@ class AppRepository(
         withContext(Dispatchers.IO) {
             val code = indexFile(id).readText()
             val now = System.currentTimeMillis()
-            val meta = AppMeta(id = id, name = name, emoji = guessEmoji(name, kind), kind = kind, createdAt = now, updatedAt = now)
+            val meta = AppMeta(id = id, name = name, emoji = emojiInCode(code) ?: guessEmoji(name, kind), kind = kind, createdAt = now, updatedAt = now)
             writeMeta(meta)
             if (readVersions(id).isEmpty()) saveVersion(id, code, "Imported")
             meta
@@ -299,6 +299,31 @@ class AppRepository(
             listOf("matrix", "code", "código") to "💻",
             listOf("game", "juego") to "🎮",
         )
+
+        /**
+         * The emoji the app shows next to its own name, in its <title> or its first <h1>, if it has one:
+         * the AI picks a better one there than [guessEmoji] can.
+         */
+        fun emojiInCode(html: String): String? {
+            val places = listOf(Regex("<title[^>]*>(.*?)</title>"), Regex("<h1[^>]*>(.*?)</h1>"))
+                .mapNotNull { it.find(html.take(200_000))?.groupValues?.get(1) }
+            for (place in places) {
+                val text = place.replace(Regex("<[^>]*>"), " ")
+                val chars = java.text.BreakIterator.getCharacterInstance().apply { setText(text) }
+                var start = chars.first()
+                var end = chars.next()
+                while (end != java.text.BreakIterator.DONE) {
+                    val grapheme = text.substring(start, end)
+                    if (isEmoji(grapheme.codePointAt(0))) return grapheme
+                    start = end
+                    end = chars.next()
+                }
+            }
+            return null
+        }
+
+        /** Pictographs and the older symbols used as emoji (☀ ✨ ✅), not arrows, © or ™. */
+        private fun isEmoji(cp: Int) = cp in 0x1F000..0x1FAFF || cp in 0x2600..0x27BF || cp == 0x2B50 || cp == 0x2B55
 
         fun guessEmoji(text: String, kind: AppKind): String {
             val t = text.lowercase()
