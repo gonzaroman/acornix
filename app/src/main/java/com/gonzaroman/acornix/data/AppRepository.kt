@@ -303,7 +303,7 @@ class AppRepository(
         /** Calls that make it a shortcut (same list as the community gallery's "phone" tag). */
         private val PHONE_CALL = Regex(
             """Acornix\.(speak|flashlight|notify|battery|deviceInfo|listApps|openApp|alarm|timer|call|sms|whatsapp|maps|launchApp|""" +
-                """volume|ringer|doNotDisturb|brightness|keepAwake|media|calendar|clipboard|done)\b""",
+                """volume|ringer|doNotDisturb|brightness|keepAwake|media|calendar|clipboard|youtube|done)\b""",
         )
 
         /** Whether the code makes the phone do things, so an imported app counts as a shortcut. */

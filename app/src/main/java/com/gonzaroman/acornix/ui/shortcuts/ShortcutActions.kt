@@ -72,7 +72,11 @@ val SHORTCUT_ACTIONS = listOf(
     )),
     ActionDef("launchApp", "📱", R.string.sa_launch_app, R.string.sg_apps, listOf(FieldDef("name", R.string.sf_app_name, FieldKind.APP))),
     ActionDef("maps", "🗺️", R.string.sa_maps, R.string.sg_apps, listOf(FieldDef("query", R.string.sf_place, FieldKind.TEXT, variables = true))),
-    ActionDef("openUrl", "🌐", R.string.sa_open_url, R.string.sg_apps, listOf(FieldDef("url", R.string.sf_url, FieldKind.TEXT))),
+    ActionDef("youtube", "▶️", R.string.sa_youtube, R.string.sg_apps, listOf(FieldDef("query", R.string.sf_search, FieldKind.TEXT, variables = true))),
+    ActionDef("openUrl", "🌐", R.string.sa_open_url, R.string.sg_apps, listOf(
+        FieldDef("url", R.string.sf_url, FieldKind.TEXT),
+        FieldDef("app", R.string.sf_open_with, FieldKind.APP),
+    )),
     ActionDef("copy", "📋", R.string.sa_copy, R.string.sg_apps, listOf(FieldDef("text", R.string.sf_text, FieldKind.TEXT, variables = true))),
     ActionDef("share", "📤", R.string.sa_share, R.string.sg_apps, listOf(FieldDef("text", R.string.sf_text, FieldKind.TEXT, variables = true))),
 )

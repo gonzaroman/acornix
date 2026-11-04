@@ -79,6 +79,7 @@ fun ShortcutsScreen(nav: NavHostController) {
     val c = context.container
     val apps by c.apps.apps.collectAsState()
     val gallery by c.gallery.state.collectAsState()
+    val schedules by c.schedules.all.collectAsState()
     var selected by remember { mutableStateOf<AppMeta?>(null) }
     var choosing by remember { mutableStateOf(false) }
     val settings by c.settings.settings.collectAsState(initial = null)
@@ -150,7 +151,8 @@ fun ShortcutsScreen(nav: NavHostController) {
             } else {
                 item(span = { GridItemSpan(maxLineSpan) }) { SectionTitle(stringResource(R.string.shortcuts_mine)) }
                 items(mine, key = { it.id }) { app ->
-                    ShortcutTile(app, onClick = { AppLauncher.open(context, app.id) }, onLongClick = { selected = app })
+                    ShortcutTile(app, scheduleBadge(schedules.firstOrNull { it.appId == app.id }),
+                        onClick = { AppLauncher.open(context, app.id) }, onLongClick = { selected = app })
                 }
             }
 
@@ -205,7 +207,7 @@ private fun NewShortcutOption(emoji: String, title: String, text: String, onClic
 /** A big colored button: the shortcut's emoji and name. Tap runs it, long-press shows its options. */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun ShortcutTile(app: AppMeta, onClick: () -> Unit, onLongClick: () -> Unit) {
+private fun ShortcutTile(app: AppMeta, badge: String?, onClick: () -> Unit, onLongClick: () -> Unit) {
     val colors = TILE_COLORS[abs(app.id.hashCode()) % TILE_COLORS.size]
     Box(
         Modifier.fillMaxWidth().aspectRatio(1.35f).clip(MaterialTheme.shapes.extraLarge)
@@ -214,6 +216,10 @@ private fun ShortcutTile(app: AppMeta, onClick: () -> Unit, onLongClick: () -> U
             .padding(16.dp),
     ) {
         Text(app.emoji, fontSize = 34.sp, modifier = Modifier.align(Alignment.TopStart))
+        badge?.let {
+            Text(it, color = Color.White, style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier.align(Alignment.TopEnd).clip(MaterialTheme.shapes.small).background(Color.Black.copy(alpha = 0.25f)).padding(horizontal = 8.dp, vertical = 3.dp))
+        }
         Text(
             app.name,
             color = Color.White,

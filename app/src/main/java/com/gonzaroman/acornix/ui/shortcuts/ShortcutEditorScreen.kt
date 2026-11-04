@@ -90,6 +90,7 @@ fun ShortcutEditorScreen(nav: NavHostController, appId: String?) {
     val steps = remember { mutableStateListOf<ShortcutStep>() }
     var picking by remember { mutableStateOf(false) }
     var saving by remember { mutableStateOf(false) }
+    var schedule by remember { mutableStateOf(appId?.let { c.schedules.get(it) }) }
 
     LaunchedEffect(appId) {
         if (appId == null) return@LaunchedEffect
@@ -116,6 +117,7 @@ fun ShortcutEditorScreen(nav: NavHostController, appId: String?) {
                 c.apps.rename(appId, finalName, finalEmoji)
                 appId
             }
+            schedule?.let { c.schedules.set(it.copy(appId = id)) } ?: c.schedules.remove(id)
             Toast.makeText(context, R.string.shortcut_saved, Toast.LENGTH_SHORT).show()
             nav.popBackStack()
             if (andRun) AppLauncher.open(context, id)
@@ -184,6 +186,7 @@ fun ShortcutEditorScreen(nav: NavHostController, appId: String?) {
                     Text(stringResource(R.string.shortcut_add_step))
                 }
             }
+            item { ScheduleCard(appId ?: "", schedule) { schedule = it } }
             if (steps.any { s -> shortcutAction(s.action)?.fields?.any { it.variables } == true }) {
                 item {
                     Text(stringResource(R.string.shortcut_variables), style = MaterialTheme.typography.bodySmall,
@@ -250,6 +253,9 @@ private fun StepCard(
     }
 }
 
+/** Where an app setting keeps the chosen app's package ("name" → "package", "app" → "appPackage"). */
+private fun packageKey(key: String) = if (key == "name") "package" else key + "Package"
+
 /** Edits one setting; [onChange] receives the settings that changed (an app or a contact sets two). */
 @Composable
 private fun FieldEditor(field: FieldDef, params: Map<String, String>, onChanges: (Map<String, String>) -> Unit) {
@@ -264,7 +270,7 @@ private fun FieldEditor(field: FieldDef, params: Map<String, String>, onChanges:
             }
             if (picking) {
                 AppPickerSheet(
-                    onPick = { app -> picking = false; onChanges(mapOf(field.key to app.label, "package" to app.packageName)) },
+                    onPick = { app -> picking = false; onChanges(mapOf(field.key to app.label, packageKey(field.key) to app.packageName)) },
                     onDismiss = { picking = false },
                 )
             }

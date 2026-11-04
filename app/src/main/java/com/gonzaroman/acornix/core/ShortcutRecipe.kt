@@ -92,7 +92,8 @@ data class ShortcutRecipe(val version: Int = 1, val steps: List<ShortcutStep> = 
     call: function (p) { return (L === 'es' ? '📞 Llamar · ' : '📞 Call · ') + (p.contact || p.number || ''); },
     maps: function (p) { return '🗺️ ' + (p.query || ''); },
     launchApp: function (p) { return (L === 'es' ? '📱 Abrir ' : '📱 Open ') + (p.name || ''); },
-    openUrl: function (p) { return '🌐 ' + (p.url || ''); },
+    openUrl: function (p) { return '🌐 ' + (p.url || '') + (p.app ? ' · ' + p.app : ''); },
+    youtube: function (p) { return '▶️ YouTube · ' + (p.query || ''); },
     speak: function (p) { return '🗣️ ' + (p.text || ''); },
     notify: function (p) { return '🔔 ' + (p.title || ''); },
     vibrate: function () { return L === 'es' ? '📳 Vibrar' : '📳 Vibrate'; },
@@ -146,7 +147,8 @@ data class ShortcutRecipe(val version: Int = 1, val steps: List<ShortcutStep> = 
       case 'call': return A.call(p.number || '');
       case 'maps': return A.maps(await fill(p.query));
       case 'launchApp': var r = await A.launchApp(p['package'] || p.name || '', p.name || ''); return r === true;
-      case 'openUrl': return A.openUrl(await fill(p.url));
+      case 'openUrl': return A.openUrl(await fill(p.url), p.appPackage || null);
+      case 'youtube': return A.youtube(await fill(p.query));
       case 'speak': return A.speak(await fill(p.text), L === 'es' ? 'es-ES' : 'en-US');
       case 'notify': return A.notify(await fill(p.title), await fill(p.text));
       case 'vibrate': return A.vibrate([200, 100, 200]);

@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Alarm
 import androidx.compose.material.icons.rounded.Archive
 import androidx.compose.material.icons.automirrored.rounded.AddToHomeScreen
 import androidx.compose.material.icons.rounded.AutoFixHigh
@@ -74,6 +75,7 @@ import com.gonzaroman.acornix.data.AppMeta
 import com.gonzaroman.acornix.device.NfcStickers
 import com.gonzaroman.acornix.device.ShortcutHelper
 import com.gonzaroman.acornix.ui.shortcuts.NfcWriteDialog
+import com.gonzaroman.acornix.ui.shortcuts.ScheduleDialog
 import com.gonzaroman.acornix.ui.Routes
 import com.gonzaroman.acornix.ui.components.AppCard
 import com.gonzaroman.acornix.ui.components.AppIcon
@@ -178,6 +180,7 @@ fun AppActionsSheet(app: AppMeta, nav: NavHostController, onDismiss: () -> Unit)
     var deleting by remember { mutableStateOf(false) }
     var askData by remember { mutableStateOf(false) }
     var writingNfc by remember { mutableStateOf(false) }
+    var scheduling by remember { mutableStateOf(false) }
 
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Row(Modifier.padding(horizontal = 24.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -208,6 +211,9 @@ fun AppActionsSheet(app: AppMeta, nav: NavHostController, onDismiss: () -> Unit)
             val ok = ShortcutHelper.pin(context, app, c.apps)
             if (!ok) Toast.makeText(context, R.string.pin_unsupported, Toast.LENGTH_SHORT).show()
             onDismiss()
+        }
+        if (app.kind == AppKind.FEATURE) {
+            SheetAction(Icons.Rounded.Alarm, stringResource(R.string.action_schedule)) { scheduling = true }
         }
         if (app.kind == AppKind.FEATURE && NfcStickers.isSupported(context)) {
             SheetAction(Icons.Rounded.Nfc, stringResource(R.string.action_nfc)) { writingNfc = true }
@@ -244,6 +250,7 @@ fun AppActionsSheet(app: AppMeta, nav: NavHostController, onDismiss: () -> Unit)
     }
 
     if (writingNfc) NfcWriteDialog(app) { writingNfc = false; onDismiss() }
+    if (scheduling) ScheduleDialog(app) { scheduling = false; onDismiss() }
 
     if (askData) {
         IncludeDataDialog(

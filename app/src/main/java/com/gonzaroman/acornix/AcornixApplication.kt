@@ -34,6 +34,7 @@ class AppContainer(context: Context) {
     val updates = UpdateChecker(context)
     val device = DeviceActions(context)
     val media = MediaExport(context)
+    val schedules = com.gonzaroman.acornix.data.ShortcutSchedules(context)
     val aiPermissions = com.gonzaroman.acornix.data.AiPermissions(context)
     val appReview = com.gonzaroman.acornix.core.AppReview(settings)
     val gallery = com.gonzaroman.acornix.data.Gallery(context.filesDir, apps, importExport, aiPermissions)

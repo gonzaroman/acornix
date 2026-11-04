@@ -62,8 +62,10 @@ class DeviceActions(private val context: Context) {
         false
     }
 
-    fun openUrl(url: String): Boolean {
+    /** Opens a link; with [packageName] in that app (e.g. Chrome), falling back to the default one. */
+    fun openUrl(url: String, packageName: String? = null): Boolean {
         val fixed = if (Regex("^[a-zA-Z][a-zA-Z0-9+.-]*:").containsMatchIn(url)) url else "https://$url"
+        if (!packageName.isNullOrBlank() && launch(Intent(Intent.ACTION_VIEW, Uri.parse(fixed)).setPackage(packageName))) return true
         return launch(Intent(Intent.ACTION_VIEW, Uri.parse(fixed)))
     }
 

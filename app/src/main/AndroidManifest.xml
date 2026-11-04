@@ -8,6 +8,12 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.NFC" />
+    <!-- Scheduled shortcuts ("every day at 8:00") use alarm-clock alarms. -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Lets a scheduled shortcut open itself from the background (see ScheduleReceiver). -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
     <uses-permission
         android:name="android.permission.WRITE_SETTINGS"
@@ -102,6 +108,21 @@
                 <data android:scheme="acornix" android:host="app" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".web.ScheduleReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".web.ScheduleRearmReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+        </receiver>
 
         <activity
             android:name=".web.AcornixOsActivity"

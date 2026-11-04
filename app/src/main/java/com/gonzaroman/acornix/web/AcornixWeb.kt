@@ -307,7 +307,8 @@ class AcornixJsBridge(
             "speak" -> { device.speak(str(0).orEmpty(), str(1)); JsonPrimitive(true) }
             "toast" -> { device.toast(str(0).orEmpty()); JsonPrimitive(true) }
             "notify" -> JsonPrimitive(device.notify(str(0).orEmpty(), str(1).orEmpty()))
-            "openUrl" -> JsonPrimitive(device.openUrl(str(0).orEmpty()))
+            "openUrl" -> JsonPrimitive(device.openUrl(str(0).orEmpty(), str(1)))
+            "youtube" -> JsonPrimitive(device.youtubeSearch(str(0).orEmpty()))
             "share" -> JsonPrimitive(device.shareText(str(0).orEmpty()))
             "copy" -> { device.copyToClipboard(str(0).orEmpty()); JsonPrimitive(true) }
             "battery" -> device.battery().let {
@@ -509,7 +510,8 @@ class AcornixJsBridge(
                 speak: function (t, l) { return call('speak', [String(t), l || null]); },
                 toast: function (m) { return call('toast', [String(m)]); },
                 notify: function (t, b) { return call('notify', [String(t), String(b || '')]); },
-                openUrl: function (u) { return call('openUrl', [String(u)]); },
+                openUrl: function (u, app) { return call('openUrl', [String(u), app ? String(app) : null]); },
+                youtube: function (q) { return call('youtube', [String(q)]); },
                 share: function (t) { return call('share', [String(t)]); },
                 copy: function (t) { return call('copy', [String(t)]); },
                 battery: function () { return call('battery'); },

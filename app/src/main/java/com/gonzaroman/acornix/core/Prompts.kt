@@ -180,7 +180,8 @@ object Prompts {
         - Acornix.speak(text, lang?)               // text to speech, lang like "es-ES"
         - Acornix.toast(message)
         - Acornix.notify(title, body)              // system notification
-        - Acornix.openUrl(url)
+        - Acornix.openUrl(url, app?)             // app: optional package to open it with, e.g. 'com.android.chrome'
+        - Acornix.youtube(query)                 // searches YouTube (in the YouTube app if installed)
         - Acornix.share(text)
         - Acornix.copy(text)                       // clipboard
         - Acornix.battery()      -> {level: 0-100, charging: boolean, temperature: number}

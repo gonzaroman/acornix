@@ -719,6 +719,13 @@
     <string name="shortcut_add_step">Añadir acción</string>
     <string name="shortcut_no_steps">Añade las acciones que hará tu atajo, en orden. Se ejecutan una tras otra con un toque.</string>
     <string name="shortcut_variables">Puedes escribir {hora}, {fecha}, {ubicación} o {batería} y se rellenan al ejecutarlo.</string>
+    <string name="schedule_title">Ejecutar solo</string>
+    <string name="schedule_text">Cada día a la hora que elijas, aunque Acornix esté cerrado.</string>
+    <string name="schedule_channel">Atajos programados</string>
+    <string name="schedule_tap_to_run">Toca para ejecutarlo ahora.</string>
+    <string name="schedule_overlay">Para abrirse solo, Acornix necesita «Mostrar sobre otras apps». Sin ese permiso, te llega una notificación para tocarla.</string>
+    <string name="schedule_overlay_allow">Permitir</string>
+    <string name="action_schedule">Programar hora</string>
     <string name="shortcut_search_apps">Buscar apps</string>
     <string name="shortcut_pick_app">Elegir app</string>
     <string name="shortcut_pick_contact">Elegir contacto</string>
@@ -753,6 +760,7 @@
     <string name="sa_launch_app">Abrir una app</string>
     <string name="sa_maps">Abrir en Maps</string>
     <string name="sa_open_url">Abrir una web</string>
+    <string name="sa_youtube">Buscar en YouTube</string>
     <string name="sa_copy">Copiar texto</string>
     <string name="sa_share">Compartir texto</string>
     <string name="sf_level">Nivel</string>
@@ -770,6 +778,8 @@
     <string name="sf_app_name">Nombre de la app (p. ej. Spotify)</string>
     <string name="sf_place">Lugar o dirección</string>
     <string name="sf_url">Dirección web</string>
+    <string name="sf_search">Buscar</string>
+    <string name="sf_open_with">Abrir con (opcional)</string>
     <string name="sc_media">Multimedia</string>
     <string name="sc_ring">Tono de llamada</string>
     <string name="sc_alarm">Alarmas</string>

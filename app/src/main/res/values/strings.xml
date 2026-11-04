@@ -720,6 +720,13 @@
     <string name="shortcut_add_step">Add action</string>
     <string name="shortcut_no_steps">Add the actions your shortcut will do, in order. They run one after another with one tap.</string>
     <string name="shortcut_variables">You can write {time}, {date}, {location} or {battery} and they are filled in when it runs.</string>
+    <string name="schedule_title">Run it on its own</string>
+    <string name="schedule_text">Every day at the time you choose, even with Acornix closed.</string>
+    <string name="schedule_channel">Scheduled shortcuts</string>
+    <string name="schedule_tap_to_run">Tap to run it now.</string>
+    <string name="schedule_overlay">To open on its own, Acornix needs “Display over other apps”. Without it, you get a notification to tap.</string>
+    <string name="schedule_overlay_allow">Allow</string>
+    <string name="action_schedule">Run at a time</string>
     <string name="shortcut_search_apps">Search apps</string>
     <string name="shortcut_pick_app">Choose an app</string>
     <string name="shortcut_pick_contact">Choose a contact</string>
@@ -754,6 +761,7 @@
     <string name="sa_launch_app">Open an app</string>
     <string name="sa_maps">Open in Maps</string>
     <string name="sa_open_url">Open a web page</string>
+    <string name="sa_youtube">Search on YouTube</string>
     <string name="sa_copy">Copy text</string>
     <string name="sa_share">Share text</string>
     <string name="sf_level">Level</string>
@@ -771,6 +779,8 @@
     <string name="sf_app_name">App name (e.g. Spotify)</string>
     <string name="sf_place">Place or address</string>
     <string name="sf_url">Web address</string>
+    <string name="sf_search">Search for</string>
+    <string name="sf_open_with">Open with (optional)</string>
     <string name="sc_media">Media</string>
     <string name="sc_ring">Ringtone</string>
     <string name="sc_alarm">Alarms</string>
