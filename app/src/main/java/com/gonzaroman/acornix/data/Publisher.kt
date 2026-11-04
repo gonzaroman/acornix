@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
@@ -139,6 +140,18 @@ class Publisher(
         private const val MARKER = "<!-- acornix-submission v1 -->"
         private val TEXT_FILE = Regex("""\.(html?|js|mjs|css|json|svg|txt|md)$""", RegexOption.IGNORE_CASE)
         private val json = Json { prettyPrint = true }
+
+        /** {"es": "...", "en": "..."} from the AI (maybe inside other text) -> the descriptions that look right. */
+        fun parseDescriptions(raw: String): Map<String, String> {
+            val start = raw.indexOf('{')
+            val end = raw.lastIndexOf('}')
+            if (start < 0 || end <= start) return emptyMap()
+            val obj = runCatching { Json.parseToJsonElement(raw.substring(start, end + 1)).jsonObject }.getOrNull() ?: return emptyMap()
+            return listOf("es", "en").mapNotNull { lang ->
+                (obj[lang] as? JsonPrimitive)?.takeIf { it.isString }?.content?.trim()
+                    ?.takeIf { it.isNotEmpty() && it.length <= 300 }?.let { lang to it }
+            }.toMap()
+        }
 
         /** <html lang="en-GB"> -> "en". */
         fun languageOf(html: String): String? =

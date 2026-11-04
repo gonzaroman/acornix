@@ -49,14 +49,16 @@ object Prompts {
     """.trimIndent()
 
     fun createFeature(language: String) = """
-        You are an expert web developer building an Acornix "functionality": a mobile web app that can
-        use the phone's capabilities through the JavaScript bridge described below.
+        You are an expert web developer building an Acornix shortcut: a mobile web app that makes the phone do
+        things through the JavaScript bridge described below.
         $MOBILE_RULES
         - Bilingual: every visible text in Spanish AND English, in one object like const T = { es: {...}, en: {...} }, picking
           const L = ((window.Acornix && Acornix.language) || navigator.language || 'en').toLowerCase().startsWith('es') ? 'es' : 'en'.
           $language is the user's language, so make sure that version reads naturally. Content the user writes is never translated.
 
         $BRIDGE_DOCS
+
+        $SHORTCUT_RULES
 
         $STORAGE_DOCS
 
@@ -72,7 +74,7 @@ object Prompts {
         - Bilingual: every visible text in Spanish AND English, in one object like const T = { es: {...}, en: {...} }, picking
           const L = ((window.Acornix && Acornix.language) || navigator.language || 'en').toLowerCase().startsWith('es') ? 'es' : 'en'.
           $language is the user's language, so make sure that version reads naturally. Content the user writes is never translated.
-        ${if (isFeature) BRIDGE_DOCS else "- If the app needs phone features (vibration, flashlight, battery, speech…), it may use the window.Acornix bridge:\n$BRIDGE_DOCS"}
+        ${if (isFeature) BRIDGE_DOCS + "\n\n" + SHORTCUT_RULES else "- If the app needs phone features (vibration, flashlight, battery, speech…), it may use the window.Acornix bridge:\n$BRIDGE_DOCS"}
 
         $STORAGE_DOCS
 
@@ -186,7 +188,33 @@ object Prompts {
         - Acornix.listApps()     -> [{id, name, emoji}]   // the user's Acornix apps
         - Acornix.openApp(nameOrId)
         - Acornix.askAI(prompt, options?)                // the user's own AI: see AI INSIDE THE APP
-        Calls can fail (e.g. no flashlight): use try/catch and show a friendly message.
+        Shortcut actions (the phone does things for the user):
+        - Acornix.alarm(hour, minute, label?)  · Acornix.timer(seconds, label?)   // in the phone's clock app
+        - Acornix.call(number) · Acornix.sms(number, text) · Acornix.whatsapp(number?, text)   // opens them ready to send
+        - Acornix.maps(placeOrAddress)         · Acornix.launchApp(name)          // e.g. launchApp('Spotify')
+        - Acornix.volume(0-100, 'media'|'ring'|'alarm') · Acornix.volume(undefined, stream) -> current %
+        - Acornix.ringer('normal'|'vibrate'|'silent') · Acornix.doNotDisturb(on)  // false the first time: Acornix asks the user for access
+        - Acornix.brightness(0-100)            // false if the user hasn't let Acornix change system settings yet
+        - Acornix.keepAwake(on)                // keep the screen on while the app is open
+        - Acornix.media('play'|'pause'|'toggle'|'next'|'previous')   // controls the music app that is playing
+        - Acornix.calendar({ title, start: Date, end: Date, location? })   // opens the calendar with the event filled in
+        - Acornix.clipboard() -> text
+        - Acornix.done(message?)               // the shortcut finished: Acornix shows "✓ message" and closes it
+        - Acornix.trigger                      // what opened it: 'tap', 'home' (home screen icon) or 'nfc' (NFC sticker)
+        The phone's location: navigator.geolocation. Calls can fail (e.g. no flashlight): use try/catch and show a friendly message.
+    """.trimIndent()
+
+    /** How a shortcut behaves: instant actions run and close, settings are asked once. */
+    private val SHORTCUT_RULES = """
+        SHORTCUTS: this is a shortcut, like iPhone Shortcuts. Keep it dead simple to use.
+        - If the request is an action (bedtime mode, tell someone I arrived, start the car playlist…), do it as soon
+          as the page loads, showing only a small "working" state with what is being done, then call Acornix.done('short
+          summary'). No buttons to press first.
+        - Anything personal it needs (a phone number, a contact name, an hour, a place) is asked ONCE the first time in a
+          friendly one-screen form, saved with Acornix.db, and then never asked again. Show a small ⚙️ button (and keep it
+          available when Acornix.done is skipped) to change those settings.
+        - If the request needs a screen (a dashboard, a timer, a game with the flashlight…), build a normal app instead.
+        - Never use the AI (Acornix.askAI) unless the request clearly needs it: shortcuts must work without an AI key.
     """.trimIndent()
 
     fun assistant(

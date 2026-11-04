@@ -334,19 +334,20 @@ private fun CategoryPicker(selected: String?, onPick: (String) -> Unit) {
 }
 
 /**
- * The description in the other gallery language (Spanish or English), written by the user's AI so people
- * who speak it see what the app does. Without an AI, or if it fails, the app is published without it.
+ * The description in both gallery languages (Spanish and English), written by the user's AI so people who speak
+ * either see what the app does, whatever language the author wrote it in. Without an AI, or if it fails, the app
+ * is published without them.
  */
 private suspend fun translateDescription(c: com.gonzaroman.acornix.AppContainer, text: String): Map<String, String> {
     if (text.isBlank()) return emptyMap()
-    val to = if (java.util.Locale.getDefault().language == "es") "en" else "es"
-    val name = if (to == "es") "Spanish (Spain)" else "English"
     return runCatching {
         val out = c.settings.activeProvider().streamText(
-            "You translate short app store descriptions into natural, friendly $name. Keep it about the same length. Reply with the translation only.",
+            "You write short app store descriptions in natural, friendly Spanish (Spain) and English, keeping the meaning " +
+                "and about the same length. If the text is already in one of them, keep it as it is for that one. " +
+                "Reply only with JSON: {\"es\": \"...\", \"en\": \"...\"}",
             text,
             quick = true,
-        ) { }.text.trim().trim('"')
-        if (out.isBlank() || out.length > 300) emptyMap() else mapOf(to to out)
+        ) { }.text
+        com.gonzaroman.acornix.data.Publisher.parseDescriptions(out)
     }.getOrDefault(emptyMap())
 }

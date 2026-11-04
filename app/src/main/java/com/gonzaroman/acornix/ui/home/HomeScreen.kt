@@ -70,6 +70,7 @@ import com.gonzaroman.acornix.R
 import com.gonzaroman.acornix.container
 import com.gonzaroman.acornix.ui.Routes
 import com.gonzaroman.acornix.ui.components.AppCard
+import com.gonzaroman.acornix.ui.components.GalleryPickCard
 import com.gonzaroman.acornix.ui.components.SectionTitle
 import com.gonzaroman.acornix.ui.components.UpdateCard
 import com.gonzaroman.acornix.ui.navigateTab
@@ -144,8 +145,8 @@ fun HomeScreen(nav: NavHostController) {
         item {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    SectionTile("🧬", stringResource(R.string.section_feature), stringResource(R.string.section_feature_desc),
-                        MaterialTheme.colorScheme.secondaryContainer, Modifier.weight(1f)) { nav.navigate(Routes.create(feature = true)) }
+                    SectionTile("⚡", stringResource(R.string.section_feature), stringResource(R.string.section_feature_desc),
+                        MaterialTheme.colorScheme.secondaryContainer, Modifier.weight(1f)) { nav.navigateTab(Routes.SHORTCUTS) }
                     SectionTile("🤖", stringResource(R.string.section_control), stringResource(R.string.section_control_desc),
                         MaterialTheme.colorScheme.tertiaryContainer, Modifier.weight(1f)) { nav.navigateTab(Routes.assistant(control = true)) }
                 }
@@ -165,7 +166,7 @@ fun HomeScreen(nav: NavHostController) {
                 }
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     items(picks, key = { it.id }) { app ->
-                        PickCard(app, c.gallery.screenshotUrl(app), Modifier.width(140.dp)) { nav.navigate(Routes.galleryApp(app.id)) }
+                        GalleryPickCard(app, c.gallery.screenshotUrl(app), Modifier.width(140.dp)) { nav.navigate(Routes.galleryApp(app.id)) }
                     }
                 }
             }
@@ -288,32 +289,6 @@ private fun ExploreBanner(onClick: () -> Unit) {
             Icon(Icons.AutoMirrored.Rounded.ArrowForward, null)
         }
     }
-    }
-}
-
-/** A community app to try: its screenshot and name, opening its page in the gallery. */
-@Composable
-private fun PickCard(app: GalleryApp, screenshot: String, modifier: Modifier, onClick: () -> Unit) {
-    Card(
-        onClick = onClick,
-        modifier = modifier,
-        shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
-    ) {
-        AsyncImage(
-            model = screenshot,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            alignment = Alignment.TopCenter,
-            modifier = Modifier.fillMaxWidth().aspectRatio(0.8f).background(MaterialTheme.colorScheme.surfaceContainerHighest),
-        )
-        Text(
-            "${app.emoji} ${app.name}",
-            style = MaterialTheme.typography.labelLarge,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
-        )
     }
 }
 

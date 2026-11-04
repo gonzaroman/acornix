@@ -17,6 +17,27 @@
     <string name="app_not_found">This app no longer exists</string>
     <string name="tab_home">Home</string>
     <string name="tab_apps">My Apps</string>
+    <string name="tab_shortcuts">Shortcuts</string>
+    <string name="shortcuts_subtitle">Shortcuts for Android: tell your phone what to do, and it does it with one tap.</string>
+    <string name="shortcuts_new">New shortcut</string>
+    <string name="shortcuts_mine">My shortcuts</string>
+    <string name="shortcuts_discover">Ready-made shortcuts</string>
+    <string name="shortcuts_see_all">See all</string>
+    <string name="shortcuts_empty_title">Your first shortcut</string>
+    <string name="shortcuts_empty_text">Say what you want your phone to do. It\'s created once, and then it works with one tap, without AI. Try one of these:</string>
+    <string-array name="shortcuts_examples">
+        <item>Bedtime mode: silent, low brightness and an alarm at 7:00</item>
+        <item>SOS: send my location by WhatsApp and flash the flashlight</item>
+        <item>Where I parked: save the spot and take me back with Maps</item>
+    </string-array>
+    <string name="shortcut_done">Done</string>
+    <string name="action_nfc">Write to an NFC sticker</string>
+    <string name="nfc_hold">Hold an NFC sticker to the back of your phone. Touching it later will run this shortcut.</string>
+    <string name="nfc_written">Done! Touch the sticker and %1$s will run.</string>
+    <string name="nfc_read_only">That sticker is locked and can\'t be written. Try another one.</string>
+    <string name="nfc_too_small">That sticker is too small. Try another one.</string>
+    <string name="nfc_failed">Couldn\'t write it. Keep the sticker still on the back of the phone and try again.</string>
+    <string name="nfc_off">Turn on NFC in your phone\'s settings, then come back.</string>
     <string name="tab_assistant">Assistant</string>
     <string name="tab_settings">Settings</string>
     <string name="greeting_morning">Good morning 👋</string>
@@ -27,8 +48,8 @@
     <string name="hero_title">Create an app</string>
     <string name="hero_desc">Describe it with words, voice or a photo and watch it being written live.</string>
     <string name="hero_button">Start</string>
-    <string name="section_feature">Functionality</string>
-    <string name="section_feature_desc">Mini-apps that use your phone</string>
+    <string name="section_feature">Shortcuts</string>
+    <string name="section_feature_desc">Tell your phone what to do</string>
     <string name="section_control">Control phone</string>
     <string name="section_control_desc">Ask and Acornix does it</string>
     <string name="section_apps">My apps</string>
@@ -65,9 +86,9 @@
     <string name="tool_help_desc">How to get the most out of Acornix</string>
     <string name="filter_all">All</string>
     <string name="filter_apps">Apps</string>
-    <string name="filter_features">Functionalities</string>
+    <string name="filter_features">Shortcuts</string>
     <string name="filter_samples">Samples</string>
-    <string name="kind_feature">Functionality</string>
+    <string name="kind_feature">Shortcut</string>
     <string name="kind_sample">Sample</string>
     <string name="new_app">New app</string>
     <string name="search_apps">Search your apps</string>
@@ -101,11 +122,11 @@
     <string name="send">Send</string>
     <string name="back">Back</string>
     <string name="create_app_title">Create app</string>
-    <string name="create_feature_title">Create functionality</string>
+    <string name="create_feature_title">Create a shortcut</string>
     <string name="improve_title">Improve %1$s</string>
     <string name="improve_subtitle">Tell me what to change. A new version will be saved.</string>
     <string name="create_app_intro">Describe the app or game you imagine. The more detail, the better.</string>
-    <string name="create_feature_intro">A functionality is a mini-app that can use your phone: vibration, flashlight, battery, voice, notifications and even the AI.</string>
+    <string name="create_feature_intro">A shortcut makes your phone do things: turn on the flashlight, set alarms, change the volume, send a WhatsApp, speak, vibrate… Once created it works without AI, with one tap.</string>
     <string name="field_name_optional">Name (optional)</string>
     <string name="field_idea">What should it do?</string>
     <string name="field_idea_hint">A space shooter with touch controls, levels and a high score…</string>
@@ -250,7 +271,7 @@
     <string name="onb_welcome_title">Welcome to Acornix</string>
     <string name="onb_welcome_text">Your AI that creates apps and controls your phone.</string>
     <string name="onb_feature_create">Create apps and games by describing them</string>
-    <string name="onb_feature_feature">Functionalities that use your phone\'s hardware</string>
+    <string name="onb_feature_feature">Shortcuts that make your phone do things for you</string>
     <string name="onb_feature_control">An assistant that does things for you</string>
     <string name="onb_feature_apps">Your apps on the home screen, like real ones</string>
     <string name="onb_ai_title">Connect your AI</string>
@@ -356,8 +377,8 @@
     <string name="studio_save">Save and open</string>
     <string name="help_create_title">Create apps</string>
     <string name="help_create_text">Describe what you want (or dictate it, or attach a photo). Acornix writes a full web app live and you can try it straight away. Then apply the suggested improvement or ask for your own changes: every change is a new version.</string>
-    <string name="help_feature_title">Functionalities</string>
-    <string name="help_feature_text">They replace the Python plugins of the Termux version. They are apps that can use window.Acornix to vibrate, turn on the flashlight, speak, read the battery, send notifications or ask the AI.</string>
+    <string name="help_feature_title">Shortcuts</string>
+    <string name="help_feature_text">Shortcuts for Android: apps that make your phone do things through window.Acornix (flashlight, alarms, volume, music, messages, voice, notifications…). Some show a screen and some run with one tap and close. Put them on your home screen or on an NFC sticker.</string>
     <string name="help_assistant_title">The assistant</string>
     <string name="help_assistant_text">Ask for anything in natural language: “turn on the flashlight in SOS”, “search Nirvana videos on YouTube”, “set an alarm at 7”, “create a piano and open it”. You\'ll see each step it takes and can stop it at any time.</string>
     <string name="help_control_title">Total control</string>
@@ -489,14 +510,14 @@
     <string name="tour_apps_title">Like real apps</string>
     <string name="tour_apps_text">Your creations open full screen, keep their data and every version, and can go on your home screen with their own icon.</string>
     <string name="tour_apps_button">Open My apps</string>
-    <string name="tour_feature_title">Apps that use your phone</string>
-    <string name="tour_feature_text">Functionalities can turn on the flashlight, vibrate, speak out loud, send notifications and even ask your AI.</string>
+    <string name="tour_feature_title">Shortcuts for your phone</string>
+    <string name="tour_feature_text">Like iPhone Shortcuts, but you create them by just saying what you want: turn on the flashlight, set an alarm, go silent, send a WhatsApp… and they work without AI.</string>
     <string-array name="tour_feature_examples">
         <item>A workout coach that talks</item>
         <item>Morse code with the flashlight</item>
         <item>A translator that reads aloud</item>
     </string-array>
-    <string name="tour_feature_button">Try it: create a functionality</string>
+    <string name="tour_feature_button">Try it: create a shortcut</string>
     <string name="tour_ai_title">Apps with their own AI</string>
     <string name="tour_ai_text">Your apps can use your AI too: understand a photo from the camera, write, translate, invent stories or answer questions.</string>
     <string-array name="tour_ai_examples">

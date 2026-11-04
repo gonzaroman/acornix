@@ -77,9 +77,11 @@ Made something cool? Tap **Share** and Acornix builds a card with **your app run
 
 **Explore** apps and games other people made with Acornix: search them, filter by category or by whether they need your AI, see the request that created each one, **try them without installing**, install them with one tap or **remix** them with your own AI. Every app is reviewed before it's published, shows what it uses (your AI, the camera, the internet…) and gets updates from its author. Home suggests a new mix of them every time you open Acornix. They live in [acornix-apps](https://github.com/gonzaroman/acornix-apps), under the MIT license.
 
-### 🧬 Functionalities: apps that use your phone
+### ⚡ Shortcuts for Android
 
-Functionalities are apps that talk to your device through a built-in JavaScript bridge, `window.Acornix`. They can vibrate, switch the flashlight on, speak out loud, read the battery, send notifications, share, copy, open other apps and even **ask the AI** from inside the app. Some examples: a big SOS button, a battery dashboard, a pocket translator that speaks, a Pomodoro timer that vibrates.
+Like iPhone Shortcuts, but you create them by saying what you want: *"bedtime mode: silent, low brightness and an alarm at 7"*, *"send my location to Mum on WhatsApp"*, *"car mode: volume up and my playlist"*. The AI writes the shortcut once; after that it runs with **one tap and no AI at all**. Shortcuts have their own tab, and you can put each one on your home screen or **write it to an NFC sticker**: touch the sticker and it runs.
+
+They can set alarms and timers, change the volume, go silent or turn on Do not disturb, change the brightness, play or skip music, open WhatsApp, SMS, calls, Maps or any app, add calendar events, use your location, the flashlight, vibration and voice, send notifications and even ask your AI. Ready-made shortcuts are waiting in the community gallery.
 
 ### 🤖 An AI assistant that gets things done
 
@@ -242,6 +244,19 @@ const { level, charging } = await Acornix.battery();
 const info = await Acornix.deviceInfo();
 await Acornix.share('Look what I made');
 await Acornix.openUrl('https://example.com');
+// Shortcuts
+await Acornix.alarm(7, 30, 'Wake up');      // and Acornix.timer(seconds, label) — in the phone's clock app
+await Acornix.volume(80, 'media');          // 'media', 'ring' or 'alarm'; Acornix.volume() reads it
+await Acornix.ringer('silent');             // 'normal', 'vibrate'; Acornix.doNotDisturb(true)
+await Acornix.brightness(20);               // 0-100
+await Acornix.media('next');                // 'play', 'pause', 'toggle', 'previous': whatever music app is playing
+await Acornix.whatsapp('+34600000000', "I'm home"); // Acornix.sms(number, text), Acornix.call(number)
+await Acornix.maps('Plaza Mayor, Madrid');  // Acornix.launchApp('Spotify')
+await Acornix.calendar({ title: 'Dentist', start: new Date('2026-12-01T10:00'), end: new Date('2026-12-01T11:00') });
+const text = await Acornix.clipboard();
+await Acornix.keepAwake(true);              // screen stays on while the app is open
+Acornix.trigger;                            // 'tap', 'home' (home screen icon) or 'nfc' (NFC sticker)
+await Acornix.done('Bedtime mode on');      // shows "✓ Bedtime mode on" and closes the shortcut
 
 // Your AI, inside the app (the user's own model and key)
 const fact = await Acornix.askAI('Give me a fun fact about acorns');

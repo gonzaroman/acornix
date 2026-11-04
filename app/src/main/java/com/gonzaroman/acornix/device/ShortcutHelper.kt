@@ -29,7 +29,7 @@ object ShortcutHelper {
             .setShortLabel(app.name.take(24))
             .setLongLabel(app.name)
             .setIcon(IconCompat.createWithAdaptiveBitmap(iconBitmap(app, repo)))
-            .setIntent(AppLauncher.intent(context, app.id))
+            .setIntent(AppLauncher.intent(context, app.id, "home"))
             .build()
         return ShortcutManagerCompat.requestPinShortcut(context, info, null)
     }

@@ -28,6 +28,15 @@ class PublisherTest {
     }
 
     @Test
+    fun descriptionsInBothLanguages() {
+        assertEquals(mapOf("es" to "Suelta frutas", "en" to "Drop fruits"),
+            Publisher.parseDescriptions("Sure!\n```json\n{\"es\": \"Suelta frutas\", \"en\": \"Drop fruits\"}\n```"))
+        assertEquals(mapOf("en" to "Drop fruits"), Publisher.parseDescriptions("{\"es\": \"\", \"en\": \"Drop fruits\", \"fr\": \"x\"}"))
+        assertEquals(emptyMap<String, String>(), Publisher.parseDescriptions("no json here"))
+        assertEquals(emptyMap<String, String>(), Publisher.parseDescriptions("{\"es\": 3}"))
+    }
+
+    @Test
     fun languageFromTheHtmlTag() {
         assertEquals("en", Publisher.languageOf("<!doctype html>\n<html lang=\"en-GB\">"))
         assertEquals("es", Publisher.languageOf("<HTML class='x' LANG='ES'>"))

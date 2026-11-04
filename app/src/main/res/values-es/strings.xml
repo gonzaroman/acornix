@@ -16,6 +16,27 @@
     <string name="app_not_found">Esta app ya no existe</string>
     <string name="tab_home">Inicio</string>
     <string name="tab_apps">Mis Apps</string>
+    <string name="tab_shortcuts">Atajos</string>
+    <string name="shortcuts_subtitle">Atajos para Android: dile a tu móvil qué hacer y lo hará con un toque.</string>
+    <string name="shortcuts_new">Nuevo atajo</string>
+    <string name="shortcuts_mine">Mis atajos</string>
+    <string name="shortcuts_discover">Atajos listos para usar</string>
+    <string name="shortcuts_see_all">Ver todos</string>
+    <string name="shortcuts_empty_title">Tu primer atajo</string>
+    <string name="shortcuts_empty_text">Di qué quieres que haga tu móvil. Se crea una vez y luego funciona con un toque, sin IA. Prueba uno de estos:</string>
+    <string-array name="shortcuts_examples">
+        <item>Modo dormir: silencio, brillo bajo y alarma a las 7:00</item>
+        <item>SOS: mandar mi ubicación por WhatsApp y hacer parpadear la linterna</item>
+        <item>Dónde aparqué: guardar el sitio y llevarme de vuelta con Maps</item>
+    </string-array>
+    <string name="shortcut_done">Hecho</string>
+    <string name="action_nfc">Grabar en una pegatina NFC</string>
+    <string name="nfc_hold">Acerca una pegatina NFC a la parte de atrás del móvil. Cuando la toques después, se ejecutará este atajo.</string>
+    <string name="nfc_written">¡Listo! Toca la pegatina y se ejecutará %1$s.</string>
+    <string name="nfc_read_only">Esa pegatina está bloqueada y no se puede grabar. Prueba con otra.</string>
+    <string name="nfc_too_small">Esa pegatina es demasiado pequeña. Prueba con otra.</string>
+    <string name="nfc_failed">No se ha podido grabar. Mantén la pegatina quieta en la parte de atrás del móvil y vuelve a probar.</string>
+    <string name="nfc_off">Activa el NFC en los ajustes del móvil y vuelve aquí.</string>
     <string name="tab_assistant">Asistente</string>
     <string name="tab_settings">Ajustes</string>
     <string name="greeting_morning">Buenos días 👋</string>
@@ -26,8 +47,8 @@
     <string name="hero_title">Crear una app</string>
     <string name="hero_desc">Descríbela con palabras, con la voz o con una foto y mira cómo se escribe en directo.</string>
     <string name="hero_button">Empezar</string>
-    <string name="section_feature">Funcionalidad</string>
-    <string name="section_feature_desc">Mini-apps que usan tu móvil</string>
+    <string name="section_feature">Atajos</string>
+    <string name="section_feature_desc">Dile a tu móvil qué hacer</string>
     <string name="section_control">Controlar el móvil</string>
     <string name="section_control_desc">Pide y Acornix lo hace</string>
     <string name="section_apps">Mis apps</string>
@@ -64,9 +85,9 @@
     <string name="tool_help_desc">Cómo sacarle partido a Acornix</string>
     <string name="filter_all">Todas</string>
     <string name="filter_apps">Apps</string>
-    <string name="filter_features">Funcionalidades</string>
+    <string name="filter_features">Atajos</string>
     <string name="filter_samples">Ejemplos</string>
-    <string name="kind_feature">Funcionalidad</string>
+    <string name="kind_feature">Atajo</string>
     <string name="kind_sample">Ejemplo</string>
     <string name="new_app">Nueva app</string>
     <string name="search_apps">Busca en tus apps</string>
@@ -100,11 +121,11 @@
     <string name="send">Enviar</string>
     <string name="back">Atrás</string>
     <string name="create_app_title">Crear app</string>
-    <string name="create_feature_title">Crear funcionalidad</string>
+    <string name="create_feature_title">Crear un atajo</string>
     <string name="improve_title">Mejorar %1$s</string>
     <string name="improve_subtitle">Dime qué cambiar. Se guardará una versión nueva.</string>
     <string name="create_app_intro">Describe la app o el juego que imaginas. Cuanto más detalle, mejor.</string>
-    <string name="create_feature_intro">Una funcionalidad es una mini-app que puede usar tu móvil: vibración, linterna, batería, voz, notificaciones e incluso la IA.</string>
+    <string name="create_feature_intro">Un atajo hace que tu móvil haga cosas: encender la linterna, poner alarmas, cambiar el volumen, mandar un WhatsApp, hablar, vibrar… Una vez creado funciona sin IA, con un toque.</string>
     <string name="field_name_optional">Nombre (opcional)</string>
     <string name="field_idea">¿Qué debe hacer?</string>
     <string name="field_idea_hint">Un juego de naves con controles táctiles, niveles y récord…</string>
@@ -249,7 +270,7 @@
     <string name="onb_welcome_title">Bienvenido a Acornix</string>
     <string name="onb_welcome_text">Tu IA que crea apps y controla tu móvil.</string>
     <string name="onb_feature_create">Crea apps y juegos describiéndolos</string>
-    <string name="onb_feature_feature">Funcionalidades que usan el hardware del móvil</string>
+    <string name="onb_feature_feature">Atajos que hacen que tu móvil haga cosas por ti</string>
     <string name="onb_feature_control">Un asistente que hace cosas por ti</string>
     <string name="onb_feature_apps">Tus apps en el escritorio, como si fueran de verdad</string>
     <string name="onb_ai_title">Conecta tu IA</string>
@@ -355,8 +376,8 @@
     <string name="studio_save">Guardar y abrir</string>
     <string name="help_create_title">Crear apps</string>
     <string name="help_create_text">Describe lo que quieres (o díctalo, o adjunta una foto). Acornix escribe una web app completa en directo y la puedes probar al momento. Después aplica la mejora sugerida o pide tus propios cambios: cada cambio es una versión nueva.</string>
-    <string name="help_feature_title">Funcionalidades</string>
-    <string name="help_feature_text">Sustituyen a los plugins de Python de la versión de Termux. Son apps que pueden usar window.Acornix para vibrar, encender la linterna, hablar, leer la batería, enviar notificaciones o preguntar a la IA.</string>
+    <string name="help_feature_title">Atajos</string>
+    <string name="help_feature_text">Atajos para Android: apps que hacen que tu móvil haga cosas con window.Acornix (linterna, alarmas, volumen, música, mensajes, voz, notificaciones…). Unos muestran una pantalla y otros se ejecutan con un toque y se cierran. Ponlos en la pantalla de inicio o en una pegatina NFC.</string>
     <string name="help_assistant_title">El asistente</string>
     <string name="help_assistant_text">Pide lo que sea en lenguaje natural: «linterna en SOS», «busca vídeos de Nirvana en YouTube», «pon una alarma a las 7», «crea un piano y ábrelo». Verás cada paso que da y puedes detenerlo cuando quieras.</string>
     <string name="help_control_title">Control total</string>
@@ -488,14 +509,14 @@
     <string name="tour_apps_title">Como apps de verdad</string>
     <string name="tour_apps_text">Lo que creas se abre a pantalla completa, guarda sus datos y todas sus versiones, y puede ir a tu pantalla de inicio con su propio icono.</string>
     <string name="tour_apps_button">Abrir Mis apps</string>
-    <string name="tour_feature_title">Apps que usan tu móvil</string>
-    <string name="tour_feature_text">Las funcionalidades pueden encender la linterna, vibrar, hablar en voz alta, mandar notificaciones e incluso preguntar a tu IA.</string>
+    <string name="tour_feature_title">Atajos para tu móvil</string>
+    <string name="tour_feature_text">Como los Atajos de iPhone, pero los creas diciendo lo que quieres: encender la linterna, poner una alarma, silenciar el móvil, mandar un WhatsApp… y funcionan sin IA.</string>
     <string-array name="tour_feature_examples">
         <item>Un entrenador que habla</item>
         <item>Código Morse con la linterna</item>
         <item>Un traductor que lee en voz alta</item>
     </string-array>
-    <string name="tour_feature_button">Probar: crear una funcionalidad</string>
+    <string name="tour_feature_button">Probar: crear un atajo</string>
     <string name="tour_ai_title">Apps con su propia IA</string>
     <string name="tour_ai_text">Tus apps también pueden usar tu IA: entender una foto de la cámara, escribir, traducir, inventar cuentos o responder preguntas.</string>
     <string-array name="tour_ai_examples">

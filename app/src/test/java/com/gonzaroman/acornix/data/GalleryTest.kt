@@ -49,6 +49,11 @@ class GalleryTest {
     }
 
     @Test
+    fun shortcutsFilterShowsAppsThatUseThePhone() {
+        assertEquals(listOf("bowling"), Gallery.search(catalog.apps, "", Gallery.SHORTCUTS).map { it.id })
+    }
+
+    @Test
     fun sortOrders() {
         fun ids(sort: Gallery.Companion.Sort) = Gallery.sorted(catalog.apps, sort).map { it.id }
         assertEquals(listOf("bowling", "chef", "notes"), ids(Gallery.Companion.Sort.POPULAR))

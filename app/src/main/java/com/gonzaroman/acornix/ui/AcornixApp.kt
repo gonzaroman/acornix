@@ -11,10 +11,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AutoAwesome
+import androidx.compose.material.icons.outlined.Bolt
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Widgets
 import androidx.compose.material.icons.rounded.AutoAwesome
+import androidx.compose.material.icons.rounded.Bolt
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Widgets
@@ -50,6 +52,7 @@ import com.gonzaroman.acornix.ui.explore.GalleryAppScreen
 import com.gonzaroman.acornix.ui.explore.PublishScreen
 import com.gonzaroman.acornix.ui.home.HomeScreen
 import com.gonzaroman.acornix.ui.onboarding.OnboardingScreen
+import com.gonzaroman.acornix.ui.shortcuts.ShortcutsScreen
 import com.gonzaroman.acornix.ui.onboarding.CommunityTourScreen
 import com.gonzaroman.acornix.ui.onboarding.TourScreen
 import com.gonzaroman.acornix.web.AcornixOsActivity
@@ -82,6 +85,8 @@ object Routes {
     const val DATA = "data/{id}"
     const val SHARE = "share/{id}"
     const val EXPLORE = "explore"
+    const val EXPLORE_ROUTE = "explore?cat={cat}"
+    const val SHORTCUTS = "shortcuts"
     const val COMMUNITY_TOUR = "community_tour"
     const val GALLERY_APP = "gallery/{id}"
     const val PUBLISH = "publish/{id}"
@@ -96,6 +101,7 @@ object Routes {
     fun data(appId: String) = "data/${Uri.encode(appId)}"
     fun share(appId: String) = "share/${Uri.encode(appId)}"
     fun galleryApp(id: String) = "gallery/${Uri.encode(id)}"
+    fun explore(category: String) = "explore?cat=${Uri.encode(category)}"
     fun publish(appId: String) = "publish/${Uri.encode(appId)}"
 }
 
@@ -103,6 +109,7 @@ private data class Tab(val route: String, val base: String, val label: Int, val 
 
 private val TABS = listOf(
     Tab(Routes.HOME, "home", R.string.tab_home, Icons.Outlined.Home, Icons.Rounded.Home),
+    Tab(Routes.SHORTCUTS, "shortcuts", R.string.tab_shortcuts, Icons.Outlined.Bolt, Icons.Rounded.Bolt),
     Tab(Routes.APPS, "apps", R.string.tab_apps, Icons.Outlined.Widgets, Icons.Rounded.Widgets),
     Tab(Routes.assistant(), "assistant", R.string.tab_assistant, Icons.Outlined.AutoAwesome, Icons.Rounded.AutoAwesome),
     Tab(Routes.SETTINGS, "settings", R.string.tab_settings, Icons.Outlined.Settings, Icons.Rounded.Settings),
@@ -195,6 +202,7 @@ fun AcornixApp(
                 }
                 composable(Routes.HOME) { HomeScreen(nav) }
                 composable(Routes.APPS) { AppsScreen(nav) }
+                composable(Routes.SHORTCUTS) { ShortcutsScreen(nav) }
                 composable(
                     Routes.ASSISTANT,
                     arguments = listOf(
@@ -237,7 +245,10 @@ fun AcornixApp(
                 composable(Routes.HELP) { HelpScreen(nav) }
                 composable(Routes.CONTROL_HELP) { ControlHelpScreen(nav) }
                 composable(Routes.STUDIO) { StudioScreen(nav) }
-                composable(Routes.EXPLORE) { ExploreScreen(nav) }
+                composable(
+                    Routes.EXPLORE_ROUTE,
+                    arguments = listOf(navArgument("cat") { type = NavType.StringType; nullable = true; defaultValue = null }),
+                ) { entry -> ExploreScreen(nav, entry.arguments?.getString("cat")) }
                 composable(Routes.COMMUNITY_TOUR) {
                     CommunityTourScreen(
                         onClose = { nav.popBackStack() },

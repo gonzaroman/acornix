@@ -244,11 +244,14 @@ class Gallery(
         /** Apps that use the user's AI only work for people who set one up, so they can be told apart. */
         enum class Ai { ANY, WITH, WITHOUT }
 
-        /** [category] is a category id, or null for all. */
+        /** The gallery filter for shortcuts (apps that use the phone), next to the real categories. */
+        const val SHORTCUTS = "shortcuts"
+
+        /** [category] is a category id, [SHORTCUTS], or null for all. */
         fun search(apps: List<GalleryApp>, query: String, category: String?, sort: Sort = Sort.POPULAR, ai: Ai = Ai.ANY): List<GalleryApp> {
             val words = query.trim().lowercase().split(Regex("\\s+")).filter { it.isNotEmpty() }
             return sorted(apps, sort).filter { app ->
-                (category == null || app.category == category) &&
+                (category == null || app.category == category || (category == SHORTCUTS && "phone" in app.tags)) &&
                     (ai == Ai.ANY || ("ai" in app.tags) == (ai == Ai.WITH)) &&
                     words.all { w -> (listOfNotNull(app.name, app.description, app.prompt, app.author, "acornix".takeIf { app.official }) + app.descriptionI18n.values).any { it.lowercase().contains(w) } }
             }

@@ -32,6 +32,7 @@ import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.DriveFileRenameOutline
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.Nfc
 import androidx.compose.material.icons.rounded.Public
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Share
@@ -69,7 +70,9 @@ import com.gonzaroman.acornix.R
 import com.gonzaroman.acornix.container
 import com.gonzaroman.acornix.data.AppKind
 import com.gonzaroman.acornix.data.AppMeta
+import com.gonzaroman.acornix.device.NfcStickers
 import com.gonzaroman.acornix.device.ShortcutHelper
+import com.gonzaroman.acornix.ui.shortcuts.NfcWriteDialog
 import com.gonzaroman.acornix.ui.Routes
 import com.gonzaroman.acornix.ui.components.AppCard
 import com.gonzaroman.acornix.ui.components.AppIcon
@@ -173,6 +176,7 @@ fun AppActionsSheet(app: AppMeta, nav: NavHostController, onDismiss: () -> Unit)
     var renaming by remember { mutableStateOf(false) }
     var deleting by remember { mutableStateOf(false) }
     var askData by remember { mutableStateOf(false) }
+    var writingNfc by remember { mutableStateOf(false) }
 
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Row(Modifier.padding(horizontal = 24.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -197,6 +201,9 @@ fun AppActionsSheet(app: AppMeta, nav: NavHostController, onDismiss: () -> Unit)
             val ok = ShortcutHelper.pin(context, app, c.apps)
             if (!ok) Toast.makeText(context, R.string.pin_unsupported, Toast.LENGTH_SHORT).show()
             onDismiss()
+        }
+        if (app.kind == AppKind.FEATURE && NfcStickers.isSupported(context)) {
+            SheetAction(Icons.Rounded.Nfc, stringResource(R.string.action_nfc)) { writingNfc = true }
         }
         SheetAction(Icons.Rounded.Share, stringResource(R.string.action_share_social)) { onDismiss(); nav.navigate(Routes.share(app.id)) }
         SheetAction(Icons.Rounded.Public, stringResource(R.string.action_publish)) { onDismiss(); nav.navigate(Routes.publish(app.id)) }
@@ -228,6 +235,8 @@ fun AppActionsSheet(app: AppMeta, nav: NavHostController, onDismiss: () -> Unit)
         SheetAction(Icons.Rounded.Delete, stringResource(R.string.action_delete), MaterialTheme.colorScheme.error) { deleting = true }
         Spacer(Modifier.windowInsetsPadding(WindowInsets.navigationBars).height(16.dp))
     }
+
+    if (writingNfc) NfcWriteDialog(app) { writingNfc = false; onDismiss() }
 
     if (askData) {
         IncludeDataDialog(

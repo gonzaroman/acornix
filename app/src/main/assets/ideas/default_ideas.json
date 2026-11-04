@@ -48,8 +48,7 @@
         {"emoji": "😴", "title": "Sleep Diary", "prompt": "Log when you went to bed, woke up and how you felt, and see your sleep on a beautiful weekly chart with your average and best nights."},
         {"emoji": "🍎", "title": "Rainbow Plate", "prompt": "Track how many colors of fruit and vegetables you eat each day by tapping colored circles, with a weekly rainbow that fills up."},
         {"emoji": "🚶", "title": "Walk Challenge Map", "prompt": "Turn your daily walks into a journey along a famous route: log your kilometers and watch your marker move along the map with milestones."}
-      ]
-      ,
+      ],
       "5": [
         {"emoji": "🎨", "title": "Pixel Art Studio", "prompt": "A pixel art editor with a 32×32 canvas, a color palette, a fill bucket and a mirror mode, that saves your drawings in a gallery and exports them as PNG."},
         {"emoji": "✨", "title": "Glow Writing", "prompt": "Write or draw with your finger and the strokes glow and slowly fade like light painting in the dark, with colors and brush sizes to choose from."},
@@ -69,12 +68,12 @@
     },
     "feature": {
       "": [
-        {"emoji": "🏋️", "title": "Talking Workout Coach", "prompt": "A 3-minute workout coach with a big countdown ring that says each exercise out loud, counts down the last seconds by voice and vibrates when switching to the next one."},
-        {"emoji": "🔦", "title": "Morse Flashlight", "prompt": "Type a message and the flashlight blinks it in Morse code while the screen shows each letter as it's sent, with a big SOS button."},
-        {"emoji": "🗣️", "title": "Pocket Translator", "prompt": "Type a sentence, choose a language and the AI translates it and reads it out loud, keeping a history of your translations."},
-        {"emoji": "🔋", "title": "Battery Coach", "prompt": "A battery dashboard with the level, temperature and charging state, a chart over time and a notification when it reaches the level you choose."},
-        {"emoji": "🔮", "title": "Talking Oracle", "prompt": "Ask a question, tap the glowing crystal ball and a mysterious oracle answers out loud with a vibration, using the AI for witty answers."},
-        {"emoji": "⏰", "title": "Focus Sprints", "prompt": "A 25-minute focus timer that notifies you and vibrates when each sprint ends, and reads a short motivating phrase out loud."}
+        {"emoji": "😴", "title": "Bedtime mode", "prompt": "Bedtime mode: when tapped it turns on Do not disturb, sets the brightness to 10%, lowers the media volume, sets an alarm at the time I choose the first time and says \"Good night\". Then it closes."},
+        {"emoji": "🆘", "title": "SOS with my location", "prompt": "SOS: when tapped it gets my location and opens WhatsApp with a help message and the Google Maps link for the contact I choose the first time, and flashes the flashlight in SOS."},
+        {"emoji": "🚗", "title": "Where I parked", "prompt": "Where I parked: one button saves the car's location with the time, and another takes me back by opening Maps with walking directions."},
+        {"emoji": "🏠", "title": "I'm home", "prompt": "I'm home: when tapped it opens WhatsApp with the message \"I got home safe 🏠\" and my location for the person I choose the first time, then closes."},
+        {"emoji": "💼", "title": "Meeting mode", "prompt": "Meeting mode: sets the phone to vibrate and turns on Do not disturb for the time I choose (30, 60 or 90 minutes) with a countdown, and puts everything back when it ends."},
+        {"emoji": "🎧", "title": "Music mode", "prompt": "Music mode: turns the media volume up to 70%, opens Spotify and presses play, and says \"Enjoy!\"."}
       ]
     }
   },
@@ -147,12 +146,12 @@
     },
     "feature": {
       "": [
-        {"emoji": "🏋️", "title": "Entrenador que habla", "prompt": "Un entrenador de 3 minutos con un gran anillo de cuenta atrás que dice cada ejercicio en voz alta, cuenta los últimos segundos con la voz y vibra al pasar al siguiente."},
-        {"emoji": "🔦", "title": "Linterna Morse", "prompt": "Escribe un mensaje y la linterna lo emite en código Morse mientras la pantalla muestra cada letra según se envía, con un botón grande de SOS."},
-        {"emoji": "🗣️", "title": "Traductor de bolsillo", "prompt": "Escribe una frase, elige un idioma y la IA la traduce y la lee en voz alta, guardando un historial de tus traducciones."},
-        {"emoji": "🔋", "title": "Entrenador de batería", "prompt": "Un panel de batería con el nivel, la temperatura y si está cargando, un gráfico en el tiempo y una notificación cuando llega al nivel que elijas."},
-        {"emoji": "🔮", "title": "Oráculo que habla", "prompt": "Haz una pregunta, toca la bola de cristal brillante y un oráculo misterioso responde en voz alta con una vibración, usando la IA para dar respuestas ingeniosas."},
-        {"emoji": "⏰", "title": "Sprints de concentración", "prompt": "Un temporizador de concentración de 25 minutos que te avisa con una notificación y una vibración al acabar cada sprint y lee en voz alta una frase motivadora."}
+        {"emoji": "😴", "title": "Modo dormir", "prompt": "Modo dormir: al tocarlo activa No molestar, pone el brillo al 10 %, baja el volumen multimedia, pone una alarma a la hora que elija la primera vez y dice «Buenas noches». Luego se cierra."},
+        {"emoji": "🆘", "title": "SOS con mi ubicación", "prompt": "SOS: al tocarlo coge mi ubicación y abre WhatsApp con un mensaje de ayuda y el enlace de Google Maps para el contacto que elija la primera vez, y hace parpadear la linterna en SOS."},
+        {"emoji": "🚗", "title": "Dónde aparqué", "prompt": "Dónde aparqué: un botón guarda la ubicación del coche con la hora, y otro me lleva de vuelta abriendo Maps con la ruta a pie."},
+        {"emoji": "🏠", "title": "He llegado", "prompt": "He llegado: al tocarlo abre WhatsApp con el mensaje «He llegado bien 🏠» y mi ubicación para la persona que elija la primera vez, y se cierra."},
+        {"emoji": "💼", "title": "Modo reunión", "prompt": "Modo reunión: pone el móvil en vibración, activa No molestar durante el tiempo que elija (30, 60 o 90 minutos) con una cuenta atrás, y al terminar lo deja todo como estaba."},
+        {"emoji": "🎧", "title": "Modo música", "prompt": "Modo música: sube el volumen multimedia al 70 %, abre Spotify y le da a reproducir, y dice «¡A disfrutar!»."}
       ]
     }
   }

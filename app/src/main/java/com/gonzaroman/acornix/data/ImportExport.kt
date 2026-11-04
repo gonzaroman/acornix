@@ -97,7 +97,8 @@ class ImportExport(
         val prefix = appRoot(entries)
         val id = repo.uniqueId(name)
         writeEntries(id, entries, prefix)
-        val meta = repo.adopt(id, name, AppKind.APP)
+        val code = entries["${prefix}${AppRepository.INDEX}"]?.let { String(it) }.orEmpty()
+        val meta = repo.adopt(id, name, if (AppRepository.usesPhone(code)) AppKind.FEATURE else AppKind.APP)
         // Data exported together with the app (a shared game save, a list…).
         entries["${prefix}$DATA_FILE"]?.let { bytes ->
             runCatching { AiJsonLite.parseToJsonElement(String(bytes)).jsonObject }.getOrNull()

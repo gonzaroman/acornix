@@ -34,14 +34,27 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.longOrNull
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.doubleOrNull
+import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.put
 import java.security.MessageDigest
 
+/** An activity that can end a shortcut: Acornix.done() shows "✓ …" and closes it. */
+interface ShortcutHost {
+    fun shortcutDone(message: String?)
+}
+
 object AppLauncher {
-    fun intent(context: Context, appId: String): Intent =
+    /** [trigger] says what opened it ("tap", "home", "nfc"…); apps read it as Acornix.trigger. */
+    fun intent(context: Context, appId: String, trigger: String = "tap"): Intent =
         Intent(context, AppRunnerActivity::class.java)
             .setAction(Intent.ACTION_VIEW)
-            .setData(Uri.parse("acornix://app/${Uri.encode(appId)}"))
+            .setData(Uri.parse("acornix://app/${Uri.encode(appId)}?trigger=${Uri.encode(trigger)}"))
+
+    /** The link an NFC sticker holds to open a shortcut. */
+    fun link(appId: String): String = "acornix://app/${Uri.encode(appId)}"
 
     fun open(context: Context, appId: String) {
         context.startActivity(intent(context, appId).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
@@ -78,6 +91,8 @@ object AcornixWebView {
         context: Context,
         scope: CoroutineScope,
         appId: String,
+        /** What opened the app ("tap", "nfc", "home"…), for Acornix.trigger. */
+        trigger: String = "tap",
         onPageFinished: () -> Unit = {},
     ) {
         val c = context.container
@@ -124,7 +139,7 @@ object AcornixWebView {
 
             override fun onPageStarted(view: WebView, url: String?, favicon: android.graphics.Bitmap?) {
                 if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT) && url?.startsWith(origin(appId)) == true) {
-                    view.evaluateJavascript(AcornixJsBridge.script(context), null)
+                    view.evaluateJavascript(AcornixJsBridge.script(context, trigger), null)
                 }
             }
 
@@ -138,7 +153,7 @@ object AcornixWebView {
                 }
             }
         }
-        AcornixJsBridge(context, scope, appId).attach(webView)
+        AcornixJsBridge(context, scope, appId, trigger).attach(webView)
 
         // When someone else (the assistant, the Data screen) changes this app's data, tell the page.
         scope.launch {
@@ -159,6 +174,7 @@ class AcornixJsBridge(
     private val context: Context,
     private val scope: CoroutineScope,
     private val appId: String,
+    private val trigger: String = "tap",
 ) {
     private val origin = AcornixWebView.origin(appId)
 
@@ -191,7 +207,7 @@ class AcornixJsBridge(
             }
         }
         if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
-            WebViewCompat.addDocumentStartJavaScript(webView, script(context), setOf(origin))
+            WebViewCompat.addDocumentStartJavaScript(webView, script(context, trigger), setOf(origin))
         }
     }
 
@@ -214,6 +230,7 @@ class AcornixJsBridge(
         val device = c.device
         fun arg(i: Int): JsonElement? = args.getOrNull(i)?.takeIf { it !is JsonNull }
         fun str(i: Int) = (arg(i) as? JsonPrimitive)?.content
+        fun int(i: Int) = (arg(i) as? JsonPrimitive)?.let { it.intOrNull ?: it.doubleOrNull?.toInt() }
         fun obj(i: Int) = arg(i) as? JsonObject ?: throw IllegalArgumentException("Argument ${i + 1} must be an object")
         fun req(i: Int, what: String) = str(i)?.takeIf { it.isNotEmpty() } ?: throw IllegalArgumentException("$what is required")
         val data = c.data
@@ -316,6 +333,55 @@ class AcornixJsBridge(
                     ?: throw IllegalArgumentException("App not found: $q")
                 AppLauncher.open(context, app.id); JsonPrimitive(true)
             }
+            // Shortcuts: what the phone does for you.
+            "alarm" -> JsonPrimitive(device.setAlarm(int(0) ?: 7, int(1) ?: 0, str(2)))
+            "timer" -> JsonPrimitive(device.setTimer((int(0) ?: 60).coerceAtLeast(1), str(1)))
+            "call" -> JsonPrimitive(device.dial(str(0).orEmpty()))
+            "sms" -> JsonPrimitive(device.composeSms(str(0).orEmpty(), str(1).orEmpty()))
+            "whatsapp" -> JsonPrimitive(device.whatsapp(str(0), str(1).orEmpty()))
+            "maps" -> JsonPrimitive(device.openMaps(str(0).orEmpty()))
+            "launchApp" -> JsonPrimitive(device.openApp(str(0).orEmpty()) != null)
+            "volume" -> {
+                val level = int(0)
+                if (level != null) JsonPrimitive(device.setVolume(level, str(1))) else JsonPrimitive(device.volume(str(1)))
+            }
+            "ringer" -> JsonPrimitive(device.setRinger(str(0) ?: "normal"))
+            "doNotDisturb" -> JsonPrimitive(device.setDoNotDisturb((arg(0) as? JsonPrimitive)?.booleanOrNull ?: true))
+            "brightness" -> {
+                val level = (int(0) ?: 50).coerceIn(0, 100)
+                // Without permission to change the system's brightness, at least this app's screen changes.
+                val system = device.setSystemBrightness(level)
+                (context as? android.app.Activity)?.let { a ->
+                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                        a.window.attributes = a.window.attributes.apply { screenBrightness = if (system) -1f else level / 100f }
+                    }
+                }
+                JsonPrimitive(system)
+            }
+            "keepAwake" -> {
+                val on = (arg(0) as? JsonPrimitive)?.booleanOrNull ?: true
+                (context as? android.app.Activity)?.let { a ->
+                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                        if (on) a.window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                        else a.window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    }
+                }
+                JsonPrimitive(true)
+            }
+            "media" -> JsonPrimitive(device.mediaKey(str(0) ?: "toggle"))
+            "calendar" -> {
+                val o = arg(0) as? JsonObject ?: throw IllegalArgumentException("calendar needs { title, start, end }")
+                val start = o["start"]?.jsonPrimitive?.longOrNull ?: System.currentTimeMillis()
+                val end = o["end"]?.jsonPrimitive?.longOrNull ?: (start + 3_600_000)
+                JsonPrimitive(device.addCalendarEvent(o["title"]?.jsonPrimitive?.contentOrNull.orEmpty(), start, end, o["location"]?.jsonPrimitive?.contentOrNull))
+            }
+            "clipboard" -> JsonPrimitive(device.clipboardText())
+            "done" -> {
+                val host = context as? ShortcutHost
+                if (host != null) kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) { host.shortcutDone(str(0)) }
+                else device.toast("✓ " + (str(0) ?: ""))
+                JsonPrimitive(true)
+            }
             "askAI" -> {
                 if (!AiPermissionPrompt.ensureConfigured(context, appId)) {
                     throw IllegalStateException("No AI is set up yet. Connect your AI in Acornix › Settings.")
@@ -353,8 +419,10 @@ class AcornixJsBridge(
             }
         }
 
-        /** The shim plus Acornix.language, so apps can show their text in the language picked in Acornix. */
-        fun script(context: Context): String = SHIM + "\nif (window.Acornix) window.Acornix.language = '" + language(context).filter { it.isLetter() }.take(8) + "';"
+        /** The shim plus Acornix.language (to show the app in the language picked in Acornix) and Acornix.trigger. */
+        fun script(context: Context, trigger: String = "tap"): String = SHIM +
+            "\nif (window.Acornix) { window.Acornix.language = '" + language(context).filter { it.isLetter() }.take(8) + "';" +
+            " window.Acornix.trigger = '" + trigger.filter { it.isLetterOrDigit() }.take(16) + "'; }"
 
         /** Injected before any page script runs; builds the Promise-based API on top of AcornixNative. */
         val SHIM = """
@@ -440,6 +508,28 @@ class AcornixJsBridge(
                 deviceInfo: function () { return call('deviceInfo'); },
                 listApps: function () { return call('listApps'); },
                 openApp: function (n) { return call('openApp', [String(n)]); },
+                // Shortcuts
+                alarm: function (h, m, label) { return call('alarm', [h, m || 0, label || null]); },
+                timer: function (sec, label) { return call('timer', [sec, label || null]); },
+                call: function (n) { return call('call', [String(n)]); },
+                sms: function (n, t) { return call('sms', [String(n), String(t || '')]); },
+                whatsapp: function (n, t) { return call('whatsapp', [n ? String(n) : null, String(t || '')]); },
+                maps: function (q) { return call('maps', [String(q)]); },
+                launchApp: function (n) { return call('launchApp', [String(n)]); },
+                volume: function (level, stream) { return call('volume', [level === undefined ? null : level, stream || 'media']); },
+                ringer: function (mode) { return call('ringer', [String(mode)]); },
+                doNotDisturb: function (on) { return call('doNotDisturb', [on !== false]); },
+                brightness: function (level) { return call('brightness', [level]); },
+                keepAwake: function (on) { return call('keepAwake', [on !== false]); },
+                media: function (action) { return call('media', [String(action || 'toggle')]); },
+                calendar: function (ev) {
+                  ev = ev || {};
+                  var t = function (d) { return d instanceof Date ? d.getTime() : (typeof d === 'string' ? Date.parse(d) : d); };
+                  return call('calendar', [{ title: String(ev.title || ''), start: t(ev.start), end: t(ev.end), location: ev.location || null }]);
+                },
+                clipboard: function () { return call('clipboard'); },
+                done: function (msg) { return call('done', [msg ? String(msg) : null]); },
+                trigger: 'tap',
                 askAI: askAI,
                 ai: {
                   // A conversation that remembers its own turns while the app is open (never saved, trimmed by Acornix).

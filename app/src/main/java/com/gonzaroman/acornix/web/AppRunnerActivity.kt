@@ -37,7 +37,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 /** Runs one generated app full screen, in its own task, like a real installed app. */
-class AppRunnerActivity : ComponentActivity() {
+class AppRunnerActivity : ComponentActivity(), ShortcutHost {
 
     private lateinit var webView: WebView
     private var appId: String = ""
@@ -79,7 +79,8 @@ class AppRunnerActivity : ComponentActivity() {
 
         webView = WebView(this)
         webView.webChromeClient = webAccess.chromeClient()
-        AcornixWebView.configure(webView, this, lifecycleScope, appId) { scheduleThumbnail() }
+        val trigger = intent?.data?.getQueryParameter("trigger")?.takeIf { it.isNotBlank() } ?: "tap"
+        AcornixWebView.configure(webView, this, lifecycleScope, appId, trigger) { scheduleThumbnail() }
         val root = FrameLayout(this).apply {
             setBackgroundColor(0xFF000000.toInt())
             addView(webView, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
@@ -213,6 +214,13 @@ class AppRunnerActivity : ComponentActivity() {
             // "Window doesn't have a backing surface": a missing thumbnail must never crash Acornix.
             thumbnailTaken = false
         }
+    }
+
+    /** Acornix.done(): a shortcut finished its job, so say so and get out of the way. */
+    override fun shortcutDone(message: String?) {
+        if (isFinishing) return
+        Toast.makeText(this, "✓ " + (message?.takeIf { it.isNotBlank() } ?: getString(R.string.shortcut_done)), Toast.LENGTH_SHORT).show()
+        finishAndRemoveTask()
     }
 
     private companion object {

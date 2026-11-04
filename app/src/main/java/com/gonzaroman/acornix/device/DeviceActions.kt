@@ -123,6 +123,106 @@ class DeviceActions(private val context: Context) {
     /** Opens the dialer with the number; the user presses call. */
     fun dial(number: String): Boolean = launch(Intent(Intent.ACTION_DIAL, Uri.parse("tel:${Uri.encode(number)}")))
 
+    /** Opens WhatsApp with the message written, to a number (international format) or to pick a chat. */
+    fun whatsapp(number: String?, text: String): Boolean {
+        val digits = number.orEmpty().filter { it.isDigit() }
+        val url = (if (digits.isEmpty()) "https://wa.me/" else "https://wa.me/$digits") + "?text=${enc(text)}"
+        return openUrl(url)
+    }
+
+    /** Opens the calendar app with a new event filled in; the user saves it. Times are epoch milliseconds. */
+    fun addCalendarEvent(title: String, start: Long, end: Long, location: String?): Boolean = launch(
+        Intent(Intent.ACTION_INSERT, android.provider.CalendarContract.Events.CONTENT_URI)
+            .putExtra(android.provider.CalendarContract.Events.TITLE, title)
+            .putExtra(android.provider.CalendarContract.EXTRA_EVENT_BEGIN_TIME, start)
+            .putExtra(android.provider.CalendarContract.EXTRA_EVENT_END_TIME, end)
+            .apply { if (!location.isNullOrBlank()) putExtra(android.provider.CalendarContract.Events.EVENT_LOCATION, location) },
+    )
+
+    // ---------- Sound, screen and music ----------
+
+    private val audio get() = context.getSystemService(Context.AUDIO_SERVICE) as android.media.AudioManager
+
+    private fun stream(name: String?) = when (name?.lowercase()) {
+        "ring", "ringer" -> android.media.AudioManager.STREAM_RING
+        "alarm" -> android.media.AudioManager.STREAM_ALARM
+        "notification" -> android.media.AudioManager.STREAM_NOTIFICATION
+        else -> android.media.AudioManager.STREAM_MUSIC
+    }
+
+    /** Sets a volume from 0 to 100 ("media" by default, or "ring", "alarm", "notification"). */
+    fun setVolume(percent: Int, streamName: String?): Boolean = runCatching {
+        val s = stream(streamName)
+        val max = audio.getStreamMaxVolume(s)
+        audio.setStreamVolume(s, (percent.coerceIn(0, 100) * max + 50) / 100, 0)
+        true
+    }.getOrDefault(false)
+
+    fun volume(streamName: String?): Int = runCatching {
+        val s = stream(streamName)
+        audio.getStreamVolume(s) * 100 / audio.getStreamMaxVolume(s).coerceAtLeast(1)
+    }.getOrDefault(0)
+
+    private val notifications get() = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+    /** Whether Acornix may change Do not disturb (and the silent mode, which needs the same access). */
+    fun canChangeDnd() = notifications.isNotificationPolicyAccessGranted
+
+    /** Opens the settings page where the user lets Acornix change Do not disturb. */
+    fun askDndAccess(): Boolean = launch(Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS))
+
+    /** "normal", "vibrate" or "silent". False without Do not disturb access (silent needs it). */
+    fun setRinger(mode: String): Boolean = runCatching {
+        val m = when (mode.lowercase()) {
+            "silent", "mute" -> android.media.AudioManager.RINGER_MODE_SILENT
+            "vibrate" -> android.media.AudioManager.RINGER_MODE_VIBRATE
+            else -> android.media.AudioManager.RINGER_MODE_NORMAL
+        }
+        if (!canChangeDnd() && m != audio.ringerMode) { askDndAccess(); return false }
+        audio.ringerMode = m
+        true
+    }.getOrDefault(false)
+
+    fun setDoNotDisturb(on: Boolean): Boolean {
+        if (!canChangeDnd()) { askDndAccess(); return false }
+        notifications.setInterruptionFilter(if (on) NotificationManager.INTERRUPTION_FILTER_PRIORITY else NotificationManager.INTERRUPTION_FILTER_ALL)
+        return true
+    }
+
+    /** Sets the system brightness (0-100) when Acornix may change system settings; otherwise opens that permission. */
+    fun setSystemBrightness(percent: Int): Boolean {
+        if (!Settings.System.canWrite(context)) {
+            launch(Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS, Uri.parse("package:${context.packageName}")))
+            return false
+        }
+        return runCatching {
+            Settings.System.putInt(context.contentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL)
+            Settings.System.putInt(context.contentResolver, Settings.System.SCREEN_BRIGHTNESS, (percent.coerceIn(0, 100) * 255 / 100).coerceAtLeast(1))
+            true
+        }.getOrDefault(false)
+    }
+
+    /** Controls whatever music or video app is playing: "play", "pause", "toggle", "next", "previous". */
+    fun mediaKey(action: String): Boolean {
+        val code = when (action.lowercase()) {
+            "play" -> android.view.KeyEvent.KEYCODE_MEDIA_PLAY
+            "pause" -> android.view.KeyEvent.KEYCODE_MEDIA_PAUSE
+            "next" -> android.view.KeyEvent.KEYCODE_MEDIA_NEXT
+            "previous", "prev" -> android.view.KeyEvent.KEYCODE_MEDIA_PREVIOUS
+            "stop" -> android.view.KeyEvent.KEYCODE_MEDIA_STOP
+            else -> android.view.KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
+        }
+        audio.dispatchMediaKeyEvent(android.view.KeyEvent(android.view.KeyEvent.ACTION_DOWN, code))
+        audio.dispatchMediaKeyEvent(android.view.KeyEvent(android.view.KeyEvent.ACTION_UP, code))
+        return true
+    }
+
+    /** The clipboard's text (only readable while an Acornix screen is in front). */
+    fun clipboardText(): String {
+        val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        return cm.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(context)?.toString().orEmpty()
+    }
+
     fun shareText(text: String): Boolean = launch(
         Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), null),
     )

@@ -111,12 +111,12 @@ fun compactCount(n: Long): String =
 /** The community gallery: search, filter by category and open an app's page. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExploreScreen(nav: NavHostController) {
+fun ExploreScreen(nav: NavHostController, startFilter: String? = null) {
     val c = LocalContext.current.container
     val state by c.gallery.state.collectAsState()
     val installed by c.apps.apps.collectAsState()
     var query by rememberSaveable { mutableStateOf("") }
-    var filter by rememberSaveable { mutableStateOf<String?>(null) }
+    var filter by rememberSaveable { mutableStateOf(startFilter) }
     var sort by rememberSaveable { mutableStateOf(Gallery.Companion.Sort.POPULAR) }
     var ai by rememberSaveable { mutableStateOf(Gallery.Companion.Ai.ANY) }
     val scope = rememberCoroutineScope()
@@ -129,7 +129,8 @@ fun ExploreScreen(nav: NavHostController) {
 
     val all = state.catalog?.apps.orEmpty()
     // Only the categories that have apps.
-    val filters = CATEGORIES.map { it.id }.filter { cat -> all.any { it.category == cat } }
+    val filters = listOfNotNull(Gallery.SHORTCUTS.takeIf { all.any { "phone" in it.tags } }) +
+        CATEGORIES.map { it.id }.filter { cat -> all.any { it.category == cat } }
     val shown = Gallery.search(all, query, filter, sort, ai)
 
     Scaffold(
@@ -199,7 +200,10 @@ fun ExploreScreen(nav: NavHostController) {
                                     FilterChip(
                                         selected = filter == f,
                                         onClick = { filter = if (filter == f) null else f },
-                                        label = { Text(category(f)?.let { "${it.emoji} " + stringResource(it.label) }.orEmpty()) },
+                                        label = {
+                                            Text(if (f == Gallery.SHORTCUTS) "⚡ " + stringResource(R.string.filter_features)
+                                                else category(f)?.let { "${it.emoji} " + stringResource(it.label) }.orEmpty())
+                                        },
                                     )
                                 }
                             }

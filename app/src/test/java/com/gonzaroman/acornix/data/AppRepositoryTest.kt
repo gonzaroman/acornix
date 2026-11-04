@@ -2,6 +2,7 @@ package com.gonzaroman.acornix.data
 
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -89,6 +90,13 @@ class AppRepositoryTest {
         assertTrue(fresh.updatedAt > 1_000_000L)
         assertEquals(listOf("fresh", "old"), repo.apps.value.map { it.id })
         assertTrue(File(repo.dir(fresh.id), "acornix.json").readText().contains("updatedAt"))
+    }
+
+    @Test
+    fun shortcutsAreAppsThatUseThePhone() {
+        assertTrue(AppRepository.usesPhone("await Acornix.ringer('silent'); Acornix.done('ok')"))
+        assertTrue(AppRepository.usesPhone("Acornix.speak('hi')"))
+        assertFalse(AppRepository.usesPhone("await Acornix.db.set('a', 1); Acornix.askAI('x'); Acornix.vibrate(20)"))
     }
 
     @Test

@@ -280,7 +280,7 @@ class AgentTools(
             tool("create_web_app", "Creates a new mobile web app or game with AI and saves it in the user's Acornix apps. Takes 30s to a few minutes.") {
                 string("description", "Detailed description of what to build: purpose, screens, controls, style.")
                 string("name", "Short name for the app", required = false)
-                string("kind", "'functionality' if it must use phone features (vibration, flashlight, battery, speech, notifications) through the Acornix bridge", required = false, enum = listOf("app", "functionality"))
+                string("kind", "'functionality' for a shortcut (shown to the user as \"Shortcuts\"/\"Atajos\"): it makes the phone do things through the Acornix bridge (alarms, volume, silent mode, brightness, music, messages, flashlight, speech, notifications…)", required = false, enum = listOf("app", "functionality"))
             },
             tool("improve_app", "Changes one of the user's existing apps (fix, add features, restyle). A new version is saved.") {
                 string("app_id", "The app id from list_my_apps")
