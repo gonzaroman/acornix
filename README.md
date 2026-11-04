@@ -311,6 +311,8 @@ const json = JSON.parse(await Acornix.http('https://api.open-meteo.com/v1/foreca
 await Acornix.youtube('lofi beats');                 // Acornix.openUrl(url, 'com.android.chrome') opens it in that app
 Acornix.input;                                       // text shared with the shortcut ("Share with a shortcut")
 await Acornix.keepAwake(true);              // screen stays on while the app is open
+await Acornix.bluetooth(true);              // asks once for permission; false turns it off
+await Acornix.alarmSound(30);               // rings the alarm tone for 30 s; Acornix.stopAlarm()
 Acornix.trigger;                            // 'tap', 'home', 'icon', 'widget', 'tile', 'share', 'nfc', 'schedule', 'bluetooth'…
 await Acornix.done('Bedtime mode on');      // shows "✓ Bedtime mode on" and closes the shortcut
 
