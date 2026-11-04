@@ -236,7 +236,8 @@
     <string name="step_open_notifications">Abriendo notificaciones</string>
     <string name="settings_ai">Inteligencia artificial</string>
     <string name="settings_generated_apps">Apps generadas</string>
-    <string name="settings_app_language">Idioma de los textos de las apps</string>
+    <string name="settings_app_language">Acornix, sus atajos y las apps que crees</string>
+    <string name="settings_language">Idioma</string>
     <string name="lang_auto">Del móvil</string>
     <string name="lang_es">Español</string>
     <string name="lang_en">English</string>

@@ -66,13 +66,17 @@ class AppContainer(private val context: Context) {
         appScope.launch {
             apps.refresh()
             samples.installIfNeeded()
+            runCatching { com.gonzaroman.acornix.data.AppLocale.sync(context, settings) }
             runCatching {
                 val language = when (settings.current().appLanguage) {
                     com.gonzaroman.acornix.data.AppLanguage.SPANISH -> "es"
                     com.gonzaroman.acornix.data.AppLanguage.ENGLISH -> "en"
                     else -> java.util.Locale.getDefault().language
                 }
-                com.gonzaroman.acornix.core.ShortcutSamples(context, apps).installIfNeeded(language)
+                com.gonzaroman.acornix.core.ShortcutSamples(context, apps).apply {
+                    installIfNeeded(language)
+                    relocalize(language == "es")
+                }
                 com.gonzaroman.acornix.core.ShortcutUpgrades.upgradeAll(apps)
             }
             // Quiet daily check for a newer release on GitHub; failures (offline…) are ignored.
@@ -85,6 +89,8 @@ class AppContainer(private val context: Context) {
 class AcornixApplication : Application(), ImageLoaderFactory {
     lateinit var container: AppContainer
         private set
+
+    override fun attachBaseContext(base: Context) = super.attachBaseContext(com.gonzaroman.acornix.data.AppLocale.wrap(base))
 
     override fun onCreate() {
         super.onCreate()

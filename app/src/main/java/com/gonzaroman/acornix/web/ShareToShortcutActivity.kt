@@ -1,5 +1,6 @@
 package com.gonzaroman.acornix.web
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -29,6 +30,8 @@ import com.gonzaroman.acornix.ui.theme.AcornixTheme
  * shared text (a link, a note…) as Acornix.input, the {input} variable of step-by-step shortcuts.
  */
 class ShareToShortcutActivity : ComponentActivity() {
+
+    override fun attachBaseContext(newBase: Context) = super.attachBaseContext(com.gonzaroman.acornix.data.AppLocale.wrap(newBase))
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val text = listOfNotNull(intent?.getStringExtra(Intent.EXTRA_SUBJECT), intent?.getStringExtra(Intent.EXTRA_TEXT))

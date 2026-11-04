@@ -47,6 +47,8 @@ import java.util.Date
  */
 class AcornixOsActivity : ComponentActivity(), DesktopActions {
 
+    override fun attachBaseContext(newBase: Context) = super.attachBaseContext(com.gonzaroman.acornix.data.AppLocale.wrap(newBase))
+
     private val webAccess = WebAccess(this)
     private lateinit var prefs: OsPrefs
 

@@ -560,6 +560,21 @@ class ShortcutSamples(private val context: android.content.Context, private val 
         prefs.edit().putInt(KEY, VERSION).apply()
     }
 
+    /** After a language change: the examples the user never changed, in the new language (name, steps and description). */
+    suspend fun relocalize(spanish: Boolean) {
+        INSTALLED.forEach { id ->
+            val from = ShortcutTemplates.find(id, !spanish) ?: return@forEach
+            val to = ShortcutTemplates.find(id, spanish) ?: return@forEach
+            apps.apps.value.filter { it.name == from.name }.forEach { app ->
+                val recipe = runCatching { ShortcutRecipe.fromHtml(apps.readCode(app.id)) }.getOrNull()
+                if (recipe != null && recipe.steps == from.recipe.steps) {
+                    apps.update(app.id, to.recipe.html(to.name, to.emoji), "Example shortcut")
+                    apps.edit(app.id) { it.copy(name = to.name, description = to.description) }
+                }
+            }
+        }
+    }
+
     private companion object {
         const val KEY = "installed"
         const val VERSION = 6

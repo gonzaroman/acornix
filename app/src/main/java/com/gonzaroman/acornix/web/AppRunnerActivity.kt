@@ -2,6 +2,7 @@ package com.gonzaroman.acornix.web
 
 import android.app.ActivityManager
 import android.graphics.Bitmap
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -39,6 +40,8 @@ import java.io.File
 
 /** Runs one generated app full screen, in its own task, like a real installed app. */
 class AppRunnerActivity : ComponentActivity(), ShortcutHost {
+
+    override fun attachBaseContext(newBase: Context) = super.attachBaseContext(com.gonzaroman.acornix.data.AppLocale.wrap(newBase))
 
     private lateinit var webView: WebView
     private var appId: String = ""

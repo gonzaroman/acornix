@@ -1,5 +1,6 @@
 package com.gonzaroman.acornix
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -24,6 +25,8 @@ import com.gonzaroman.acornix.ui.share.SupportPrefs
 import com.gonzaroman.acornix.ui.theme.AcornixTheme
 
 class MainActivity : ComponentActivity() {
+
+    override fun attachBaseContext(newBase: Context) = super.attachBaseContext(com.gonzaroman.acornix.data.AppLocale.wrap(newBase))
 
     private var external by mutableStateOf<ExternalRequest?>(null)
     /** A ZIP opened from another app, waiting for the user to review and install it. */

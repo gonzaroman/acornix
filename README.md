@@ -218,7 +218,7 @@ Acornix checks GitHub for new versions. When one comes out you'll see what's new
 
 ### And more
 
-A **tour of everything Acornix can do** (Settings › Discover Acornix), **phone status** (battery, memory, storage), Material You colors with light and dark themes, and an interface in **English and Spanish**. Generated apps follow your phone's language too.
+A **tour of everything Acornix can do** (Settings › Discover Acornix), **phone status** (battery, memory, storage), Material You colors with light and dark themes, and an interface in **English and Spanish**: it follows your phone, or pick one in Settings › Language and Acornix, its shortcuts and the apps it creates switch to it.
 
 <p align="center">
 <img src="docs/screenshots/home-dark.jpg" width="230" alt="Acornix home screen in dark mode">&nbsp;&nbsp;

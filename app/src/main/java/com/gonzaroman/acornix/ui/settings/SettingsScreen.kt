@@ -114,22 +114,40 @@ fun SettingsScreen(nav: NavHostController) {
         SectionTitle(stringResource(R.string.settings_ai))
         SettingsCard { ProviderEditor(s, modifier = Modifier.padding(16.dp)) }
 
-        SectionTitle(stringResource(R.string.settings_generated_apps))
+        SectionTitle(stringResource(R.string.settings_language))
         SettingsCard {
             Column(Modifier.padding(16.dp)) {
-                Text(stringResource(R.string.settings_app_language), style = MaterialTheme.typography.titleSmall)
+                Text(stringResource(R.string.settings_app_language), style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(Modifier.height(8.dp))
                 SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
                     val options = listOf(AppLanguage.AUTO to R.string.lang_auto, AppLanguage.SPANISH to R.string.lang_es, AppLanguage.ENGLISH to R.string.lang_en)
                     options.forEachIndexed { i, (lang, label) ->
                         SegmentedButton(
                             selected = s.appLanguage == lang,
-                            onClick = { scope.launch { repo.setAppLanguage(lang) } },
+                            onClick = {
+                                scope.launch {
+                                    repo.setAppLanguage(lang)
+                                    // The screens are recreated in the new language; the examples follow in the background.
+                                    val container = context.container
+                                    container.appScope.launch {
+                                        runCatching {
+                                            com.gonzaroman.acornix.core.ShortcutSamples(context.applicationContext, container.apps)
+                                                .relocalize(com.gonzaroman.acornix.data.AppLocale.isSpanish(lang))
+                                        }
+                                    }
+                                    com.gonzaroman.acornix.data.AppLocale.apply(context, lang)
+                                }
+                            },
                             shape = SegmentedButtonDefaults.itemShape(i, options.size),
                         ) { Text(stringResource(label)) }
                     }
                 }
             }
+        }
+
+        SectionTitle(stringResource(R.string.settings_generated_apps))
+        SettingsCard {
             SwitchRow(stringResource(R.string.settings_ai_ideas), stringResource(R.string.settings_ai_ideas_desc), s.aiIdeas) {
                 scope.launch { repo.setAiIdeas(it) }
             }

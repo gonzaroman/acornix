@@ -237,7 +237,8 @@
     <string name="step_open_notifications">Opening notifications</string>
     <string name="settings_ai">Artificial intelligence</string>
     <string name="settings_generated_apps">Generated apps</string>
-    <string name="settings_app_language">Language of the apps\' texts</string>
+    <string name="settings_app_language">Acornix, its shortcuts and the apps you create</string>
+    <string name="settings_language">Language</string>
     <string name="lang_auto">Phone</string>
     <string name="lang_es">Español</string>
     <string name="lang_en">English</string>
