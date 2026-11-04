@@ -52,6 +52,7 @@ import com.gonzaroman.acornix.ui.explore.GalleryAppScreen
 import com.gonzaroman.acornix.ui.explore.PublishScreen
 import com.gonzaroman.acornix.ui.home.HomeScreen
 import com.gonzaroman.acornix.ui.onboarding.OnboardingScreen
+import com.gonzaroman.acornix.ui.shortcuts.ShortcutEditorScreen
 import com.gonzaroman.acornix.ui.shortcuts.ShortcutsScreen
 import com.gonzaroman.acornix.ui.onboarding.CommunityTourScreen
 import com.gonzaroman.acornix.ui.onboarding.TourScreen
@@ -87,6 +88,7 @@ object Routes {
     const val EXPLORE = "explore"
     const val EXPLORE_ROUTE = "explore?cat={cat}"
     const val SHORTCUTS = "shortcuts"
+    const val SHORTCUT_EDITOR = "shortcut_editor?id={id}"
     const val COMMUNITY_TOUR = "community_tour"
     const val GALLERY_APP = "gallery/{id}"
     const val PUBLISH = "publish/{id}"
@@ -102,6 +104,7 @@ object Routes {
     fun share(appId: String) = "share/${Uri.encode(appId)}"
     fun galleryApp(id: String) = "gallery/${Uri.encode(id)}"
     fun explore(category: String) = "explore?cat=${Uri.encode(category)}"
+    fun shortcutEditor(appId: String? = null) = "shortcut_editor" + (appId?.let { "?id=${Uri.encode(it)}" } ?: "")
     fun publish(appId: String) = "publish/${Uri.encode(appId)}"
 }
 
@@ -203,6 +206,10 @@ fun AcornixApp(
                 composable(Routes.HOME) { HomeScreen(nav) }
                 composable(Routes.APPS) { AppsScreen(nav) }
                 composable(Routes.SHORTCUTS) { ShortcutsScreen(nav) }
+                composable(
+                    Routes.SHORTCUT_EDITOR,
+                    arguments = listOf(navArgument("id") { type = NavType.StringType; nullable = true; defaultValue = null }),
+                ) { entry -> ShortcutEditorScreen(nav, entry.arguments?.getString("id")) }
                 composable(
                     Routes.ASSISTANT,
                     arguments = listOf(

@@ -34,6 +34,7 @@ import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Nfc
 import androidx.compose.material.icons.rounded.Public
+import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material.icons.rounded.Storage
@@ -193,6 +194,12 @@ fun AppActionsSheet(app: AppMeta, nav: NavHostController, onDismiss: () -> Unit)
         }
         Spacer(Modifier.height(8.dp))
         SheetAction(Icons.Rounded.PlayArrow, stringResource(R.string.action_open)) { onDismiss(); AppLauncher.open(context, app.id) }
+        val stepByStep = remember(app.id, app.updatedAt) {
+            app.kind == AppKind.FEATURE && runCatching { com.gonzaroman.acornix.core.ShortcutRecipe.fromHtml(c.apps.indexFile(app.id).readText()) }.getOrNull() != null
+        }
+        if (stepByStep) {
+            SheetAction(Icons.Rounded.Tune, stringResource(R.string.action_edit_steps)) { onDismiss(); nav.navigate(Routes.shortcutEditor(app.id)) }
+        }
         SheetAction(Icons.Rounded.AutoFixHigh, stringResource(R.string.action_improve)) { onDismiss(); nav.navigate(Routes.improve(app.id)) }
         SheetAction(Icons.Rounded.Code, stringResource(R.string.action_edit_code)) { onDismiss(); nav.navigate(Routes.editor(app.id)) }
         SheetAction(Icons.Rounded.History, stringResource(R.string.action_versions)) { onDismiss(); nav.navigate(Routes.versions(app.id)) }

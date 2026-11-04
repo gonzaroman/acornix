@@ -4,6 +4,11 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -67,6 +72,7 @@ import kotlin.math.abs
  * Shortcuts for Android: the user's shortcuts as big tiles that run with one tap, a way to create one by saying
  * what it should do, and ready-made ones from the community gallery.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShortcutsScreen(nav: NavHostController) {
     val context = LocalContext.current
@@ -74,6 +80,11 @@ fun ShortcutsScreen(nav: NavHostController) {
     val apps by c.apps.apps.collectAsState()
     val gallery by c.gallery.state.collectAsState()
     var selected by remember { mutableStateOf<AppMeta?>(null) }
+    var choosing by remember { mutableStateOf(false) }
+    val settings by c.settings.settings.collectAsState(initial = null)
+    val hasAi = settings?.config()?.isUsable == true
+    // Without an AI there is only one way to make a shortcut: step by step.
+    fun newShortcut() = if (hasAi) choosing = true else nav.navigate(Routes.shortcutEditor())
 
     LaunchedEffect(Unit) { if (c.gallery.state.value.catalog == null) c.gallery.refresh() }
 
@@ -89,7 +100,7 @@ fun ShortcutsScreen(nav: NavHostController) {
         contentWindowInsets = WindowInsets(0),
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = { nav.navigate(Routes.create(feature = true)) },
+                onClick = { newShortcut() },
                 icon = { Icon(Icons.Rounded.Add, null) },
                 text = { Text(stringResource(R.string.shortcuts_new)) },
             )
@@ -125,9 +136,14 @@ fun ShortcutsScreen(nav: NavHostController) {
                         Text(stringResource(R.string.shortcuts_empty_text), style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Spacer(Modifier.height(12.dp))
-                        // Each example creates that shortcut straight away.
-                        stringArrayResource(R.array.shortcuts_examples).forEach { example ->
-                            AssistChip(onClick = { nav.navigate(Routes.create(feature = true, prompt = example)) }, label = { Text(example) })
+                        // With an AI, each example creates that shortcut straight away.
+                        if (hasAi) {
+                            stringArrayResource(R.array.shortcuts_examples).forEach { example ->
+                                AssistChip(onClick = { nav.navigate(Routes.create(feature = true, prompt = example)) }, label = { Text(example) })
+                            }
+                        }
+                        FilledTonalButton(onClick = { nav.navigate(Routes.shortcutEditor()) }) {
+                            Text("🧩  " + stringResource(R.string.shortcut_new_manual))
                         }
                     }
                 }
@@ -156,6 +172,34 @@ fun ShortcutsScreen(nav: NavHostController) {
     }
 
     selected?.let { app -> AppActionsSheet(app, nav, onDismiss = { selected = null }) }
+
+    if (choosing) {
+        ModalBottomSheet(onDismissRequest = { choosing = false }) {
+            Column(Modifier.padding(horizontal = 16.dp).padding(bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(stringResource(R.string.shortcut_new_title), style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(start = 8.dp))
+                NewShortcutOption("✨", stringResource(R.string.shortcut_new_ai), stringResource(R.string.shortcut_new_ai_desc)) {
+                    choosing = false; nav.navigate(Routes.create(feature = true))
+                }
+                NewShortcutOption("🧩", stringResource(R.string.shortcut_new_manual), stringResource(R.string.shortcut_new_manual_desc)) {
+                    choosing = false; nav.navigate(Routes.shortcutEditor())
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun NewShortcutOption(emoji: String, title: String, text: String, onClick: () -> Unit) {
+    Surface(onClick = onClick, shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainerHigh, modifier = Modifier.fillMaxWidth()) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(emoji, fontSize = 30.sp)
+            Spacer(Modifier.width(14.dp))
+            Column {
+                Text(title, style = MaterialTheme.typography.titleMedium)
+                Text(text, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+    }
 }
 
 /** A big colored button: the shortcut's emoji and name. Tap runs it, long-press shows its options. */
