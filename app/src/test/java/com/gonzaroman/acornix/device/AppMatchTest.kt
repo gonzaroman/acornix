@@ -7,7 +7,7 @@ import org.junit.Test
 class AppMatchTest {
     private val apps = listOf(
         InstalledApp("YouTube", "com.google.android.youtube"),
-        InstalledApp("YouTube Music", "com.google.android.apps.youtube.music"),
+        InstalledApp("YT Music", "com.google.android.apps.youtube.music"),
         InstalledApp("Spotify", "com.spotify.music"),
         InstalledApp("WhatsApp", "com.whatsapp"),
         InstalledApp("Maps", "com.google.android.apps.maps"),
@@ -23,6 +23,8 @@ class AppMatchTest {
         assertEquals("com.spotify.music", match("Spotfy"))
         assertEquals("com.whatsapp", match("whatsap"))
         assertEquals("com.google.android.apps.maps", match("Mapa"))
+        assertEquals("com.google.android.apps.youtube.music", match("YouTube Music"))
+        assertEquals("com.google.android.apps.youtube.music", match("YT Music"))
     }
 
     @Test

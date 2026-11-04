@@ -229,7 +229,7 @@ fun ShortcutEditorScreen(nav: NavHostController, appId: String?, templateId: Str
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
             )
             LazyColumn(Modifier.fillMaxHeight(0.85f).windowInsetsPadding(WindowInsets.navigationBars)) {
-                SHORTCUT_ACTIONS.filter { !it.hidden && (query.isBlank() || context.getString(it.label).contains(query.trim(), ignoreCase = true)) }
+                SHORTCUT_ACTIONS.filter { !it.hidden && (query.isBlank() || plain(context.getString(it.label)).contains(plain(query.trim()))) }
                     .groupBy { it.group }.forEach { (group, actions) ->
                     item {
                         Text(stringResource(group), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary,
@@ -276,6 +276,9 @@ private fun removeStep(steps: MutableList<ShortcutStep>, index: Int) {
     }
     drop.sortedDescending().forEach { steps.removeAt(it) }
 }
+
+/** "Menú" → "menu", so searching without accents finds it. */
+private fun plain(s: String) = java.text.Normalizer.normalize(s.lowercase(), java.text.Normalizer.Form.NFD).replace(Regex("\\p{M}"), "")
 
 private val BUILT_IN_ES = listOf("hora", "fecha", "ubicación", "batería", "portapapeles", "entrada")
 private val BUILT_IN_EN = listOf("time", "date", "location", "battery", "clipboard", "input")

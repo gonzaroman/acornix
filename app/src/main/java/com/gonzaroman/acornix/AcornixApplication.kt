@@ -28,7 +28,12 @@ class AppContainer(private val context: Context) {
     val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     val settings = SettingsRepository(context)
     val data = AppDataStore(context)
-    val apps = AppRepository(context.filesDir) { id -> data.deleteApp(id) }
+    val apps = AppRepository(context.filesDir) { id ->
+        data.deleteApp(id)
+        // A deleted shortcut doesn't run on its own any more.
+        schedules.remove(id)
+        triggers.removeApp(id)
+    }
     val importExport = ImportExport(context, apps, data)
     val backups = BackupManager(context, apps, data)
     val updates = UpdateChecker(context)
@@ -50,7 +55,7 @@ class AppContainer(private val context: Context) {
     private val samples = SampleAppsInstaller(context, apps)
 
     fun start() {
-        runCatching { com.gonzaroman.acornix.device.AutomationService.sync(context) }
+        runCatching { triggers.prune { id -> apps.indexFile(id).exists() } }
         // Keep the Acornix icon's menu, the widget and the Quick Settings tile in step with the user's shortcuts.
         appScope.launch {
             apps.apps.collect { list ->
@@ -68,6 +73,7 @@ class AppContainer(private val context: Context) {
                     else -> java.util.Locale.getDefault().language
                 }
                 com.gonzaroman.acornix.core.ShortcutSamples(context, apps).installIfNeeded(language)
+                com.gonzaroman.acornix.core.ShortcutUpgrades.upgradeAll(apps)
             }
             // Quiet daily check for a newer release on GitHub; failures (offline…) are ignored.
             delay(2500)

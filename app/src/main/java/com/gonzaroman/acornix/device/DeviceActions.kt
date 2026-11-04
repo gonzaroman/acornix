@@ -432,6 +432,11 @@ class DeviceActions(private val context: Context) {
             apps.firstOrNull { it.label.lowercase() == q }?.let { return it }
             apps.firstOrNull { it.label.lowercase().startsWith(q) }?.let { return it }
             apps.firstOrNull { it.label.lowercase().contains(q) }?.let { return it }
+            // "YouTube Music" is the app whose name or package has every word ("YT Music", …youtube.music), not YouTube.
+            val words = q.split(Regex("\\W+")).filter { it.length >= 3 }
+            if (words.size > 1) {
+                apps.firstOrNull { app -> (app.label + " " + app.packageName).lowercase().let { t -> words.all { it in t } } }?.let { return it }
+            }
             apps.firstOrNull { q.contains(it.label.lowercase()) && it.label.length > 2 }?.let { return it }
             val allowed = if (q.length <= 4) 1 else 2
             return apps.map { it to distance(q, it.label.lowercase()) }

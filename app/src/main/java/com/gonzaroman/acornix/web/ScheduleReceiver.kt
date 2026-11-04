@@ -108,6 +108,6 @@ class ScheduleRearmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val c = context.container
         c.schedules.rearmAll { id -> c.apps.indexFile(id).exists() }
-        com.gonzaroman.acornix.device.AutomationService.sync(context)
+        c.triggers.prune { id -> c.apps.indexFile(id).exists() }
     }
 }

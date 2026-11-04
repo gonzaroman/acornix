@@ -211,6 +211,37 @@ data class ShortcutRecipe(
   function pick(data, path) {
     return String(path || '').split('.').filter(Boolean).reduce(function (o, k) { return o == null ? o : o[k]; }, data);
   }
+  // "12,5 * (3 + 1) / 2" -> 25, with + - * / % and parentheses; no code is run. Empty values count as 0.
+  function arithmetic(text) {
+    var src = String(text).replace(/,/g, '.').replace(/\s+/g, ''), i = 0;
+    function num() {
+      var m = /^\d*\.?\d+/.exec(src.slice(i)) || /^\d+\.?/.exec(src.slice(i));
+      if (!m) return null;
+      i += m[0].length; return parseFloat(m[0]);
+    }
+    function factor() {
+      if (src[i] === '-') { i++; var f = factor(); return f === null ? null : -f; }
+      if (src[i] === '+') { i++; return factor(); }
+      if (src[i] === '(') { i++; var e = expr(); if (src[i] !== ')') return null; i++; return e; }
+      if (i >= src.length || ')*/%'.indexOf(src[i]) >= 0) return 0;
+      return num();
+    }
+    function term() {
+      var v = factor();
+      while (v !== null && (src[i] === '*' || src[i] === '/' || src[i] === '%')) {
+        var op = src[i++], r = factor(); if (r === null) return null;
+        v = op === '*' ? v * r : op === '/' ? (r === 0 ? null : v / r) : v % r;
+      }
+      return v;
+    }
+    function expr() {
+      var v = term();
+      while (v !== null && (src[i] === '+' || src[i] === '-')) { var op = src[i++], r = term(); if (r === null) return null; v = op === '+' ? v + r : v - r; }
+      return v;
+    }
+    var out = expr();
+    return (out === null || i !== src.length || !isFinite(out)) ? null : out;
+  }
   function compare(a, op, b) {
     var na = parseFloat(String(a).replace(',', '.')), nb = parseFloat(String(b).replace(',', '.'));
     var sa = norm(a), sb = norm(b);
@@ -343,10 +374,8 @@ data class ShortcutRecipe(
         return true;
       case 'setVar': setVar(p['var'], await fill(p.value)); return true;
       case 'calc':
-        var expr = String(await fill(p.expr)).replace(/,/g, '.');
-        if (!/^[\d\s+\-*/().%]*$/.test(expr)) return false;
-        var res = Function('"use strict"; return (' + (expr || '0') + ')')();
-        if (typeof res !== 'number' || !isFinite(res)) return false;
+        var res = arithmetic(String(await fill(p.expr)));
+        if (res === null) return false;
         setVar(p['var'], Math.round(res * 100) / 100);
         return true;
       case 'show': await show(await fill(p.text)); return true;

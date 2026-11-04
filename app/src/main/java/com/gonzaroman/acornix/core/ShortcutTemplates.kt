@@ -256,3 +256,18 @@ class ShortcutSamples(private val context: android.content.Context, private val 
         val INSTALLED = listOf("bedtime", "weather", "battery", "kitchen")
     }
 }
+
+/**
+ * Step-by-step shortcuts carry the runtime that runs them inside their own index.html, so a fix to the runtime
+ * reaches them only when their page is written again: this rewrites any whose page is older, keeping its steps.
+ */
+object ShortcutUpgrades {
+    suspend fun upgradeAll(apps: com.gonzaroman.acornix.data.AppRepository) {
+        apps.apps.value.filter { it.kind == com.gonzaroman.acornix.data.AppKind.FEATURE }.forEach { meta ->
+            val html = runCatching { apps.readCode(meta.id) }.getOrNull() ?: return@forEach
+            val recipe = ShortcutRecipe.fromHtml(html) ?: return@forEach
+            val fresh = recipe.html(meta.name, meta.emoji)
+            if (fresh != html) apps.update(meta.id, fresh, "Shortcut engine updated")
+        }
+    }
+}

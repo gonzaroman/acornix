@@ -49,6 +49,12 @@ class ShortcutTriggers(private val context: Context) {
 
     fun removeApp(appId: String) = save(_all.value.filter { it.appId != appId })
 
+    /** Drops triggers of shortcuts that no longer exist. */
+    fun prune(exists: (String) -> Boolean) {
+        val kept = _all.value.filter { exists(it.appId) }
+        if (kept.size != _all.value.size) save(kept) else com.gonzaroman.acornix.device.AutomationService.sync(context)
+    }
+
     /** Shortcuts to run for this event, e.g. (BLUETOOTH_CONNECTED, "Car Multimedia"). */
     fun matching(type: TriggerType, value: String?): List<ShortcutTrigger> = _all.value.filter { it.matches(type, value) }
 
