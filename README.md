@@ -1,11 +1,13 @@
 <div align="center">
 
-# AI app builder for Android - Create apps from voice - 🌰 Acornix
+# AI app builder and Shortcuts for Android - Create apps from voice - 🌰 Acornix
 
 ## Vibe code app builder
 
 ### Vibe code apps and games on your phone. Create apps from your voice, text or a photo.
 
+
+**⚡ Shortcuts for Android, like iPhone Shortcuts:** tell your phone what to do and it does it with one tap, at a time of day or when your car connects. [See how](#-shortcuts-for-android-atajos-para-android)
 
 **Vibe coding in your pocket.** Describe an app, a game or a tool, and watch the AI write it live. Seconds later it runs full screen on your phone, saves its own data and can sit on your home screen like any other app. Or just ask the assistant to do things for you.
 
@@ -28,6 +30,7 @@ https://github.com/user-attachments/assets/d9b09e3d-3a41-4094-82b8-69c64a8655c1
 
 Acornix is a **free AI app builder for Android** and a **no-code app creator**: an AI app generator that turns a sentence, your voice or a photo into a working app or game, right on your phone. You bring an API key from your favourite AI (Claude, GPT, Gemini or any OpenAI-compatible model), and Acornix does the rest:
 
+- **Brings Shortcuts to Android** (*Atajos para Android*): automations like iPhone Shortcuts, made by describing them or step by step without any AI. [More below](#-shortcuts-for-android-atajos-para-android).
 - **Creates apps and games** from a sentence, your voice or a photo, and lets you keep improving them by asking. Out of ideas? **The AI suggests original ones**.
 - **Lets you show them off** with a share card: your app, its name and how many seconds it took.
 - **Runs them like real apps**: full screen, offline, on your home screen, each with its own private database.
@@ -37,6 +40,58 @@ Acornix is a **free AI app builder for Android** and a **no-code app creator**: 
 No terminal, no server, no account. Everything you create lives on your phone.
 
 > Acornix started as a Python tool for Termux. Version 2.0 is a full native Android app that does everything the old one did and much more. [Looking for the Termux version?](#-looking-for-the-original-termux-version)
+
+---
+
+## ⚡ Shortcuts for Android (Atajos para Android)
+
+**Android finally has its own Shortcuts app.** Acornix Shortcuts are like **iPhone Shortcuts for Android**: as simple as Apple's, as powerful as Tasker, and as easy as telling your phone what you want. Tap a shortcut and your phone does several things in a row: turns on Do not disturb, sets the volume, opens Google Maps, flashes the flashlight, reads you the weather, sends a WhatsApp…
+
+<p align="center">
+<img src="docs/screenshots/shortcuts-help.jpg" width="260" alt="Shortcuts for Android in Acornix: the built-in tutorial">&nbsp;&nbsp;
+<img src="docs/screenshots/shortcuts-editor.jpg" width="260" alt="Editing an Android shortcut step by step: If battery is below 21, say it out loud">
+</p>
+
+- **Three ways to make one.** *Describe it* — *"bedtime mode: silent, low brightness and an alarm at 7"* — and your AI builds it as steps you can edit. Or build it **step by step without any AI**, picking actions from a list, like in iPhone Shortcuts. Or download one from the community.
+- **Real logic.** Ask for a value, choose from a menu, keep answers in **variables** (`{answer}`, `{time}`, `{location}`, `{battery}`…), **If / Otherwise**, **Repeat**, calculate, and **get data from the web** (JSON APIs like Open-Meteo) to say it, show it or send it.
+- **Actions:** alarms and timers, volume, silent and Do not disturb, brightness, Bluetooth, music controls, flashlight and strobe, vibration, voice, notifications, WhatsApp (it can send the message by itself), SMS and calls (pick a contact), open any app (pick it from a list), Google Maps navigation, YouTube search, web pages in the app you choose, copy and share.
+- **Automations that run on their own:** at a time of day, when your car's Bluetooth connects, when you plug in the charger, when the battery runs low, when you join or leave a wifi, or when you touch an **NFC sticker**.
+- **Run them from anywhere:** the Shortcuts tab, their own home screen icon, a long-press on the Acornix icon, the Acornix widget, a **Quick Settings** button, or **Share with a shortcut** from any app.
+- **A built-in tutorial**: tap the big **?** for a step-by-step guide with examples you can open in the editor.
+- Once made, shortcuts work **without an AI key**. Free and open source.
+
+### Shortcuts included
+
+Acornix comes with eight example shortcuts that show what's possible. Open any of them to see its steps and change them:
+
+| Shortcut | What it does |
+|---|---|
+| 🌙 **Night mode** | Lowest brightness, volume at 80 %, Do not disturb, and it tells you the time. |
+| 🎶 **Synthwave lights** | Plays synthwave music on YouTube while the flashlight flashes. |
+| 🔋 **Low battery alert** | If the battery is low it warns you out loud, with a notification, and dims the screen. |
+| ⏰ **Light alarm** | The alarm rings at the time you choose, the flashlight flashes and it says good morning. |
+| 🚗 **Driving** | Turns Bluetooth on, opens Google Maps to your destination, volume up and Do not disturb. |
+| ☀️ **Good morning** | The date, the weather in your city and your battery, out loud, and Do not disturb off. |
+| 📈 **Markets** | The price of bitcoin, Nvidia, Apple, Google and Amazon, live from the internet. |
+| 🎬 **Acornix videos** | Opens Acornix's Shorts on YouTube. |
+
+The tutorial has more (cinema mode, "I'm running late", tip calculator, focus timer, SOS with your location, kitchen timer…), and the **⚡ Shortcuts** filter in Community apps has shortcuts made by other people.
+
+### Questions about shortcuts on Android
+
+**Is there an iPhone Shortcuts app for Android?** Android doesn't come with one, and that's the gap Acornix fills: a Shortcuts tab with actions, variables, If / Otherwise, Repeat, automations and home screen icons, like Shortcuts on iPhone.
+
+**How do I create a shortcut on Android?** Open the **Shortcuts** tab, tap **New shortcut** and either describe it in a sentence or add steps one by one. Tap **Save and try** to test it, then put it on your home screen, in Quick Settings or on an NFC sticker.
+
+**Is it a Tasker or MacroDroid alternative?** Yes. If you found Tasker hard to learn, Acornix lets you describe the automation in your own words and gives you the steps already made, which you can still edit by hand. Triggers cover time of day, Bluetooth, charger, battery, wifi and NFC.
+
+**Do I need an AI key?** Only to create shortcuts by describing them. Building them step by step, running them and the automations all work without an AI key and without an account.
+
+**Can it run automations in the background?** Yes. Scheduled shortcuts use exact alarms, and charger, battery and wifi triggers use a small "Automations are on" notification so Android keeps delivering those events.
+
+### Atajos para Android (en español)
+
+**Acornix trae los Atajos de iPhone a Android.** Crea atajos y automatizaciones describiéndolos con una frase (*"modo dormir: silencio, brillo bajo y alarma a las 7"*) o paso a paso sin IA, como en Atajos de iPhone. Tienen variables, condiciones *Si / Si no*, repeticiones y datos de internet, y se ejecutan solos a una hora, al conectar el Bluetooth del coche, al enchufar el cargador, con poca batería, al conectarte a una wifi o al tocar una pegatina NFC. Puedes lanzarlos desde la pestaña Atajos, su icono en la pantalla de inicio, el widget o los Ajustes rápidos. Es una alternativa gratuita y de código abierto a Tasker y MacroDroid, toda la app está en español y, una vez creados, los atajos funcionan sin clave de IA. [Descarga el APK gratis](https://github.com/gonzaroman/acornix/releases/latest/download/acornix.apk).
 
 ---
 
@@ -79,14 +134,7 @@ Made something cool? Tap **Share** and Acornix builds a card with **your app run
 
 ### ⚡ Shortcuts for Android
 
-Like iPhone Shortcuts, powerful like Tasker and as easy as Acornix: tell your phone what to do and it does it with one tap. Shortcuts have their own tab, a step-by-step tutorial (the big **?**) and ready-made examples.
-
-- **Three ways to make one.** *Describe it* — *"bedtime mode: silent, low brightness and an alarm at 7"* — and your AI builds it as steps you can edit. Or build it **step by step without any AI**, picking actions from a list. Or download one from the community.
-- **Real logic.** Ask for a value, choose from a menu, keep answers in **variables** (`{answer}`, `{time}`, `{location}`, `{battery}`…), **If / Otherwise**, **Repeat**, calculate, and **get data from the web** (JSON APIs like Open-Meteo) to say it, show it or send it.
-- **Actions:** alarms and timers, volume, silent and Do not disturb, brightness, music controls, flashlight, vibration, voice, notifications, WhatsApp, SMS and calls (pick a contact), open any app (pick it from a list), Maps, YouTube search, web pages in the app you choose, copy and share.
-- **They run on their own:** at a time of day, when your car's Bluetooth connects, when you plug in the charger, when the battery runs low, when you join or leave a wifi, or when you touch an **NFC sticker**.
-- **Run them from anywhere:** the Shortcuts tab, their own home screen icon, a long-press on the Acornix icon, the Acornix widget, a Quick Settings button, or **Share with a shortcut** from any app.
-- Once made, shortcuts work **without an AI key**.
+iPhone-style shortcuts and automations, with their own tab. [Everything about Shortcuts ↑](#-shortcuts-for-android-atajos-para-android)
 
 ### 🤖 An AI assistant that gets things done
 
