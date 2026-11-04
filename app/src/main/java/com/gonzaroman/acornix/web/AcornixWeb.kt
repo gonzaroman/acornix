@@ -348,8 +348,13 @@ class AcornixJsBridge(
             "alarm" -> JsonPrimitive(device.setAlarm(int(0) ?: 7, int(1) ?: 0, str(2)))
             "timer" -> JsonPrimitive(device.setTimer((int(0) ?: 60).coerceAtLeast(1), str(1)))
             "call" -> JsonPrimitive(device.dial(str(0).orEmpty()))
-            "sms" -> JsonPrimitive(device.composeSms(str(0).orEmpty(), str(1).orEmpty()))
-            "whatsapp" -> JsonPrimitive(device.whatsapp(str(0), str(1).orEmpty()))
+            // With "send" true the SMS goes straight away when Acornix may send SMS; otherwise it opens ready to send.
+            "sms" -> {
+                val send = (arg(2) as? JsonPrimitive)?.booleanOrNull == true
+                if (send && device.sendSms(str(0).orEmpty(), str(1).orEmpty())) JsonPrimitive("sent")
+                else JsonPrimitive(device.composeSms(str(0).orEmpty(), str(1).orEmpty()))
+            }
+            "whatsapp" -> JsonPrimitive(device.whatsapp(str(0), str(1).orEmpty(), (arg(2) as? JsonPrimitive)?.booleanOrNull == true))
             "maps" -> JsonPrimitive(device.openMaps(str(0).orEmpty()))
             // Opened → true. Not installed → Google Play's search for it, and "store".
             "launchApp" -> {
@@ -550,8 +555,8 @@ class AcornixJsBridge(
                 alarm: function (h, m, label) { return call('alarm', [h, m || 0, label || null]); },
                 timer: function (sec, label) { return call('timer', [sec, label || null]); },
                 call: function (n) { return call('call', [String(n)]); },
-                sms: function (n, t) { return call('sms', [String(n), String(t || '')]); },
-                whatsapp: function (n, t) { return call('whatsapp', [n ? String(n) : null, String(t || '')]); },
+                sms: function (n, t, send) { return call('sms', [String(n), String(t || ''), send === true]); },
+                whatsapp: function (n, t, send) { return call('whatsapp', [n ? String(n) : null, String(t || ''), send === true]); },
                 maps: function (q) { return call('maps', [String(q)]); },
                 launchApp: function (n, label) { return call('launchApp', [String(n), label ? String(label) : null]); },
                 volume: function (level, stream) { return call('volume', [level === undefined ? null : level, stream || 'media']); },

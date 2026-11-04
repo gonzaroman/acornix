@@ -22,6 +22,66 @@ object ShortcutTemplates {
     fun find(id: String, spanish: Boolean) = all(spanish).firstOrNull { it.id == id }
 
     private val ES = listOf(
+        // The six shortcuts made and tested for 2.6: three step by step, three by the AI from one sentence.
+        ShortcutTemplate(
+            "cinema", "🎬", "Modo cine", "Silencio, No molestar y brillo al mínimo para ver una película.",
+            ShortcutRecipe(steps = listOf(
+                s("ringer", "mode" to "silent"),
+                s("dnd", "on" to "on"),
+                s("brightness", "level" to "9"),
+                s("show", "text" to "Disfruta la película 🍿 El móvil no te molestará."),
+            )),
+            "Ponlo en los ajustes rápidos para activarlo al entrar en el cine.",
+        ),
+        ShortcutTemplate(
+            "late", "🏃", "Llego tarde", "Elige cuánto vas a tardar y avisa por WhatsApp con tu ubicación.",
+            ShortcutRecipe(steps = listOf(
+                s("ask", "question" to "¿A quién aviso? Número con prefijo, por ejemplo +34600111222", "type" to "text", "var" to "contacto", "remember" to "yes"),
+                s("menu", "question" to "¿Cuánto vas a llegar tarde?", "options" to "5 minutos\n15 minutos\nmedia hora", "var" to "retraso"),
+                s("whatsapp", "number" to "{contacto}", "text" to "Llego {retraso} tarde, lo siento. Estoy aquí: {ubicación}"),
+            )),
+        ),
+        ShortcutTemplate(
+            "tip", "🧮", "Calcular propina", "Dile la cuenta, elige el porcentaje y te calcula la propina y el total.",
+            ShortcutRecipe(steps = listOf(
+                s("ask", "question" to "¿Cuánto es la cuenta?", "type" to "number", "var" to "cuenta"),
+                s("menu", "question" to "¿Qué propina quieres dejar? (%)", "options" to "5\n10\n15\n20", "var" to "porcentaje"),
+                s("calc", "expr" to "{cuenta} * {porcentaje} / 100", "var" to "propina"),
+                s("calc", "expr" to "{cuenta} + {propina}", "var" to "total"),
+                s("show", "text" to "Propina del {porcentaje} %: {propina} €\nTotal a pagar: {total} €"),
+            )),
+        ),
+        ShortcutTemplate(
+            "music", "🎵", "Modo música", "Sube el volumen, abre YouTube Music y le da a reproducir.",
+            ShortcutRecipe(steps = listOf(
+                s("volume", "level" to "70", "stream" to "media"),
+                s("launchApp", "name" to "YouTube Music"),
+                s("wait", "seconds" to "2"),
+                s("media", "action" to "play"),
+                s("speak", "text" to "A disfrutar"),
+            )),
+            "Hecho por la IA con una frase. Automatízalo al conectar los auriculares por Bluetooth.",
+        ),
+        ShortcutTemplate(
+            "focus", "🎯", "Concentración", "Te pregunta cuántos minutos, silencia el móvil y pone un temporizador.",
+            ShortcutRecipe(steps = listOf(
+                s("ask", "question" to "¿Cuántos minutos quieres concentrarte?", "type" to "number", "var" to "minutos", "default" to "25"),
+                s("dnd", "on" to "on"),
+                s("ringer", "mode" to "vibrate"),
+                s("timer", "minutes" to "{minutos}", "label" to "Concentración"),
+                s("speak", "text" to "A concentrarse"),
+            )),
+            "Hecho por la IA con una frase.",
+        ),
+        ShortcutTemplate(
+            "bitcoin", "₿", "Precio del bitcoin", "Consulta en internet el precio del bitcoin en euros y te lo dice.",
+            ShortcutRecipe(steps = listOf(
+                s("getUrl", "url" to "https://api.coinbase.com/v2/prices/BTC-EUR/spot", "path" to "data.amount", "var" to "precio"),
+                s("speak", "text" to "El precio actual del bitcoin es de {precio} euros."),
+                s("show", "text" to "1 BTC = {precio} €"),
+            )),
+            "Hecho por la IA con una frase.",
+        ),
         ShortcutTemplate(
             "bedtime", "😴", "Modo dormir", "No molestar, brillo bajo, volumen bajo y la alarma de mañana, con un toque.",
             ShortcutRecipe(steps = listOf(
@@ -127,6 +187,65 @@ object ShortcutTemplates {
     )
 
     private val EN = listOf(
+        ShortcutTemplate(
+            "cinema", "🎬", "Cinema mode", "Silent, Do not disturb and the lowest brightness to watch a film.",
+            ShortcutRecipe(steps = listOf(
+                s("ringer", "mode" to "silent"),
+                s("dnd", "on" to "on"),
+                s("brightness", "level" to "9"),
+                s("show", "text" to "Enjoy the film 🍿 Your phone won't bother you."),
+            )),
+            "Put it in Quick Settings to turn it on as you walk into the cinema.",
+        ),
+        ShortcutTemplate(
+            "late", "🏃", "Running late", "Pick how late you'll be and tell someone on WhatsApp, with your location.",
+            ShortcutRecipe(steps = listOf(
+                s("ask", "question" to "Who should I tell? Number with country code, e.g. +15551234567", "type" to "text", "var" to "contact", "remember" to "yes"),
+                s("menu", "question" to "How late will you be?", "options" to "5 minutes\n15 minutes\nhalf an hour", "var" to "delay"),
+                s("whatsapp", "number" to "{contact}", "text" to "I'll be {delay} late, sorry. I'm here: {location}"),
+            )),
+        ),
+        ShortcutTemplate(
+            "tip", "🧮", "Tip calculator", "Tell it the bill, pick the percentage and it works out the tip and the total.",
+            ShortcutRecipe(steps = listOf(
+                s("ask", "question" to "How much is the bill?", "type" to "number", "var" to "bill"),
+                s("menu", "question" to "What tip do you want to leave? (%)", "options" to "5\n10\n15\n20", "var" to "percent"),
+                s("calc", "expr" to "{bill} * {percent} / 100", "var" to "tip"),
+                s("calc", "expr" to "{bill} + {tip}", "var" to "total"),
+                s("show", "text" to "{percent} % tip: {tip}\nTotal to pay: {total}"),
+            )),
+        ),
+        ShortcutTemplate(
+            "music", "🎵", "Music mode", "Turns the volume up, opens YouTube Music and presses play.",
+            ShortcutRecipe(steps = listOf(
+                s("volume", "level" to "70", "stream" to "media"),
+                s("launchApp", "name" to "YouTube Music"),
+                s("wait", "seconds" to "2"),
+                s("media", "action" to "play"),
+                s("speak", "text" to "Enjoy"),
+            )),
+            "Made by the AI from one sentence. Automate it when your headphones connect over Bluetooth.",
+        ),
+        ShortcutTemplate(
+            "focus", "🎯", "Focus", "Asks how many minutes, silences the phone and starts a timer.",
+            ShortcutRecipe(steps = listOf(
+                s("ask", "question" to "How many minutes do you want to focus?", "type" to "number", "var" to "minutes", "default" to "25"),
+                s("dnd", "on" to "on"),
+                s("ringer", "mode" to "vibrate"),
+                s("timer", "minutes" to "{minutes}", "label" to "Focus"),
+                s("speak", "text" to "Time to focus"),
+            )),
+            "Made by the AI from one sentence.",
+        ),
+        ShortcutTemplate(
+            "bitcoin", "₿", "Bitcoin price", "Looks up the price of bitcoin in euros online and tells you.",
+            ShortcutRecipe(steps = listOf(
+                s("getUrl", "url" to "https://api.coinbase.com/v2/prices/BTC-EUR/spot", "path" to "data.amount", "var" to "price"),
+                s("speak", "text" to "Bitcoin is at {price} euros right now."),
+                s("show", "text" to "1 BTC = {price} €"),
+            )),
+            "Made by the AI from one sentence.",
+        ),
         ShortcutTemplate(
             "bedtime", "😴", "Bedtime mode", "Do not disturb, low brightness, low volume and tomorrow's alarm, in one tap.",
             ShortcutRecipe(steps = listOf(
@@ -252,8 +371,8 @@ class ShortcutSamples(private val context: android.content.Context, private val 
 
     private companion object {
         const val KEY = "installed"
-        const val VERSION = 1
-        val INSTALLED = listOf("bedtime", "weather", "battery", "kitchen")
+        const val VERSION = 2
+        val INSTALLED = listOf("cinema", "late", "tip", "music", "focus", "bitcoin")
     }
 }
 

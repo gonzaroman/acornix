@@ -123,11 +123,30 @@ class DeviceActions(private val context: Context) {
     /** Opens the dialer with the number; the user presses call. */
     fun dial(number: String): Boolean = launch(Intent(Intent.ACTION_DIAL, Uri.parse("tel:${Uri.encode(number)}")))
 
-    /** Opens WhatsApp with the message written, to a number (international format) or to pick a chat. */
-    fun whatsapp(number: String?, text: String): Boolean {
+    /**
+     * Opens WhatsApp with the message written, to a number (international format) or to pick a chat. With [autoSend]
+     * and Total control running, Acornix then taps Send. Returns "sent", "opened", "noControl" or "failed".
+     */
+    suspend fun whatsapp(number: String?, text: String, autoSend: Boolean = false): String {
         val digits = number.orEmpty().filter { it.isDigit() }
-        val url = (if (digits.isEmpty()) "https://wa.me/" else "https://wa.me/$digits") + "?text=${enc(text)}"
-        return openUrl(url)
+        val url = "https://api.whatsapp.com/send?" + (if (digits.isEmpty()) "" else "phone=$digits&") + "text=${enc(text)}"
+        val app = WHATSAPP_PACKAGES.firstOrNull { pkg -> runCatching { context.packageManager.getPackageInfo(pkg, 0) }.isSuccess }
+        val opened = (app != null && launch(Intent(Intent.ACTION_VIEW, Uri.parse(url)).setPackage(app))) || openUrl(url)
+        if (!opened) return "failed"
+        if (!autoSend || digits.isEmpty()) return "opened"
+        val service = com.gonzaroman.acornix.control.AcornixAccessibilityService.instance ?: return "noControl"
+        return if (service.pressSend(WHATSAPP_PACKAGES)) "sent" else "opened"
+    }
+
+    /** Sends an SMS straight away (needs the SEND_SMS permission, asked in the shortcut editor). */
+    fun sendSms(number: String, text: String): Boolean {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) return false
+        return runCatching {
+            @Suppress("DEPRECATION")
+            val sms = if (Build.VERSION.SDK_INT >= 31) context.getSystemService(android.telephony.SmsManager::class.java) else android.telephony.SmsManager.getDefault()
+            sms.sendMultipartTextMessage(number, null, sms.divideMessage(text), null, null)
+            true
+        }.getOrDefault(false)
     }
 
     /** Opens the calendar app with a new event filled in; the user saves it. Times are epoch milliseconds. */
@@ -455,6 +474,8 @@ class DeviceActions(private val context: Context) {
             }
             return prev[b.length]
         }
+
+        val WHATSAPP_PACKAGES = setOf("com.whatsapp", "com.whatsapp.w4b")
 
         const val CHANNEL_GENERAL = "general"
         const val CHANNEL_AGENT = "agent"

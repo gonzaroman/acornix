@@ -71,10 +71,12 @@ val SHORTCUT_ACTIONS = listOf(
     ActionDef("whatsapp", "💬", R.string.sa_whatsapp, R.string.sg_messages, listOf(
         FieldDef("number", R.string.sf_number_optional, FieldKind.PHONE),
         FieldDef("text", R.string.sf_message, FieldKind.TEXT, variables = true),
+        FieldDef("send", R.string.sf_send, FieldKind.CHOICE, "no", listOf("no" to R.string.sc_leave_written, "yes" to R.string.sc_send_it)),
     )),
     ActionDef("sms", "✉️", R.string.sa_sms, R.string.sg_messages, listOf(
         FieldDef("number", R.string.sf_number, FieldKind.PHONE),
         FieldDef("text", R.string.sf_message, FieldKind.TEXT, variables = true),
+        FieldDef("send", R.string.sf_send, FieldKind.CHOICE, "no", listOf("no" to R.string.sc_leave_written, "yes" to R.string.sc_send_it)),
     )),
     ActionDef("call", "📞", R.string.sa_call, R.string.sg_messages, listOf(FieldDef("number", R.string.sf_number, FieldKind.PHONE))),
     ActionDef("speak", "🗣️", R.string.sa_speak, R.string.sg_messages, listOf(FieldDef("text", R.string.sf_text, FieldKind.TEXT, variables = true))),

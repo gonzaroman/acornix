@@ -316,7 +316,34 @@ private fun StepCard(
                 action.fields.forEach { field ->
                     FieldEditor(field, step.params, variables) { changes -> onChange(step.copy(params = step.params + changes)) }
                 }
+                SendNotes(step)
             }
+        }
+    }
+}
+
+/**
+ * "Send it on its own": an SMS needs the permission to send SMS (asked here, once), and a WhatsApp needs Total
+ * control to press Send; without them the message is left written.
+ */
+@Composable
+private fun SendNotes(step: ShortcutStep) {
+    if (step.params["send"] != "yes") return
+    val context = LocalContext.current
+    when (step.action) {
+        "sms" -> {
+            var granted by remember {
+                mutableStateOf(androidx.core.content.ContextCompat.checkSelfPermission(context, android.Manifest.permission.SEND_SMS) ==
+                    android.content.pm.PackageManager.PERMISSION_GRANTED)
+            }
+            val ask = androidx.activity.compose.rememberLauncherForActivityResult(
+                androidx.activity.result.contract.ActivityResultContracts.RequestPermission(),
+            ) { granted = it }
+            LaunchedEffect(Unit) { if (!granted) ask.launch(android.Manifest.permission.SEND_SMS) }
+            if (!granted) Text(stringResource(R.string.send_sms_denied), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+        }
+        "whatsapp" -> if (!com.gonzaroman.acornix.control.AcornixAccessibilityService.isEnabled(context)) {
+            Text(stringResource(R.string.send_needs_control), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
         }
     }
 }

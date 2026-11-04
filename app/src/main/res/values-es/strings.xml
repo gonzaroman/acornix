@@ -922,4 +922,9 @@
     <string name="help_examples_text">Toca «Crear este»: se abre en el editor listo para guardar, y puedes cambiar lo que quieras.</string>
     <string name="help_create_this">Crear este</string>
     <string name="help_done">Entendido</string>
+    <string name="sf_send">Al ejecutarlo</string>
+    <string name="sc_leave_written">Dejarlo escrito</string>
+    <string name="sc_send_it">Enviarlo solo</string>
+    <string name="send_needs_control">Para enviar un WhatsApp solo, Acornix necesita el Control total (Ajustes › Control total). Sin él, el mensaje se queda escrito.</string>
+    <string name="send_sms_denied">Sin permiso para enviar SMS, el mensaje se queda escrito para que lo envíes tú.</string>
 </resources>

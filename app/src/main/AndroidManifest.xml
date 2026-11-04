@@ -8,6 +8,8 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.NFC" />
+    <!-- A shortcut step may send an SMS on its own, if the user chooses so (asked in the editor). -->
+    <uses-permission android:name="android.permission.SEND_SMS" />
     <!-- Scheduled shortcuts ("every day at 8:00") use alarm-clock alarms. -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
@@ -38,6 +40,8 @@
     <uses-feature android:name="android.hardware.nfc" android:required="false" />
 
     <queries>
+        <package android:name="com.whatsapp" />
+        <package android:name="com.whatsapp.w4b" />
         <intent>
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />

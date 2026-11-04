@@ -195,7 +195,8 @@ object Prompts {
         - Acornix.askAI(prompt, options?)                // the user's own AI: see AI INSIDE THE APP
         Shortcut actions (the phone does things for the user):
         - Acornix.alarm(hour, minute, label?)  · Acornix.timer(seconds, label?)   // in the phone's clock app
-        - Acornix.call(number) · Acornix.sms(number, text) · Acornix.whatsapp(number?, text)   // opens them ready to send
+        - Acornix.call(number) · Acornix.sms(number, text, send?) · Acornix.whatsapp(number?, text, send?)
+          // open ready to send; with send true an SMS goes straight away and a WhatsApp is sent by Total control
         - Acornix.maps(placeOrAddress)         · Acornix.launchApp(name)          // e.g. launchApp('Spotify'); true, or 'store' if it isn't installed (Google Play opens)
         - Acornix.volume(0-100, 'media'|'ring'|'alarm') · Acornix.volume(undefined, stream) -> current %
         - Acornix.ringer('normal'|'vibrate'|'silent') · Acornix.doNotDisturb(on)  // false the first time: Acornix asks the user for access
@@ -223,7 +224,8 @@ object Prompts {
         - volume {level: 0-100, stream: media|ring|alarm} · ringer {mode: normal|vibrate|silent} · dnd {on: on|off}
         - media {action: play|pause|next|previous} · brightness {level: 0-100} · flashlight {mode: on|off|sos} · vibrate {}
         - alarm {time: "HH:MM", label} · timer {minutes, label} · wait {seconds}
-        - whatsapp {number: international or "", text} · sms {number, text} · call {number}
+        - whatsapp {number: international or "", text, send: yes|no} · sms {number, text, send: yes|no} · call {number}
+          (send "yes" when the user wants it sent on its own, e.g. "send … every day at 9")
         - speak {text} · notify {title, text} · show {text}   (show waits until the user taps Continue)
         - launchApp {name: app name like "Spotify"} · maps {query} · youtube {query} · openUrl {url} · copy {text} · share {text}
         - ask {question, type: text|number, var, remember: yes|no, default} · menu {question, options: one per line, var}

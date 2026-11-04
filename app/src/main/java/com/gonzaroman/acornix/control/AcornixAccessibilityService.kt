@@ -373,6 +373,35 @@ class AcornixAccessibilityService : AccessibilityService() {
         }
 
     /** Waits for the UI to settle after an action and returns the new screen description. */
+    /**
+     * For a shortcut that sends a WhatsApp on its own: waits for the chat Acornix just opened in [packages] and taps
+     * its Send button. It does nothing else and gives up after [timeoutMs].
+     */
+    suspend fun pressSend(packages: Set<String>, timeoutMs: Long = 10_000): Boolean {
+        val until = System.currentTimeMillis() + timeoutMs
+        while (System.currentTimeMillis() < until) {
+            val root = rootInActiveWindow
+            if (root != null && root.packageName?.toString() in packages) {
+                val byId = packages.flatMap { root.findAccessibilityNodeInfosByViewId("$it:id/send") }
+                val button = byId.firstOrNull { it.isVisibleToUser } ?: findSend(root)
+                if (button != null) {
+                    var node: AccessibilityNodeInfo? = button
+                    while (node != null && !node.isClickable) node = node.parent
+                    if (node?.performAction(AccessibilityNodeInfo.ACTION_CLICK) == true) return true
+                }
+            }
+            kotlinx.coroutines.delay(300)
+        }
+        return false
+    }
+
+    private fun findSend(node: AccessibilityNodeInfo): AccessibilityNodeInfo? {
+        val desc = node.contentDescription?.toString()?.trim()?.lowercase()
+        if (desc in SEND_LABELS && node.isVisibleToUser) return node
+        for (i in 0 until node.childCount) node.getChild(i)?.let { c -> findSend(c)?.let { return it } }
+        return null
+    }
+
     suspend fun settleAndRead(ms: Long = 900): String {
         delay(ms)
         return readScreen()
@@ -381,6 +410,7 @@ class AcornixAccessibilityService : AccessibilityService() {
     companion object {
         private const val MAX_ELEMENTS = 180
         private const val SCREENSHOT_WIDTH = 720
+        private val SEND_LABELS = setOf("send", "enviar", "envoyer", "senden", "invia", "enviar mensaje")
 
         @Volatile
         var instance: AcornixAccessibilityService? = null

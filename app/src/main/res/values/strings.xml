@@ -923,4 +923,9 @@
     <string name="help_examples_text">Tap “Create this one”: it opens in the editor ready to save, and you can change anything.</string>
     <string name="help_create_this">Create this one</string>
     <string name="help_done">Got it</string>
+    <string name="sf_send">When it runs</string>
+    <string name="sc_leave_written">Leave it written</string>
+    <string name="sc_send_it">Send it on its own</string>
+    <string name="send_needs_control">To send a WhatsApp on its own, Acornix needs Total control (Settings › Total control). Without it, the message is left written.</string>
+    <string name="send_sms_denied">Without permission to send SMS, the message is left written for you to send.</string>
 </resources>

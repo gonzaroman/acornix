@@ -121,8 +121,8 @@ data class ShortcutRecipe(
   var A = window.Acornix;
   var L = ((A && A.language) || navigator.language || 'en').toLowerCase().indexOf('es') === 0 ? 'es' : 'en';
   var T = {
-    es: { preview: 'Vista previa: así es tu atajo. Ábrelo para que lo haga.', running: 'Haciéndolo…', done: 'Hecho', failed: 'Algunos pasos no se han podido hacer. Si Acornix te ha pedido un permiso, dalo y vuelve a tocar el atajo.', close: 'Cerrar', outside: 'Este atajo funciona dentro de Acornix.', empty: 'Este atajo aún no tiene pasos.', ok: 'Aceptar', cancel: 'Cancelar', stopped: 'Cancelado', next: 'Continuar' },
-    en: { preview: 'Preview: this is your shortcut. Open it to run it.', running: 'Doing it…', done: 'Done', failed: 'Some steps couldn\'t be done. If Acornix asked you for a permission, give it and tap the shortcut again.', close: 'Close', outside: 'This shortcut works inside Acornix.', empty: 'This shortcut has no steps yet.', ok: 'OK', cancel: 'Cancel', stopped: 'Cancelled', next: 'Continue' }
+    es: { needControl: 'El mensaje está escrito pero no enviado. Para que se envíe solo, activa el Control total en Acornix › Ajustes.', preview: 'Vista previa: así es tu atajo. Ábrelo para que lo haga.', running: 'Haciéndolo…', done: 'Hecho', failed: 'Algunos pasos no se han podido hacer. Si Acornix te ha pedido un permiso, dalo y vuelve a tocar el atajo.', close: 'Cerrar', outside: 'Este atajo funciona dentro de Acornix.', empty: 'Este atajo aún no tiene pasos.', ok: 'Aceptar', cancel: 'Cancelar', stopped: 'Cancelado', next: 'Continuar' },
+    en: { needControl: 'The message is written but not sent. To send it on its own, turn on Total control in Acornix › Settings.', preview: 'Preview: this is your shortcut. Open it to run it.', running: 'Doing it…', done: 'Done', failed: 'Some steps couldn\'t be done. If Acornix asked you for a permission, give it and tap the shortcut again.', close: 'Close', outside: 'This shortcut works inside Acornix.', empty: 'This shortcut has no steps yet.', ok: 'OK', cancel: 'Cancel', stopped: 'Cancelled', next: 'Continue' }
   }[L];
   var recipe = JSON.parse(document.getElementById('acornix-recipe').textContent || '{}');
   var steps = (recipe.translations && recipe.translations[L] && recipe.translations[L].length) ? recipe.translations[L] : (recipe.steps || []);
@@ -265,8 +265,8 @@ data class ShortcutRecipe(
     media: function (p) { return '🎵 ' + ({ play: '▶️', pause: '⏸️', next: '⏭️', previous: '⏮️' }[p.action] || '⏯️'); },
     alarm: function (p) { return (L === 'es' ? '⏰ Alarma ' : '⏰ Alarm ') + (p.time || ''); },
     timer: function (p) { return (L === 'es' ? '⏲️ Temporizador ' : '⏲️ Timer ') + (p.minutes || 0) + ' min'; },
-    whatsapp: function (p) { return '💬 WhatsApp' + ((p.contact || p.number) ? ' · ' + (p.contact || p.number) : ''); },
-    sms: function (p) { return '✉️ SMS · ' + (p.contact || p.number || ''); },
+    whatsapp: function (p) { return '💬 WhatsApp' + ((p.contact || p.number) ? ' · ' + (p.contact || p.number) : '') + (p.send === 'yes' ? ' ➤' : ''); },
+    sms: function (p) { return '✉️ SMS · ' + (p.contact || p.number || '') + (p.send === 'yes' ? ' ➤' : ''); },
     call: function (p) { return (L === 'es' ? '📞 Llamar · ' : '📞 Call · ') + (p.contact || p.number || ''); },
     maps: function (p) { return '🗺️ ' + (p.query || ''); },
     launchApp: function (p) { return (L === 'es' ? '📱 Abrir ' : '📱 Open ') + (p.name || ''); },
@@ -329,8 +329,12 @@ data class ShortcutRecipe(
       case 'media': return A.media(p.action || 'toggle');
       case 'alarm': var t = String(await fill(p.time || '07:00')).split(':'); return A.alarm(+t[0] || 0, +t[1] || 0, await fill(p.label || ''));
       case 'timer': return A.timer(Math.max(1, Math.round((+(await fill(p.minutes)) || 1) * 60)), await fill(p.label || ''));
-      case 'whatsapp': return A.whatsapp((await fill(p.number)) || null, await fill(p.text));
-      case 'sms': return A.sms(await fill(p.number), await fill(p.text));
+      case 'whatsapp':
+        var w = await A.whatsapp((await fill(p.number)) || null, await fill(p.text), p.send === 'yes');
+        if (w === 'failed' || w === false) return false;
+        if (w === 'noControl') { await sleep(1500); await show(T.needControl); }
+        return true;
+      case 'sms': return A.sms(await fill(p.number), await fill(p.text), p.send === 'yes');
       case 'call': return A.call(await fill(p.number));
       case 'maps': return A.maps(await fill(p.query));
       case 'launchApp': var r = await A.launchApp(p['package'] || (await fill(p.name)), await fill(p.name)); return r === true;
