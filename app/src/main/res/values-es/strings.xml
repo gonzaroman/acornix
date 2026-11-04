@@ -717,6 +717,9 @@
     <string name="shortcut_name">Nombre</string>
     <string name="shortcut_emoji">Emoji</string>
     <string name="shortcut_add_step">Añadir acción</string>
+    <string name="gen_steps_hint">Hecho de pasos: puedes cambiar cualquiera.</string>
+    <string name="shortcut_add_inside">Añadir acción dentro</string>
+    <string name="shortcut_add_after_block">Añadir después del bloque</string>
     <string name="shortcut_no_steps">Añade las acciones que hará tu atajo, en orden. Se ejecutan una tras otra con un toque.</string>
     <string name="shortcut_variables">Toca una variable para añadirla al texto de arriba.</string>
     <string name="schedule_title">Ejecutar solo</string>
@@ -860,4 +863,63 @@
     <string name="tr_any">cualquiera</string>
     <string name="tr_wifi_name">Nombre del wifi (vacío = cualquiera)</string>
     <string name="tr_bt_permission">Deja que Acornix vea tus dispositivos vinculados (el coche, los auriculares…).</string>
+    <string name="help_shortcuts_title">Cómo funcionan los atajos</string>
+    <string name="help_shortcuts_button">Ayuda</string>
+    <string name="help_shortcuts_hero_title">Atajos para Android</string>
+    <string name="help_shortcuts_hero_text">Dile a tu móvil qué hacer y lo hará con un toque: poner alarmas, silenciarse, mandar un WhatsApp, decirte el tiempo, abrir apps… Como los Atajos de iPhone, y una vez creados funcionan sin IA.</string>
+    <string name="help_ways_title">Tres formas de tener uno</string>
+    <string-array name="help_ways">
+        <item>✨ Descríbelo: di qué debe hacer («modo dormir a las 23:00») y tu IA lo crea.</item>
+        <item>🧩 Paso a paso: elige acciones de una lista y ajústalas. No hace falta IA.</item>
+        <item>🌍 Comunidad: descarga atajos listos que han hecho otras personas.</item>
+    </string-array>
+    <string name="help_first_title">Tu primer atajo, paso a paso</string>
+    <string-array name="help_first">
+        <item>Ve a Atajos y toca «Nuevo atajo» y luego «Paso a paso».</item>
+        <item>Ponle nombre y emoji, por ejemplo 😴 Modo dormir.</item>
+        <item>Toca «Añadir acción» y elige «No molestar». Después añade «Poner el brillo» y bájalo al 10 %.</item>
+        <item>Añade «Poner una alarma» a las 07:00 y «Decir en voz alta» con «Buenas noches».</item>
+        <item>Toca «Guardar y probar»: hace todo en orden, muestra ✓ Hecho y se cierra.</item>
+        <item>Mantenlo pulsado para ponerlo en la pantalla de inicio, en una pegatina NFC o en los ajustes rápidos, o para automatizarlo.</item>
+    </string-array>
+    <string name="help_vars_title">Variables: pasos que se pasan cosas</string>
+    <string-array name="help_vars">
+        <item>«Preguntar un dato» o «Elegir de un menú» guardan la respuesta en una variable, como {respuesta}.</item>
+        <item>Úsala en cualquier texto después: «Hola {respuesta}». Toca los botones de debajo de un texto para añadirlas.</item>
+        <item>También hay variables listas: {hora}, {fecha}, {ubicación}, {batería}, {portapapeles} y {entrada} (lo que le compartes).</item>
+        <item>«Solo la primera vez» recuerda la respuesta: perfecto para un número de teléfono o tu ciudad.</item>
+    </string-array>
+    <string name="help_logic_title">Decidir y repetir</string>
+    <string-array name="help_logic">
+        <item>«Si» hace sus pasos solo cuando algo se cumple: Si {batería} es menor que 20 → bajar el brillo.</item>
+        <item>Añade «Si no» para el otro caso. Las acciones nuevas entran dentro del bloque hasta que tocas «Añadir después del bloque».</item>
+        <item>«Repetir» hace sus pasos varias veces, y {repetición} dice qué vuelta es.</item>
+        <item>«Calcular» hace cuentas con números y variables: ({a} + {b}) / 2.</item>
+    </string-array>
+    <string name="help_web_title">Datos de internet</string>
+    <string-array name="help_web">
+        <item>«Obtener de una web» lee una página o una API y guarda la respuesta en una variable.</item>
+        <item>En las APIs con JSON, escribe qué dato quieres, como current.temperature_2m.</item>
+        <item>Luego dilo, muéstralo o mándalo. El ejemplo «¿Qué tiempo hace?» de abajo hace justo eso.</item>
+    </string-array>
+    <string name="help_when_title">Que se ejecuten solos</string>
+    <string-array name="help_when">
+        <item>⏰ A una hora, todos los días o solo algunos.</item>
+        <item>🚗 Al conectar o desconectar un Bluetooth: el coche, los auriculares.</item>
+        <item>🔌 Al enchufar o desenchufar el cargador, y 🔋 cuando la batería baja.</item>
+        <item>📶 Al conectarte a un wifi (casa, trabajo) o al salir de él.</item>
+        <item>🏷️ Al tocar una pegatina NFC.</item>
+        <item>Para abrir apps solos, Android pide una vez «Mostrar sobre otras apps».</item>
+    </string-array>
+    <string name="help_launch_title">Lánzalos desde donde quieras</string>
+    <string-array name="help_launch">
+        <item>La pestaña Atajos, y su propio icono en la pantalla de inicio.</item>
+        <item>Mantén pulsado el icono de Acornix: salen tus últimos atajos.</item>
+        <item>El widget de atajos de Acornix y un botón en los ajustes rápidos.</item>
+        <item>«Compartir con un atajo» desde cualquier app: lo compartido llega como {entrada}.</item>
+    </string-array>
+    <string name="help_examples_title">Ejemplos para probar</string>
+    <string name="help_examples_text">Toca «Crear este»: se abre en el editor listo para guardar, y puedes cambiar lo que quieras.</string>
+    <string name="help_create_this">Crear este</string>
+    <string name="help_done">Entendido</string>
 </resources>

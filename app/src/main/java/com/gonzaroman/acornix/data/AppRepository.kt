@@ -307,7 +307,7 @@ class AppRepository(
         )
 
         /** Whether the code makes the phone do things, so an imported app counts as a shortcut. */
-        fun usesPhone(html: String) = PHONE_CALL.containsMatchIn(html)
+        fun usesPhone(html: String) = PHONE_CALL.containsMatchIn(html) || "id=\"acornix-recipe\"" in html
 
         /**
          * The emoji the app shows next to its own name, in its <title> or its first <h1>, if it has one:

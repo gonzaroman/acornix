@@ -140,7 +140,8 @@ fun CreateScreen(nav: NavHostController, feature: Boolean, improveAppId: String?
             when (state) {
                 is CreateUi.Form -> FormContent(vm, feature)
                 is CreateUi.Generating -> GeneratingContent(state, onCancel = vm::cancel)
-                is CreateUi.Done -> DoneContent(state, vm, onShare = { nav.navigate(Routes.share(it.id)) })
+                is CreateUi.Done -> DoneContent(state, vm, onShare = { nav.navigate(Routes.share(it.id)) },
+                    onEditSteps = { nav.navigate(Routes.shortcutEditor(it.id)) })
                 is CreateUi.Failed -> FailedContent(state, onRetry = vm::retry, onEdit = vm::backToForm)
             }
         }
@@ -297,7 +298,7 @@ private fun GeneratingContent(state: CreateUi.Generating, onCancel: () -> Unit) 
 }
 
 @Composable
-private fun DoneContent(state: CreateUi.Done, vm: CreateViewModel, onShare: (AppMeta) -> Unit) {
+private fun DoneContent(state: CreateUi.Done, vm: CreateViewModel, onShare: (AppMeta) -> Unit, onEditSteps: (AppMeta) -> Unit) {
     val context = LocalContext.current
     val attachments = rememberAttachments()
     var change by rememberSaveable { mutableStateOf("") }
@@ -374,6 +375,20 @@ private fun DoneContent(state: CreateUi.Done, vm: CreateViewModel, onShare: (App
                 }
             }
             key(state.app.updatedAt) { AppPreview(state.app, Modifier.weight(1f)) }
+            // A shortcut the AI made of steps: they can be changed one by one, by hand.
+            val context = androidx.compose.ui.platform.LocalContext.current
+            val stepByStep = androidx.compose.runtime.remember(state.app.id, state.app.updatedAt) {
+                runCatching { com.gonzaroman.acornix.core.ShortcutRecipe.fromHtml(context.container.apps.indexFile(state.app.id).readText()) }.getOrNull() != null
+            }
+            if (stepByStep) {
+                Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer), shape = MaterialTheme.shapes.large) {
+                    Row(Modifier.padding(start = 16.dp, end = 8.dp, top = 10.dp, bottom = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text("🧩 " + stringResource(R.string.gen_steps_hint), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+                        Spacer(Modifier.width(8.dp))
+                        FilledTonalButton(onClick = { onEditSteps(state.app) }) { Text(stringResource(R.string.action_edit_steps)) }
+                    }
+                }
+            }
             state.suggestion?.let { suggestion ->
                 Card(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
@@ -444,7 +459,7 @@ fun AppPreview(app: AppMeta, modifier: Modifier = Modifier) {
                     // AndroidView would leave WRAP_CONTENT, which makes Chromium size the page from its
                     // content: height:100% / 100vh collapse to 0 and only a thin strip gets painted.
                     wv.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-                    AcornixWebView.configure(wv, ctx, scope, app.id)
+                    AcornixWebView.configure(wv, ctx, scope, app.id, trigger = "preview")
                     wv.loadUrl(AcornixWebView.appUrl(app.id) + "?v=${app.updatedAt}")
                 }
             },

@@ -4,6 +4,9 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Surface
@@ -116,7 +119,23 @@ fun ShortcutsScreen(nav: NavHostController) {
         ) {
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Column {
-                    Text(stringResource(R.string.tab_shortcuts), style = MaterialTheme.typography.headlineMedium)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(stringResource(R.string.tab_shortcuts), style = MaterialTheme.typography.headlineMedium, modifier = Modifier.weight(1f))
+                        // A big, obvious way into the tutorial.
+                        Surface(
+                            onClick = { nav.navigate(Routes.SHORTCUTS_HELP) },
+                            shape = MaterialTheme.shapes.extraLarge,
+                            color = MaterialTheme.colorScheme.primaryContainer,
+                        ) {
+                            Row(Modifier.padding(start = 10.dp, end = 16.dp, top = 6.dp, bottom = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Box(Modifier.size(34.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary), contentAlignment = Alignment.Center) {
+                                    Text("?", color = MaterialTheme.colorScheme.onPrimary, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                                }
+                                Spacer(Modifier.width(8.dp))
+                                Text(stringResource(R.string.help_shortcuts_button), style = MaterialTheme.typography.titleSmall)
+                            }
+                        }
+                    }
                     Text(
                         stringResource(R.string.shortcuts_subtitle),
                         style = MaterialTheme.typography.bodyMedium,

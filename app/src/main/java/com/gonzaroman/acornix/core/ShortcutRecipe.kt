@@ -11,7 +11,15 @@ import kotlinx.serialization.json.Json
  * edited again; the same file has the runtime that performs the steps through window.Acornix.
  */
 @Serializable
-data class ShortcutRecipe(val version: Int = 2, val steps: List<ShortcutStep> = emptyList()) {
+data class ShortcutRecipe(
+    val version: Int = 2,
+    val steps: List<ShortcutStep> = emptyList(),
+    /** The same steps with their texts in other languages ({"es": […]}), for shortcuts shared in the gallery. */
+    val translations: Map<String, List<ShortcutStep>> = emptyMap(),
+) {
+    /** The steps in [language] when there is a translation, otherwise the original ones. */
+    fun stepsFor(language: String): List<ShortcutStep> = translations[language]?.takeIf { it.isNotEmpty() } ?: steps
+
 
     fun toJson(): String = json.encodeToString(serializer(), this)
 
@@ -41,6 +49,13 @@ data class ShortcutRecipe(val version: Int = 2, val steps: List<ShortcutStep> = 
         steps.take(index).mapNotNull { s -> s.params["var"]?.trim()?.takeIf { it.isNotEmpty() && s.action in PRODUCERS } }.distinct()
 
     companion object {
+        /** Every action the runtime knows. */
+        val ACTIONS = setOf(
+            "volume", "ringer", "dnd", "media", "brightness", "flashlight", "vibrate", "alarm", "timer", "wait",
+            "whatsapp", "sms", "call", "speak", "notify", "launchApp", "maps", "youtube", "openUrl", "copy", "share",
+            "ask", "menu", "if", "else", "endif", "repeat", "endrepeat", "stop", "getUrl", "setVar", "calc", "show",
+        )
+
         /** Actions whose result goes into a variable ("var"). */
         val PRODUCERS = setOf("ask", "menu", "getUrl", "setVar", "calc")
 
@@ -106,11 +121,11 @@ data class ShortcutRecipe(val version: Int = 2, val steps: List<ShortcutStep> = 
   var A = window.Acornix;
   var L = ((A && A.language) || navigator.language || 'en').toLowerCase().indexOf('es') === 0 ? 'es' : 'en';
   var T = {
-    es: { running: 'Haciéndolo…', done: 'Hecho', failed: 'Algunos pasos no se han podido hacer. Si Acornix te ha pedido un permiso, dalo y vuelve a tocar el atajo.', close: 'Cerrar', outside: 'Este atajo funciona dentro de Acornix.', empty: 'Este atajo aún no tiene pasos.', ok: 'Aceptar', cancel: 'Cancelar', stopped: 'Cancelado', next: 'Continuar' },
-    en: { running: 'Doing it…', done: 'Done', failed: 'Some steps couldn\'t be done. If Acornix asked you for a permission, give it and tap the shortcut again.', close: 'Close', outside: 'This shortcut works inside Acornix.', empty: 'This shortcut has no steps yet.', ok: 'OK', cancel: 'Cancel', stopped: 'Cancelled', next: 'Continue' }
+    es: { preview: 'Vista previa: así es tu atajo. Ábrelo para que lo haga.', running: 'Haciéndolo…', done: 'Hecho', failed: 'Algunos pasos no se han podido hacer. Si Acornix te ha pedido un permiso, dalo y vuelve a tocar el atajo.', close: 'Cerrar', outside: 'Este atajo funciona dentro de Acornix.', empty: 'Este atajo aún no tiene pasos.', ok: 'Aceptar', cancel: 'Cancelar', stopped: 'Cancelado', next: 'Continuar' },
+    en: { preview: 'Preview: this is your shortcut. Open it to run it.', running: 'Doing it…', done: 'Done', failed: 'Some steps couldn\'t be done. If Acornix asked you for a permission, give it and tap the shortcut again.', close: 'Close', outside: 'This shortcut works inside Acornix.', empty: 'This shortcut has no steps yet.', ok: 'OK', cancel: 'Cancel', stopped: 'Cancelled', next: 'Continue' }
   }[L];
   var recipe = JSON.parse(document.getElementById('acornix-recipe').textContent || '{}');
-  var steps = recipe.steps || [];
+  var steps = (recipe.translations && recipe.translations[L] && recipe.translations[L].length) ? recipe.translations[L] : (recipe.steps || []);
   var list = document.getElementById('steps'), status = document.getElementById('status'), closeBtn = document.getElementById('close');
   var sheet = document.getElementById('sheet'), card = document.getElementById('card');
   var vars = {};
@@ -343,6 +358,8 @@ data class ShortcutRecipe(val version: Int = 2, val steps: List<ShortcutStep> = 
   async function main() {
     if (!A) { status.textContent = T.outside; return; }
     if (!steps.length) { status.textContent = T.empty; return; }
+    // While it's being created or shared, show the steps without doing them.
+    if (A.trigger === 'preview') { status.textContent = T.preview; return; }
     status.textContent = T.running;
     var failed = false, loops = {}, guard = 0, i = 0;
     while (i < steps.length && guard++ < 5000) {

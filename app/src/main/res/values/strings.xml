@@ -718,6 +718,9 @@
     <string name="shortcut_name">Name</string>
     <string name="shortcut_emoji">Emoji</string>
     <string name="shortcut_add_step">Add action</string>
+    <string name="gen_steps_hint">Made of steps: you can change any of them.</string>
+    <string name="shortcut_add_inside">Add action inside</string>
+    <string name="shortcut_add_after_block">Add after the block</string>
     <string name="shortcut_no_steps">Add the actions your shortcut will do, in order. They run one after another with one tap.</string>
     <string name="shortcut_variables">Tap a variable to add it to the text above.</string>
     <string name="schedule_title">Run it on its own</string>
@@ -861,4 +864,63 @@
     <string name="tr_any">any</string>
     <string name="tr_wifi_name">Wifi name (empty = any)</string>
     <string name="tr_bt_permission">Allow Acornix to see your paired devices (your car, headphones…).</string>
+    <string name="help_shortcuts_title">How shortcuts work</string>
+    <string name="help_shortcuts_button">Help</string>
+    <string name="help_shortcuts_hero_title">Shortcuts for Android</string>
+    <string name="help_shortcuts_hero_text">Tell your phone what to do and it does it with one tap: set alarms, go silent, send a WhatsApp, read the weather, open apps… Like iPhone Shortcuts, and once made they work without AI.</string>
+    <string name="help_ways_title">Three ways to get one</string>
+    <string-array name="help_ways">
+        <item>✨ Describe it: say what it should do (“bedtime mode at 11 pm”) and your AI builds it.</item>
+        <item>🧩 Step by step: pick actions from a list and set them up. No AI needed.</item>
+        <item>🌍 Community: download ready-made shortcuts made by other people.</item>
+    </string-array>
+    <string name="help_first_title">Your first shortcut, step by step</string>
+    <string-array name="help_first">
+        <item>Go to Shortcuts and tap “New shortcut”, then “Step by step”.</item>
+        <item>Give it a name and an emoji, for example 😴 Bedtime mode.</item>
+        <item>Tap “Add action” and pick “Do not disturb”. Then add “Set the brightness” and slide it to 10 %.</item>
+        <item>Add “Set an alarm” and choose 07:00. Add “Say out loud” and write “Good night”.</item>
+        <item>Tap “Save and try”: it does everything in order, shows ✓ Done and closes.</item>
+        <item>Long-press it to put it on the home screen, an NFC sticker or Quick Settings, or to automate it.</item>
+    </string-array>
+    <string name="help_vars_title">Variables: steps that pass things on</string>
+    <string-array name="help_vars">
+        <item>“Ask for a value” or “Choose from a menu” keep the answer in a variable, like {answer}.</item>
+        <item>Use it in any later text: “Hello {answer}”. Tap the chips under a text to add them.</item>
+        <item>There are ready ones too: {time}, {date}, {location}, {battery}, {clipboard} and {input} (what you shared with it).</item>
+        <item>“Only the first time” remembers the answer: perfect for a phone number or your city.</item>
+    </string-array>
+    <string name="help_logic_title">Decide and repeat</string>
+    <string-array name="help_logic">
+        <item>“If” runs its steps only when something is true: If {battery} is less than 20 → lower the brightness.</item>
+        <item>Add “Otherwise” for the other case. New actions go inside the block until you tap “Add after the block”.</item>
+        <item>“Repeat” runs its steps several times, and {repeat} says which time it is.</item>
+        <item>“Calculate” does maths with numbers and variables: ({a} + {b}) / 2.</item>
+    </string-array>
+    <string name="help_web_title">Data from the internet</string>
+    <string-array name="help_web">
+        <item>“Get from the web” reads a page or an API and keeps the answer in a variable.</item>
+        <item>For JSON APIs, write which field you want, like current.temperature_2m.</item>
+        <item>Then say it, show it or send it. The “What\'s the weather?” example below does exactly that.</item>
+    </string-array>
+    <string name="help_when_title">Make them run on their own</string>
+    <string-array name="help_when">
+        <item>⏰ At a time of day, every day or only some days.</item>
+        <item>🚗 When a Bluetooth device connects or disconnects: your car, your headphones.</item>
+        <item>🔌 When you plug in or unplug the charger, and 🔋 when the battery runs low.</item>
+        <item>📶 When you connect to a wifi (home, work) or leave it.</item>
+        <item>🏷️ When you touch an NFC sticker.</item>
+        <item>To open apps on their own, Android asks once for “Display over other apps”.</item>
+    </string-array>
+    <string name="help_launch_title">Run them from anywhere</string>
+    <string-array name="help_launch">
+        <item>The Shortcuts tab, and their own icon on the home screen.</item>
+        <item>Long-press the Acornix icon: your latest shortcuts appear.</item>
+        <item>The Acornix shortcuts widget, and a Quick Settings button.</item>
+        <item>“Share with a shortcut” from any app: the shared text arrives as {input}.</item>
+    </string-array>
+    <string name="help_examples_title">Examples to try</string>
+    <string name="help_examples_text">Tap “Create this one”: it opens in the editor ready to save, and you can change anything.</string>
+    <string name="help_create_this">Create this one</string>
+    <string name="help_done">Got it</string>
 </resources>

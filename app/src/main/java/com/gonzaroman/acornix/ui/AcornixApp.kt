@@ -88,7 +88,8 @@ object Routes {
     const val EXPLORE = "explore"
     const val EXPLORE_ROUTE = "explore?cat={cat}"
     const val SHORTCUTS = "shortcuts"
-    const val SHORTCUT_EDITOR = "shortcut_editor?id={id}"
+    const val SHORTCUT_EDITOR = "shortcut_editor?id={id}&template={template}"
+    const val SHORTCUTS_HELP = "shortcuts_help"
     const val COMMUNITY_TOUR = "community_tour"
     const val GALLERY_APP = "gallery/{id}"
     const val PUBLISH = "publish/{id}"
@@ -104,7 +105,8 @@ object Routes {
     fun share(appId: String) = "share/${Uri.encode(appId)}"
     fun galleryApp(id: String) = "gallery/${Uri.encode(id)}"
     fun explore(category: String) = "explore?cat=${Uri.encode(category)}"
-    fun shortcutEditor(appId: String? = null) = "shortcut_editor" + (appId?.let { "?id=${Uri.encode(it)}" } ?: "")
+    fun shortcutEditor(appId: String? = null, template: String? = null) = "shortcut_editor?" +
+        listOfNotNull(appId?.let { "id=${Uri.encode(it)}" }, template?.let { "template=${Uri.encode(it)}" }).joinToString("&")
     fun publish(appId: String) = "publish/${Uri.encode(appId)}"
 }
 
@@ -208,8 +210,12 @@ fun AcornixApp(
                 composable(Routes.SHORTCUTS) { ShortcutsScreen(nav) }
                 composable(
                     Routes.SHORTCUT_EDITOR,
-                    arguments = listOf(navArgument("id") { type = NavType.StringType; nullable = true; defaultValue = null }),
-                ) { entry -> ShortcutEditorScreen(nav, entry.arguments?.getString("id")) }
+                    arguments = listOf(
+                        navArgument("id") { type = NavType.StringType; nullable = true; defaultValue = null },
+                        navArgument("template") { type = NavType.StringType; nullable = true; defaultValue = null },
+                    ),
+                ) { entry -> ShortcutEditorScreen(nav, entry.arguments?.getString("id"), entry.arguments?.getString("template")) }
+                composable(Routes.SHORTCUTS_HELP) { com.gonzaroman.acornix.ui.shortcuts.ShortcutsHelpScreen(nav) }
                 composable(
                     Routes.ASSISTANT,
                     arguments = listOf(

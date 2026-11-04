@@ -449,7 +449,7 @@ private fun PhoneFrame(app: AppMeta, modifier: Modifier = Modifier) {
                         FrameLayout(ctx).also { frame ->
                             val webView = WebView(ctx)
                             frame.addView(webView, FrameLayout.LayoutParams(viewport, (screenH / scale).toInt()))
-                            AcornixWebView.configure(webView, ctx, scope, app.id)
+                            AcornixWebView.configure(webView, ctx, scope, app.id, trigger = "preview")
                             webView.loadUrl(AcornixWebView.appUrl(app.id) + "?v=${app.updatedAt}")
                         }
                     },

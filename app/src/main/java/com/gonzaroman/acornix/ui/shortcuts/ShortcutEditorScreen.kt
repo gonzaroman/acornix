@@ -83,7 +83,7 @@ import kotlinx.coroutines.withContext
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShortcutEditorScreen(nav: NavHostController, appId: String?) {
+fun ShortcutEditorScreen(nav: NavHostController, appId: String?, templateId: String? = null) {
     val context = LocalContext.current
     val c = context.container
     val scope = rememberCoroutineScope()
@@ -92,18 +92,27 @@ fun ShortcutEditorScreen(nav: NavHostController, appId: String?) {
     var emoji by rememberSaveable { mutableStateOf("⚡") }
     val steps = remember { mutableStateListOf<ShortcutStep>() }
     var picking by remember { mutableStateOf(false) }
+    // Where new actions go: inside the block just added (before its end), or at the end when null.
+    var insertAt by remember { mutableStateOf<Int?>(null) }
     var saving by remember { mutableStateOf(false) }
     var schedule by remember { mutableStateOf(appId?.let { c.schedules.get(it) }) }
     val triggers = remember { mutableStateListOf<com.gonzaroman.acornix.data.ShortcutTrigger>().apply { appId?.let { addAll(c.triggers.forApp(it)) } } }
 
-    LaunchedEffect(appId) {
-        if (appId == null) return@LaunchedEffect
+    LaunchedEffect(appId, templateId) {
+        if (appId == null) {
+            // A ready-made example from the help screen, to save as it is or change.
+            val spanish = context.resources.configuration.locales[0].language == "es"
+            com.gonzaroman.acornix.core.ShortcutTemplates.find(templateId ?: return@LaunchedEffect, spanish)?.let { t ->
+                name = t.name; emoji = t.emoji; steps.clear(); steps.addAll(t.recipe.steps)
+            }
+            return@LaunchedEffect
+        }
         val meta = c.apps.get(appId) ?: return@LaunchedEffect
         val recipe = withContext(Dispatchers.IO) { runCatching { ShortcutRecipe.fromHtml(c.apps.indexFile(appId).readText()) }.getOrNull() }
         name = meta.name
         emoji = meta.emoji
         steps.clear()
-        recipe?.steps?.let { steps.addAll(it) }
+        recipe?.stepsFor(context.resources.configuration.locales[0].language)?.let { steps.addAll(it) }
     }
 
     fun save(andRun: Boolean) {
@@ -185,16 +194,22 @@ fun ShortcutEditorScreen(nav: NavHostController, appId: String?) {
                     depth = depths.getOrElse(index) { 0 },
                     variables = recipe.variablesBefore(index) + builtIn,
                     onChange = { steps[index] = it },
-                    onUp = if (index > 0) ({ steps.add(index - 1, steps.removeAt(index)) }) else null,
-                    onDown = if (index < steps.lastIndex) ({ steps.add(index + 1, steps.removeAt(index)) }) else null,
-                    onRemove = { steps.removeAt(index) },
+                    onUp = if (index > 0) ({ insertAt = null; steps.add(index - 1, steps.removeAt(index)) }) else null,
+                    onDown = if (index < steps.lastIndex) ({ insertAt = null; steps.add(index + 1, steps.removeAt(index)) }) else null,
+                    onRemove = { insertAt = null; removeStep(steps, index) },
                 )
             }
             item {
+                val inside = insertAt?.takeIf { it in steps.indices }
                 FilledTonalButton(onClick = { picking = true }, modifier = Modifier.fillMaxWidth()) {
                     Icon(Icons.Rounded.Add, null)
                     Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.shortcut_add_step))
+                    Text(stringResource(if (inside != null) R.string.shortcut_add_inside else R.string.shortcut_add_step))
+                }
+                if (inside != null) {
+                    OutlinedButton(onClick = { insertAt = null }, modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
+                        Text(stringResource(R.string.shortcut_add_after_block))
+                    }
                 }
             }
             item { ScheduleCard(appId ?: "", schedule) { schedule = it } }
@@ -226,11 +241,13 @@ fun ShortcutEditorScreen(nav: NavHostController, appId: String?) {
                                 headlineContent = { Text(stringResource(action.label)) },
                                 leadingContent = { Text(action.emoji, fontSize = 22.sp) },
                                 modifier = Modifier.clickable {
-                                    steps.add(ShortcutStep(action.id, action.defaults(context)))
-                                    // Blocks come with their end, like in iPhone Shortcuts.
-                                    when (action.id) {
-                                        "if" -> steps.add(ShortcutStep("endif"))
-                                        "repeat" -> steps.add(ShortcutStep("endrepeat"))
+                                    val at = insertAt?.takeIf { it in steps.indices } ?: steps.size
+                                    steps.add(at, ShortcutStep(action.id, action.defaults(context)))
+                                    // Blocks come with their end, like in iPhone Shortcuts, and what comes next goes inside.
+                                    insertAt = when (action.id) {
+                                        "if" -> { steps.add(at + 1, ShortcutStep("endif")); at + 1 }
+                                        "repeat" -> { steps.add(at + 1, ShortcutStep("endrepeat")); at + 1 }
+                                        else -> if (insertAt != null) at + 1 else null
                                     }
                                     picking = false
                                 },
@@ -242,6 +259,22 @@ fun ShortcutEditorScreen(nav: NavHostController, appId: String?) {
             }
         }
     }
+}
+
+/** Removes a step; removing "If" or "Repeat" also removes its "Otherwise" and its end, keeping the steps inside. */
+private fun removeStep(steps: MutableList<ShortcutStep>, index: Int) {
+    val action = steps[index].action
+    if (action != "if" && action != "repeat") { steps.removeAt(index); return }
+    val end = if (action == "if") "endif" else "endrepeat"
+    var nested = 0
+    val drop = mutableListOf(index)
+    for (j in index + 1 until steps.size) {
+        val a = steps[j].action
+        if (a == action) nested++
+        else if (a == "else" && action == "if" && nested == 0) drop += j
+        else if (a == end) { if (nested == 0) { drop += j; break } else nested-- }
+    }
+    drop.sortedDescending().forEach { steps.removeAt(it) }
 }
 
 private val BUILT_IN_ES = listOf("hora", "fecha", "ubicación", "batería", "portapapeles", "entrada")

@@ -79,9 +79,14 @@ Made something cool? Tap **Share** and Acornix builds a card with **your app run
 
 ### ⚡ Shortcuts for Android
 
-Like iPhone Shortcuts, but you create them by saying what you want: *"bedtime mode: silent, low brightness and an alarm at 7"*, *"send my location to Mum on WhatsApp"*, *"car mode: volume up and my playlist"*. The AI writes the shortcut once; after that it runs with **one tap and no AI at all**. Shortcuts have their own tab, and you can put each one on your home screen or **write it to an NFC sticker**: touch the sticker and it runs.
+Like iPhone Shortcuts, powerful like Tasker and as easy as Acornix: tell your phone what to do and it does it with one tap. Shortcuts have their own tab, a step-by-step tutorial (the big **?**) and ready-made examples.
 
-They can set alarms and timers, change the volume, go silent or turn on Do not disturb, change the brightness, play or skip music, open WhatsApp, SMS, calls, Maps or any app, add calendar events, use your location, the flashlight, vibration and voice, send notifications and even ask your AI. Ready-made shortcuts are waiting in the community gallery.
+- **Three ways to make one.** *Describe it* — *"bedtime mode: silent, low brightness and an alarm at 7"* — and your AI builds it as steps you can edit. Or build it **step by step without any AI**, picking actions from a list. Or download one from the community.
+- **Real logic.** Ask for a value, choose from a menu, keep answers in **variables** (`{answer}`, `{time}`, `{location}`, `{battery}`…), **If / Otherwise**, **Repeat**, calculate, and **get data from the web** (JSON APIs like Open-Meteo) to say it, show it or send it.
+- **Actions:** alarms and timers, volume, silent and Do not disturb, brightness, music controls, flashlight, vibration, voice, notifications, WhatsApp, SMS and calls (pick a contact), open any app (pick it from a list), Maps, YouTube search, web pages in the app you choose, copy and share.
+- **They run on their own:** at a time of day, when your car's Bluetooth connects, when you plug in the charger, when the battery runs low, when you join or leave a wifi, or when you touch an **NFC sticker**.
+- **Run them from anywhere:** the Shortcuts tab, their own home screen icon, a long-press on the Acornix icon, the Acornix widget, a Quick Settings button, or **Share with a shortcut** from any app.
+- Once made, shortcuts work **without an AI key**.
 
 ### 🤖 An AI assistant that gets things done
 
@@ -254,8 +259,11 @@ await Acornix.whatsapp('+34600000000', "I'm home"); // Acornix.sms(number, text)
 await Acornix.maps('Plaza Mayor, Madrid');  // Acornix.launchApp('Spotify')
 await Acornix.calendar({ title: 'Dentist', start: new Date('2026-12-01T10:00'), end: new Date('2026-12-01T11:00') });
 const text = await Acornix.clipboard();
+const json = JSON.parse(await Acornix.http('https://api.open-meteo.com/v1/forecast?latitude=40.4&longitude=-3.7&current=temperature_2m')); // no CORS limits
+await Acornix.youtube('lofi beats');                 // Acornix.openUrl(url, 'com.android.chrome') opens it in that app
+Acornix.input;                                       // text shared with the shortcut ("Share with a shortcut")
 await Acornix.keepAwake(true);              // screen stays on while the app is open
-Acornix.trigger;                            // 'tap', 'home' (home screen icon) or 'nfc' (NFC sticker)
+Acornix.trigger;                            // 'tap', 'home', 'icon', 'widget', 'tile', 'share', 'nfc', 'schedule', 'bluetooth'…
 await Acornix.done('Bedtime mode on');      // shows "✓ Bedtime mode on" and closes the shortcut
 
 // Your AI, inside the app (the user's own model and key)

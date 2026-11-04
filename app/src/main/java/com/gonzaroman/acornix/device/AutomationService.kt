@@ -91,20 +91,26 @@ class AutomationService : Service() {
     private fun listenToWifi() {
         val cm = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
         var connected: String? = null
-        val callback = object : ConnectivityManager.NetworkCallback(
-            if (Build.VERSION.SDK_INT >= 31) FLAG_INCLUDE_LOCATION_INFO else 0,
-        ) {
-            override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) {
-                if (connected != null) return
+        val onChange: (Network, NetworkCapabilities) -> Unit = { _, caps ->
+            if (connected == null) {
                 val ssid = ssidOf(caps)
                 connected = ssid
                 fire(TriggerType.WIFI_CONNECTED, ssid)
             }
-
-            override fun onLost(network: Network) {
-                val was = connected ?: return
-                connected = null
-                fire(TriggerType.WIFI_DISCONNECTED, was)
+        }
+        val onLost: (Network) -> Unit = {
+            connected?.let { was -> connected = null; fire(TriggerType.WIFI_DISCONNECTED, was) }
+        }
+        // From Android 12 the callback must ask for location info to see the wifi's name.
+        val callback = if (Build.VERSION.SDK_INT >= 31) {
+            object : ConnectivityManager.NetworkCallback(FLAG_INCLUDE_LOCATION_INFO) {
+                override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) = onChange(network, caps)
+                override fun onLost(network: Network) = onLost(network)
+            }
+        } else {
+            object : ConnectivityManager.NetworkCallback() {
+                override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) = onChange(network, caps)
+                override fun onLost(network: Network) = onLost(network)
             }
         }
         runCatching {

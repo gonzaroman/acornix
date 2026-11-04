@@ -61,6 +61,14 @@ class AppContainer(private val context: Context) {
         appScope.launch {
             apps.refresh()
             samples.installIfNeeded()
+            runCatching {
+                val language = when (settings.current().appLanguage) {
+                    com.gonzaroman.acornix.data.AppLanguage.SPANISH -> "es"
+                    com.gonzaroman.acornix.data.AppLanguage.ENGLISH -> "en"
+                    else -> java.util.Locale.getDefault().language
+                }
+                com.gonzaroman.acornix.core.ShortcutSamples(context, apps).installIfNeeded(language)
+            }
             // Quiet daily check for a newer release on GitHub; failures (offline…) are ignored.
             delay(2500)
             runCatching { updates.check() }

@@ -4,6 +4,7 @@ import com.gonzaroman.acornix.ai.AiException
 import com.gonzaroman.acornix.ai.ImageData
 import com.gonzaroman.acornix.data.AppDataStore
 import com.gonzaroman.acornix.data.AppKind
+import com.gonzaroman.acornix.data.AppLanguage
 import com.gonzaroman.acornix.data.AppMeta
 import com.gonzaroman.acornix.data.AppRepository
 import com.gonzaroman.acornix.data.SettingsRepository
@@ -45,6 +46,11 @@ class AppGenerator(
 
         val existing = request.improveAppId?.let { repo.get(it) ?: throw AiException("App not found: $it") }
         val hasImage = request.images.isNotEmpty()
+
+        // A new shortcut is made of editable steps when the request fits them; only otherwise is it written as code.
+        if (existing == null && request.kind == AppKind.FEATURE && !hasImage) {
+            planShortcut(request, language, s.appLanguage)?.let { return it }
+        }
         val (system, prompt) = if (existing != null) {
             Prompts.improve(language, existing.kind == AppKind.FEATURE) to
                 Prompts.improvePrompt(repo.readCode(existing.id), request.idea, hasImage, data.describeForAi(existing.id))
@@ -84,6 +90,24 @@ class AppGenerator(
             repo.create(name, code, request.kind, description = request.idea, emoji = request.emoji, note = request.idea, buildSeconds = seconds)
         }
         return GenerationResult(app, parsed.suggestion, result.truncated)
+    }
+
+    /** The step-by-step version of a new shortcut, or null when the AI says it needs its own screen (or fails). */
+    private suspend fun planShortcut(request: GenerationRequest, language: String, appLanguage: AppLanguage): GenerationResult? {
+        val spanish = when (appLanguage) {
+            AppLanguage.SPANISH -> true
+            AppLanguage.ENGLISH -> false
+            else -> java.util.Locale.getDefault().language == "es"
+        }
+        val answer = runCatching {
+            settings.activeProvider().streamText(Prompts.shortcutPlan(language, spanish), request.idea, quick = true) { }.text
+        }.getOrNull() ?: return null
+        val plan = ShortcutPlan.parse(answer) ?: return null
+        val name = request.name.ifBlank { plan.name.trim().ifBlank { suggestName(request.idea) } }.take(40)
+        val emoji = request.emoji ?: plan.emoji.trim().ifBlank { "⚡" }.take(8)
+        val html = ShortcutRecipe(steps = plan.steps.orEmpty()).html(name, emoji)
+        val app = repo.create(name, html, AppKind.FEATURE, description = request.idea, emoji = emoji, note = request.idea)
+        return GenerationResult(app, null, false)
     }
 
     companion object {

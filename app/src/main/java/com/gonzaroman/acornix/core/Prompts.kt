@@ -206,6 +206,33 @@ object Prompts {
         The phone's location: navigator.geolocation. Calls can fail (e.g. no flashlight): use try/catch and show a friendly message.
     """.trimIndent()
 
+    /**
+     * Turns a request into step-by-step shortcut steps the user can edit, or says it needs its own screen.
+     * The answer is JSON, read by [ShortcutPlan.parse].
+     */
+    fun shortcutPlan(language: String, spanish: Boolean) = """
+        You turn a request into an Acornix shortcut made of steps, like iPhone Shortcuts. Reply ONLY with JSON:
+        {"name": "short name in $language", "emoji": "one emoji", "steps": [{"action": "…", "params": {"key": "value"}}]}
+        If it really needs its own screen (a game, a dashboard, drawing, a list the user manages, anything interactive beyond
+        asking, choosing from a menu and showing a result), reply {"steps": null}.
+        Actions and their params (every value is a string):
+        - volume {level: 0-100, stream: media|ring|alarm} · ringer {mode: normal|vibrate|silent} · dnd {on: on|off}
+        - media {action: play|pause|next|previous} · brightness {level: 0-100} · flashlight {mode: on|off|sos} · vibrate {}
+        - alarm {time: "HH:MM", label} · timer {minutes, label} · wait {seconds}
+        - whatsapp {number: international or "", text} · sms {number, text} · call {number}
+        - speak {text} · notify {title, text} · show {text}   (show waits until the user taps Continue)
+        - launchApp {name: app name like "Spotify"} · maps {query} · youtube {query} · openUrl {url} · copy {text} · share {text}
+        - ask {question, type: text|number, var, remember: yes|no, default} · menu {question, options: one per line, var}
+        - if {left, op: equals|notEquals|contains|greater|less|empty|notEmpty, right} … else {} … endif {}
+        - repeat {times} … endrepeat {} · stop {}
+        - getUrl {url, path: JSON field like "current.temperature_2m", var} (free APIs without keys, e.g. Open-Meteo)
+        - setVar {var, value} · calc {expr: maths with numbers and variables, var}
+        Variables: any text can use {var} of an earlier ask/menu/getUrl/setVar/calc, and the built-in
+        ${if (spanish) "{hora} {fecha} {ubicación} {batería} {portapapeles} {entrada} {repetición}" else "{time} {date} {location} {battery} {clipboard} {input} {repeat}"}.
+        Rules: anything personal the request doesn't say (a phone number, a city, a time) is a first "ask" step with
+        remember "yes", so it is asked only once. Every visible text in $language. Keep it as short as the request allows.
+    """.trimIndent()
+
     /** How a shortcut behaves: instant actions run and close, settings are asked once. */
     private val SHORTCUT_RULES = """
         SHORTCUTS: this is a shortcut, like iPhone Shortcuts. Keep it dead simple to use.
@@ -217,6 +244,7 @@ object Prompts {
           available when Acornix.done is skipped) to change those settings.
         - If the request needs a screen (a dashboard, a timer, a game with the flashlight…), build a normal app instead.
         - Never use the AI (Acornix.askAI) unless the request clearly needs it: shortcuts must work without an AI key.
+        - When Acornix.trigger is 'preview' (shown while it's being created), don't act: show what it will do.
     """.trimIndent()
 
     fun assistant(
