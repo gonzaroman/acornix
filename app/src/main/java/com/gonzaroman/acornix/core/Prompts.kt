@@ -191,7 +191,7 @@ object Prompts {
         Shortcut actions (the phone does things for the user):
         - Acornix.alarm(hour, minute, label?)  · Acornix.timer(seconds, label?)   // in the phone's clock app
         - Acornix.call(number) · Acornix.sms(number, text) · Acornix.whatsapp(number?, text)   // opens them ready to send
-        - Acornix.maps(placeOrAddress)         · Acornix.launchApp(name)          // e.g. launchApp('Spotify')
+        - Acornix.maps(placeOrAddress)         · Acornix.launchApp(name)          // e.g. launchApp('Spotify'); true, or 'store' if it isn't installed (Google Play opens)
         - Acornix.volume(0-100, 'media'|'ring'|'alarm') · Acornix.volume(undefined, stream) -> current %
         - Acornix.ringer('normal'|'vibrate'|'silent') · Acornix.doNotDisturb(on)  // false the first time: Acornix asks the user for access
         - Acornix.brightness(0-100)            // false if the user hasn't let Acornix change system settings yet

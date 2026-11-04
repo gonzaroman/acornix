@@ -4,7 +4,7 @@ import androidx.annotation.StringRes
 import com.gonzaroman.acornix.R
 
 /** How a setting of an action is edited. */
-enum class FieldKind { TEXT, NUMBER, PERCENT, TIME, PHONE, CHOICE }
+enum class FieldKind { TEXT, NUMBER, PERCENT, TIME, PHONE, CHOICE, APP }
 
 data class FieldDef(
     val key: String,
@@ -70,7 +70,7 @@ val SHORTCUT_ACTIONS = listOf(
         FieldDef("title", R.string.sf_title, FieldKind.TEXT, variables = true),
         FieldDef("text", R.string.sf_text, FieldKind.TEXT, variables = true),
     )),
-    ActionDef("launchApp", "📱", R.string.sa_launch_app, R.string.sg_apps, listOf(FieldDef("name", R.string.sf_app_name, FieldKind.TEXT))),
+    ActionDef("launchApp", "📱", R.string.sa_launch_app, R.string.sg_apps, listOf(FieldDef("name", R.string.sf_app_name, FieldKind.APP))),
     ActionDef("maps", "🗺️", R.string.sa_maps, R.string.sg_apps, listOf(FieldDef("query", R.string.sf_place, FieldKind.TEXT, variables = true))),
     ActionDef("openUrl", "🌐", R.string.sa_open_url, R.string.sg_apps, listOf(FieldDef("url", R.string.sf_url, FieldKind.TEXT))),
     ActionDef("copy", "📋", R.string.sa_copy, R.string.sg_apps, listOf(FieldDef("text", R.string.sf_text, FieldKind.TEXT, variables = true))),

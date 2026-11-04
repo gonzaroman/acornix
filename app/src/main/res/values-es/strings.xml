@@ -719,6 +719,9 @@
     <string name="shortcut_add_step">Añadir acción</string>
     <string name="shortcut_no_steps">Añade las acciones que hará tu atajo, en orden. Se ejecutan una tras otra con un toque.</string>
     <string name="shortcut_variables">Puedes escribir {hora}, {fecha}, {ubicación} o {batería} y se rellenan al ejecutarlo.</string>
+    <string name="shortcut_search_apps">Buscar apps</string>
+    <string name="shortcut_pick_app">Elegir app</string>
+    <string name="shortcut_pick_contact">Elegir contacto</string>
     <string name="shortcut_save">Guardar</string>
     <string name="shortcut_try">Guardar y probar</string>
     <string name="shortcut_saved">Atajo guardado</string>

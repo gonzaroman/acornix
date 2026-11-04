@@ -87,19 +87,17 @@ class DeviceActions(private val context: Context) {
             .sortedBy { it.label.lowercase() }
     }
 
-    /** Opens an installed app by (fuzzy) name or package. Returns the matched label, or null. */
+    /** Opens an installed app by package or (fuzzy, typo-tolerant) name. Returns the matched label, or null. */
     fun openApp(name: String): String? {
-        val q = name.trim().lowercase()
-        val apps = installedApps()
-        val match = apps.firstOrNull { it.packageName.equals(q, true) }
-            ?: apps.firstOrNull { it.label.lowercase() == q }
-            ?: apps.firstOrNull { it.label.lowercase().startsWith(q) }
-            ?: apps.firstOrNull { it.label.lowercase().contains(q) }
-            ?: apps.firstOrNull { q.contains(it.label.lowercase()) && it.label.length > 2 }
-            ?: return null
+        val match = bestAppMatch(name, installedApps()) ?: return null
         val launchIntent = context.packageManager.getLaunchIntentForPackage(match.packageName) ?: return null
         return if (launch(launchIntent)) match.label else null
     }
+
+    /** Google Play's search for an app the phone doesn't have. */
+    fun searchStore(name: String): Boolean =
+        launch(Intent(Intent.ACTION_VIEW, Uri.parse("market://search?q=${enc(name)}&c=apps"))) ||
+            openUrl("https://play.google.com/store/search?q=${enc(name)}&c=apps")
 
     fun setAlarm(hour: Int, minute: Int, message: String?): Boolean = launch(
         Intent(AlarmClock.ACTION_SET_ALARM)
@@ -421,6 +419,36 @@ class DeviceActions(private val context: Context) {
     private fun enc(s: String) = URLEncoder.encode(s, "UTF-8")
 
     companion object {
+        /**
+         * The app [query] means: its package, its exact name, a name that starts with or contains it, or else the
+         * closest name with at most a couple of typos ("YouTubi" → YouTube).
+         */
+        fun bestAppMatch(query: String, apps: List<InstalledApp>): InstalledApp? {
+            val q = query.trim().lowercase()
+            if (q.isEmpty()) return null
+            apps.firstOrNull { it.packageName.equals(q, true) }?.let { return it }
+            apps.firstOrNull { it.label.lowercase() == q }?.let { return it }
+            apps.firstOrNull { it.label.lowercase().startsWith(q) }?.let { return it }
+            apps.firstOrNull { it.label.lowercase().contains(q) }?.let { return it }
+            apps.firstOrNull { q.contains(it.label.lowercase()) && it.label.length > 2 }?.let { return it }
+            val allowed = if (q.length <= 4) 1 else 2
+            return apps.map { it to distance(q, it.label.lowercase()) }
+                .filter { it.second <= allowed }
+                .minByOrNull { it.second }?.first
+        }
+
+        /** Levenshtein distance. */
+        private fun distance(a: String, b: String): Int {
+            var prev = IntArray(b.length + 1) { it }
+            for (i in 1..a.length) {
+                val cur = IntArray(b.length + 1)
+                cur[0] = i
+                for (j in 1..b.length) cur[j] = minOf(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + if (a[i - 1] == b[j - 1]) 0 else 1)
+                prev = cur
+            }
+            return prev[b.length]
+        }
+
         const val CHANNEL_GENERAL = "general"
         const val CHANNEL_AGENT = "agent"
 

@@ -87,9 +87,9 @@ data class ShortcutRecipe(val version: Int = 1, val steps: List<ShortcutStep> = 
     media: function (p) { return '🎵 ' + ({ play: '▶️', pause: '⏸️', next: '⏭️', previous: '⏮️' }[p.action] || '⏯️'); },
     alarm: function (p) { return (L === 'es' ? '⏰ Alarma ' : '⏰ Alarm ') + (p.time || ''); },
     timer: function (p) { return (L === 'es' ? '⏲️ Temporizador ' : '⏲️ Timer ') + (p.minutes || 0) + ' min'; },
-    whatsapp: function (p) { return '💬 WhatsApp' + (p.number ? ' · ' + p.number : ''); },
-    sms: function (p) { return '✉️ SMS · ' + (p.number || ''); },
-    call: function (p) { return (L === 'es' ? '📞 Llamar · ' : '📞 Call · ') + (p.number || ''); },
+    whatsapp: function (p) { return '💬 WhatsApp' + ((p.contact || p.number) ? ' · ' + (p.contact || p.number) : ''); },
+    sms: function (p) { return '✉️ SMS · ' + (p.contact || p.number || ''); },
+    call: function (p) { return (L === 'es' ? '📞 Llamar · ' : '📞 Call · ') + (p.contact || p.number || ''); },
     maps: function (p) { return '🗺️ ' + (p.query || ''); },
     launchApp: function (p) { return (L === 'es' ? '📱 Abrir ' : '📱 Open ') + (p.name || ''); },
     openUrl: function (p) { return '🌐 ' + (p.url || ''); },
@@ -145,7 +145,7 @@ data class ShortcutRecipe(val version: Int = 1, val steps: List<ShortcutStep> = 
       case 'sms': return A.sms(p.number || '', await fill(p.text));
       case 'call': return A.call(p.number || '');
       case 'maps': return A.maps(await fill(p.query));
-      case 'launchApp': return A.launchApp(p.name || '');
+      case 'launchApp': var r = await A.launchApp(p['package'] || p.name || '', p.name || ''); return r === true;
       case 'openUrl': return A.openUrl(await fill(p.url));
       case 'speak': return A.speak(await fill(p.text), L === 'es' ? 'es-ES' : 'en-US');
       case 'notify': return A.notify(await fill(p.title), await fill(p.text));

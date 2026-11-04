@@ -340,7 +340,15 @@ class AcornixJsBridge(
             "sms" -> JsonPrimitive(device.composeSms(str(0).orEmpty(), str(1).orEmpty()))
             "whatsapp" -> JsonPrimitive(device.whatsapp(str(0), str(1).orEmpty()))
             "maps" -> JsonPrimitive(device.openMaps(str(0).orEmpty()))
-            "launchApp" -> JsonPrimitive(device.openApp(str(0).orEmpty()) != null)
+            // Opened → true. Not installed → Google Play's search for it, and "store".
+            "launchApp" -> {
+                val q = str(0).orEmpty()
+                when {
+                    device.openApp(q) != null -> JsonPrimitive(true)
+                    device.searchStore(str(1)?.takeIf { it.isNotBlank() } ?: q) -> JsonPrimitive("store")
+                    else -> JsonPrimitive(false)
+                }
+            }
             "volume" -> {
                 val level = int(0)
                 if (level != null) JsonPrimitive(device.setVolume(level, str(1))) else JsonPrimitive(device.volume(str(1)))
@@ -515,7 +523,7 @@ class AcornixJsBridge(
                 sms: function (n, t) { return call('sms', [String(n), String(t || '')]); },
                 whatsapp: function (n, t) { return call('whatsapp', [n ? String(n) : null, String(t || '')]); },
                 maps: function (q) { return call('maps', [String(q)]); },
-                launchApp: function (n) { return call('launchApp', [String(n)]); },
+                launchApp: function (n, label) { return call('launchApp', [String(n), label ? String(label) : null]); },
                 volume: function (level, stream) { return call('volume', [level === undefined ? null : level, stream || 'media']); },
                 ringer: function (mode) { return call('ringer', [String(mode)]); },
                 doNotDisturb: function (on) { return call('doNotDisturb', [on !== false]); },

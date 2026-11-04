@@ -720,6 +720,9 @@
     <string name="shortcut_add_step">Add action</string>
     <string name="shortcut_no_steps">Add the actions your shortcut will do, in order. They run one after another with one tap.</string>
     <string name="shortcut_variables">You can write {time}, {date}, {location} or {battery} and they are filled in when it runs.</string>
+    <string name="shortcut_search_apps">Search apps</string>
+    <string name="shortcut_pick_app">Choose an app</string>
+    <string name="shortcut_pick_contact">Choose a contact</string>
     <string name="shortcut_save">Save</string>
     <string name="shortcut_try">Save and try</string>
     <string name="shortcut_saved">Shortcut saved</string>

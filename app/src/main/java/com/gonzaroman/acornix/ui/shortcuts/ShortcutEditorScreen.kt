@@ -26,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Contacts
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material3.Button
@@ -242,18 +243,48 @@ private fun StepCard(
             }
             Column(Modifier.padding(end = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 action.fields.forEach { field ->
-                    val value = step.params[field.key] ?: field.default
-                    FieldEditor(field, value) { onChange(step.copy(params = step.params + (field.key to it))) }
+                    FieldEditor(field, step.params) { changes -> onChange(step.copy(params = step.params + changes)) }
                 }
             }
         }
     }
 }
 
+/** Edits one setting; [onChange] receives the settings that changed (an app or a contact sets two). */
 @Composable
-private fun FieldEditor(field: FieldDef, value: String, onChange: (String) -> Unit) {
+private fun FieldEditor(field: FieldDef, params: Map<String, String>, onChanges: (Map<String, String>) -> Unit) {
     val context = LocalContext.current
+    val value = params[field.key] ?: field.default
+    val onChange: (String) -> Unit = { onChanges(mapOf(field.key to it)) }
     when (field.kind) {
+        FieldKind.APP -> {
+            var picking by remember { mutableStateOf(false) }
+            OutlinedButton(onClick = { picking = true }, modifier = Modifier.fillMaxWidth()) {
+                Text(if (value.isBlank()) "📱  " + stringResource(R.string.shortcut_pick_app) else "📱  $value")
+            }
+            if (picking) {
+                AppPickerSheet(
+                    onPick = { app -> picking = false; onChanges(mapOf(field.key to app.label, "package" to app.packageName)) },
+                    onDismiss = { picking = false },
+                )
+            }
+        }
+        FieldKind.PHONE -> {
+            val pickContact = rememberContactPicker { name, number -> onChanges(mapOf(field.key to number, "contact" to name)) }
+            OutlinedTextField(
+                value = value,
+                // Typing a number by hand means it is no longer the picked contact.
+                onValueChange = { onChanges(mapOf(field.key to it, "contact" to "")) },
+                label = { Text(stringResource(field.label)) },
+                supportingText = params["contact"]?.takeIf { it.isNotBlank() }?.let { { Text("👤 $it") } },
+                trailingIcon = {
+                    IconButton(onClick = pickContact) { Icon(Icons.Rounded.Contacts, stringResource(R.string.shortcut_pick_contact)) }
+                },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
         FieldKind.CHOICE -> Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             field.choices.forEach { (v, label) ->
                 FilterChip(selected = value == v, onClick = { onChange(v) }, label = { Text(stringResource(label)) })
