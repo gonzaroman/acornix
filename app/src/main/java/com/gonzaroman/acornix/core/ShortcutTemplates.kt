@@ -22,6 +22,98 @@ object ShortcutTemplates {
     fun find(id: String, spanish: Boolean) = all(spanish).firstOrNull { it.id == id }
 
     private val ES = listOf(
+        // The examples installed with Acornix: basic things that show what shortcuts can do.
+        ShortcutTemplate(
+            "night", "🌙", "Modo noche", "Brillo al mínimo, volumen al 80 %, No molestar y te dice la hora.",
+            ShortcutRecipe(steps = listOf(
+                s("brightness", "level" to "5"),
+                s("volume", "level" to "80", "stream" to "media"),
+                s("dnd", "on" to "on"),
+                s("speak", "text" to "Son las {hora}. Modo noche activado. Que descanses."),
+            )),
+            "Prográmalo a las 23:00 en «Ejecutar solo».",
+        ),
+        ShortcutTemplate(
+            "synthwave", "🎶", "Synthwave con luces", "Pone música synthwave en YouTube y la linterna parpadea al ritmo.",
+            ShortcutRecipe(steps = listOf(
+                s("volume", "level" to "70", "stream" to "media"),
+                s("openUrl", "url" to "https://www.youtube.com/watch?v=4xDzrJKXOOY", "app" to "YouTube", "appPackage" to "com.google.android.youtube"),
+                s("wait", "seconds" to "4"),
+                s("strobe", "seconds" to "30", "speed" to "slow"),
+            )),
+            "Cambia el vídeo o los segundos de luz en «Editar pasos».",
+        ),
+        ShortcutTemplate(
+            "lowbattery", "🔋", "Aviso de batería baja", "Si queda poca batería te avisa en voz alta, con una notificación, y baja el brillo.",
+            ShortcutRecipe(steps = listOf(
+                s("if", "left" to "{batería}", "op" to "less", "right" to "21"),
+                s("speak", "text" to "Atención: batería baja, queda un {batería} por ciento."),
+                s("notify", "title" to "🔋 Batería baja: {batería} %", "text" to "Conecta el cargador. He bajado el brillo para ahorrar."),
+                s("brightness", "level" to "20"),
+                s("else"),
+                s("speak", "text" to "Tienes un {batería} por ciento de batería."),
+                s("endif"),
+            )),
+            "Automatízalo en «Automatizar» → «La batería baja del» 20 %, y te avisará solo.",
+        ),
+        ShortcutTemplate(
+            "wakeup", "⏰", "Despertador con luz", "Suena la alarma, la linterna parpadea y te da los buenos días.",
+            ShortcutRecipe(steps = listOf(
+                s("volume", "level" to "100", "stream" to "alarm"),
+                s("alarmSound", "seconds" to "20"),
+                s("strobe", "seconds" to "20", "speed" to "fast"),
+                s("speak", "text" to "¡Buenos días! Son las {hora}."),
+            )),
+            "Ponle tu hora en «Ejecutar solo» y te despertará con luz y sonido.",
+        ),
+        ShortcutTemplate(
+            "driving", "🚗", "Conducir", "Enciende el Bluetooth, abre Google Maps hacia tu destino, volumen al máximo y No molestar.",
+            ShortcutRecipe(steps = listOf(
+                s("ask", "question" to "¿A dónde vas normalmente? Escribe la dirección o «casa»", "type" to "text", "var" to "destino", "remember" to "yes"),
+                s("bluetooth", "on" to "on"),
+                s("volume", "level" to "100", "stream" to "media"),
+                s("dnd", "on" to "on"),
+                s("openUrl", "url" to "google.navigation:q={destino}"),
+                s("speak", "text" to "¡Buen viaje!"),
+            )),
+            "Automatízalo al conectar el Bluetooth del coche.",
+        ),
+        ShortcutTemplate(
+            "morning", "☀️", "Buenos días", "La fecha, el tiempo en tu ciudad y tu batería, en voz alta, y quita el No molestar.",
+            ShortcutRecipe(steps = listOf(
+                s("ask", "question" to "¿En qué ciudad vives?", "type" to "text", "var" to "ciudad", "remember" to "yes"),
+                s("dnd", "on" to "off"),
+                s("brightness", "level" to "70"),
+                s("getUrl", "url" to "https://geocoding-api.open-meteo.com/v1/search?count=1&name={ciudad}", "path" to "results.0.latitude", "var" to "lat"),
+                s("getUrl", "url" to "https://geocoding-api.open-meteo.com/v1/search?count=1&name={ciudad}", "path" to "results.0.longitude", "var" to "lon"),
+                s("getUrl", "url" to "https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m", "path" to "current.temperature_2m", "var" to "temperatura"),
+                s("speak", "text" to "Buenos días. Hoy es {fecha}. En {ciudad} hace {temperatura} grados y tienes un {batería} por ciento de batería."),
+            )),
+            "Prográmalo cada mañana a tu hora.",
+        ),
+        ShortcutTemplate(
+            "acornixvideos", "🎬", "Vídeos de Acornix", "Abre en YouTube los Shorts de Acornix: lo que se puede hacer, en vídeos cortos.",
+            ShortcutRecipe(steps = listOf(
+                s("openUrl", "url" to "https://www.youtube.com/@gonzaloroman1608/shorts", "app" to "YouTube", "appPackage" to "com.google.android.youtube"),
+            )),
+        ),
+        ShortcutTemplate(
+            "markets", "📈", "Mercados", "El precio del bitcoin, Nvidia, Apple, Google y Amazon, de internet y al momento.",
+            ShortcutRecipe(steps = listOf(
+                s("getUrl", "url" to "https://api.coinbase.com/v2/prices/BTC-EUR/spot", "path" to "data.amount", "var" to "bitcoin"),
+                s("calc", "expr" to "{bitcoin}", "var" to "bitcoin"),
+                s("getUrl", "url" to "https://query1.finance.yahoo.com/v8/finance/chart/NVDA?range=1d&interval=1d", "path" to "chart.result.0.meta.regularMarketPrice", "var" to "nvidia"),
+                s("calc", "expr" to "{nvidia}", "var" to "nvidia"),
+                s("getUrl", "url" to "https://query1.finance.yahoo.com/v8/finance/chart/AAPL?range=1d&interval=1d", "path" to "chart.result.0.meta.regularMarketPrice", "var" to "apple"),
+                s("calc", "expr" to "{apple}", "var" to "apple"),
+                s("getUrl", "url" to "https://query1.finance.yahoo.com/v8/finance/chart/GOOGL?range=1d&interval=1d", "path" to "chart.result.0.meta.regularMarketPrice", "var" to "google"),
+                s("calc", "expr" to "{google}", "var" to "google"),
+                s("getUrl", "url" to "https://query1.finance.yahoo.com/v8/finance/chart/AMZN?range=1d&interval=1d", "path" to "chart.result.0.meta.regularMarketPrice", "var" to "amazon"),
+                s("calc", "expr" to "{amazon}", "var" to "amazon"),
+                s("show", "text" to "₿ Bitcoin: {bitcoin} €\nNvidia: {nvidia} $\nApple: {apple} $\nGoogle: {google} $\nAmazon: {amazon} $"),
+            )),
+            "Cambia o añade empresas copiando un paso y cambiando NVDA por otra (por ejemplo TSLA).",
+        ),
         // The six shortcuts made and tested for 2.6: three step by step, three by the AI from one sentence.
         ShortcutTemplate(
             "cinema", "🎬", "Modo cine", "Silencio, No molestar y brillo al mínimo para ver una película.",
@@ -187,6 +279,97 @@ object ShortcutTemplates {
     )
 
     private val EN = listOf(
+        ShortcutTemplate(
+            "night", "🌙", "Night mode", "Lowest brightness, volume at 80 %, Do not disturb, and it tells you the time.",
+            ShortcutRecipe(steps = listOf(
+                s("brightness", "level" to "5"),
+                s("volume", "level" to "80", "stream" to "media"),
+                s("dnd", "on" to "on"),
+                s("speak", "text" to "It's {time}. Night mode on. Sleep well."),
+            )),
+            "Schedule it for 11 pm in “Run it on its own”.",
+        ),
+        ShortcutTemplate(
+            "synthwave", "🎶", "Synthwave lights", "Plays synthwave music on YouTube while the flashlight flashes.",
+            ShortcutRecipe(steps = listOf(
+                s("volume", "level" to "70", "stream" to "media"),
+                s("openUrl", "url" to "https://www.youtube.com/watch?v=4xDzrJKXOOY", "app" to "YouTube", "appPackage" to "com.google.android.youtube"),
+                s("wait", "seconds" to "4"),
+                s("strobe", "seconds" to "30", "speed" to "slow"),
+            )),
+            "Change the video or the seconds of light in “Edit steps”.",
+        ),
+        ShortcutTemplate(
+            "lowbattery", "🔋", "Low battery alert", "When the battery is low it warns you out loud, with a notification, and dims the screen.",
+            ShortcutRecipe(steps = listOf(
+                s("if", "left" to "{battery}", "op" to "less", "right" to "21"),
+                s("speak", "text" to "Heads up: battery low, {battery} percent left."),
+                s("notify", "title" to "🔋 Battery low: {battery} %", "text" to "Plug in the charger. I dimmed the screen to save power."),
+                s("brightness", "level" to "20"),
+                s("else"),
+                s("speak", "text" to "You have {battery} percent battery."),
+                s("endif"),
+            )),
+            "Automate it with “The battery drops below” 20 % and it will warn you on its own.",
+        ),
+        ShortcutTemplate(
+            "wakeup", "⏰", "Light alarm", "The alarm rings, the flashlight flashes and it says good morning.",
+            ShortcutRecipe(steps = listOf(
+                s("volume", "level" to "100", "stream" to "alarm"),
+                s("alarmSound", "seconds" to "20"),
+                s("strobe", "seconds" to "20", "speed" to "fast"),
+                s("speak", "text" to "Good morning! It's {time}."),
+            )),
+            "Set your time in “Run it on its own” and it will wake you with light and sound.",
+        ),
+        ShortcutTemplate(
+            "driving", "🚗", "Driving", "Turns Bluetooth on, opens Google Maps to your destination, volume up and Do not disturb.",
+            ShortcutRecipe(steps = listOf(
+                s("ask", "question" to "Where do you usually drive to? Type the address or “home”", "type" to "text", "var" to "destination", "remember" to "yes"),
+                s("bluetooth", "on" to "on"),
+                s("volume", "level" to "100", "stream" to "media"),
+                s("dnd", "on" to "on"),
+                s("openUrl", "url" to "google.navigation:q={destination}"),
+                s("speak", "text" to "Have a good trip!"),
+            )),
+            "Automate it when your car's Bluetooth connects.",
+        ),
+        ShortcutTemplate(
+            "morning", "☀️", "Good morning", "The date, the weather in your city and your battery, out loud, and Do not disturb off.",
+            ShortcutRecipe(steps = listOf(
+                s("ask", "question" to "Which city do you live in?", "type" to "text", "var" to "city", "remember" to "yes"),
+                s("dnd", "on" to "off"),
+                s("brightness", "level" to "70"),
+                s("getUrl", "url" to "https://geocoding-api.open-meteo.com/v1/search?count=1&name={city}", "path" to "results.0.latitude", "var" to "lat"),
+                s("getUrl", "url" to "https://geocoding-api.open-meteo.com/v1/search?count=1&name={city}", "path" to "results.0.longitude", "var" to "lon"),
+                s("getUrl", "url" to "https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m", "path" to "current.temperature_2m", "var" to "temperature"),
+                s("speak", "text" to "Good morning. Today is {date}. It's {temperature} degrees in {city} and you have {battery} percent battery."),
+            )),
+            "Schedule it every morning at your time.",
+        ),
+        ShortcutTemplate(
+            "acornixvideos", "🎬", "Acornix videos", "Opens Acornix's Shorts on YouTube: what it can do, in short videos.",
+            ShortcutRecipe(steps = listOf(
+                s("openUrl", "url" to "https://www.youtube.com/@gonzaloroman1608/shorts", "app" to "YouTube", "appPackage" to "com.google.android.youtube"),
+            )),
+        ),
+        ShortcutTemplate(
+            "markets", "📈", "Markets", "The price of bitcoin, Nvidia, Apple, Google and Amazon, live from the internet.",
+            ShortcutRecipe(steps = listOf(
+                s("getUrl", "url" to "https://api.coinbase.com/v2/prices/BTC-EUR/spot", "path" to "data.amount", "var" to "bitcoin"),
+                s("calc", "expr" to "{bitcoin}", "var" to "bitcoin"),
+                s("getUrl", "url" to "https://query1.finance.yahoo.com/v8/finance/chart/NVDA?range=1d&interval=1d", "path" to "chart.result.0.meta.regularMarketPrice", "var" to "nvidia"),
+                s("calc", "expr" to "{nvidia}", "var" to "nvidia"),
+                s("getUrl", "url" to "https://query1.finance.yahoo.com/v8/finance/chart/AAPL?range=1d&interval=1d", "path" to "chart.result.0.meta.regularMarketPrice", "var" to "apple"),
+                s("calc", "expr" to "{apple}", "var" to "apple"),
+                s("getUrl", "url" to "https://query1.finance.yahoo.com/v8/finance/chart/GOOGL?range=1d&interval=1d", "path" to "chart.result.0.meta.regularMarketPrice", "var" to "google"),
+                s("calc", "expr" to "{google}", "var" to "google"),
+                s("getUrl", "url" to "https://query1.finance.yahoo.com/v8/finance/chart/AMZN?range=1d&interval=1d", "path" to "chart.result.0.meta.regularMarketPrice", "var" to "amazon"),
+                s("calc", "expr" to "{amazon}", "var" to "amazon"),
+                s("show", "text" to "₿ Bitcoin: {bitcoin} €\nNvidia: {nvidia} $\nApple: {apple} $\nGoogle: {google} $\nAmazon: {amazon} $"),
+            )),
+            "Change or add companies by copying a step and replacing NVDA with another one (e.g. TSLA).",
+        ),
         ShortcutTemplate(
             "cinema", "🎬", "Cinema mode", "Silent, Do not disturb and the lowest brightness to watch a film.",
             ShortcutRecipe(steps = listOf(
@@ -360,6 +543,14 @@ class ShortcutSamples(private val context: android.content.Context, private val 
         val prefs = context.getSharedPreferences("shortcut_samples", android.content.Context.MODE_PRIVATE)
         if (prefs.getInt(KEY, 0) >= VERSION) return
         val spanish = language == "es"
+        // Examples from an earlier version go away if the user never changed them.
+        (ShortcutTemplates.all(true) + ShortcutTemplates.all(false)).filter { it.id in RETIRED }.forEach { t ->
+            apps.apps.value.filter { it.name == t.name }.forEach { app ->
+                // Same steps as the example (whatever runtime version its page has): the user never changed it.
+                val recipe = runCatching { ShortcutRecipe.fromHtml(apps.readCode(app.id)) }.getOrNull()
+                if (recipe != null && recipe.steps == t.recipe.steps) apps.delete(app.id)
+            }
+        }
         INSTALLED.mapNotNull { ShortcutTemplates.find(it, spanish) }.forEach { t ->
             if (apps.apps.value.none { it.name == t.name }) {
                 apps.create(t.name, t.recipe.html(t.name, t.emoji), com.gonzaroman.acornix.data.AppKind.FEATURE,
@@ -371,8 +562,9 @@ class ShortcutSamples(private val context: android.content.Context, private val 
 
     private companion object {
         const val KEY = "installed"
-        const val VERSION = 2
-        val INSTALLED = listOf("cinema", "late", "tip", "music", "focus", "bitcoin")
+        const val VERSION = 6
+        val INSTALLED = listOf("night", "synthwave", "lowbattery", "wakeup", "driving", "morning", "markets", "acornixvideos")
+        val RETIRED = setOf("bedtime", "weather", "battery", "kitchen", "cinema", "late", "tip", "music", "focus", "bitcoin")
     }
 }
 

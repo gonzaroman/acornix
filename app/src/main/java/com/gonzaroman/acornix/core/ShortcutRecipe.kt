@@ -51,7 +51,7 @@ data class ShortcutRecipe(
     companion object {
         /** Every action the runtime knows. */
         val ACTIONS = setOf(
-            "volume", "ringer", "dnd", "media", "brightness", "flashlight", "vibrate", "alarm", "timer", "wait",
+            "volume", "ringer", "dnd", "media", "brightness", "flashlight", "strobe", "vibrate", "alarm", "alarmSound", "timer", "wait", "bluetooth",
             "whatsapp", "sms", "call", "speak", "notify", "launchApp", "maps", "youtube", "openUrl", "copy", "share",
             "ask", "menu", "if", "else", "endif", "repeat", "endrepeat", "stop", "getUrl", "setVar", "calc", "show",
         )
@@ -275,6 +275,9 @@ data class ShortcutRecipe(
     speak: function (p) { return '🗣️ ' + (p.text || ''); },
     notify: function (p) { return '🔔 ' + (p.title || ''); },
     vibrate: function () { return L === 'es' ? '📳 Vibrar' : '📳 Vibrate'; },
+    strobe: function (p) { return (L === 'es' ? '🔦 Linterna parpadeando ' : '🔦 Flashing light ') + (p.seconds || 10) + ' s'; },
+    alarmSound: function (p) { return (L === 'es' ? '🚨 Sonar la alarma ' : '🚨 Ring the alarm ') + (p.seconds || 30) + ' s'; },
+    bluetooth: function (p) { return p.on === 'off' ? (L === 'es' ? '🔵 Apagar Bluetooth' : '🔵 Bluetooth off') : (L === 'es' ? '🔵 Encender Bluetooth' : '🔵 Bluetooth on'); },
     flashlight: function (p) { return '🔦 ' + ({ on: L === 'es' ? 'Linterna encendida' : 'Flashlight on', off: L === 'es' ? 'Linterna apagada' : 'Flashlight off', sos: 'SOS' }[p.mode] || ''); },
     wait: function (p) { return (L === 'es' ? '⏳ Esperar ' : '⏳ Wait ') + (p.seconds || 0) + ' s'; },
     copy: function (p) { return (L === 'es' ? '📋 Copiar · ' : '📋 Copy · ') + (p.text || ''); },
@@ -343,6 +346,12 @@ data class ShortcutRecipe(
       case 'speak': return A.speak(await fill(p.text), L === 'es' ? 'es-ES' : 'en-US');
       case 'notify': return A.notify(await fill(p.title), await fill(p.text));
       case 'vibrate': return A.vibrate([200, 100, 200]);
+      case 'strobe':
+        var until = Date.now() + Math.min(600, Math.max(1, +(await fill(p.seconds)) || 10)) * 1000, beat = p.speed === 'fast' ? 120 : 450;
+        while (Date.now() < until) { await A.flashlight(true); await sleep(beat); await A.flashlight(false); await sleep(beat); }
+        return true;
+      case 'alarmSound': return A.alarmSound(Math.max(1, +(await fill(p.seconds)) || 30));
+      case 'bluetooth': return (await A.bluetooth(p.on !== 'off')) !== 'failed';
       case 'flashlight':
         if (p.mode === 'sos') {
           var unit = 200, pattern = [1,1,1,3,3,3,1,1,1];

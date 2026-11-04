@@ -197,6 +197,10 @@ fun AppActionsSheet(app: AppMeta, nav: NavHostController, onDismiss: () -> Unit)
         }
         Spacer(Modifier.height(8.dp))
         SheetAction(Icons.Rounded.PlayArrow, stringResource(R.string.action_open)) { onDismiss(); AppLauncher.open(context, app.id) }
+        // Shortcuts are few and quick to make: deleting one is near the top, not under a long list.
+        if (app.kind == AppKind.FEATURE) {
+            SheetAction(Icons.Rounded.Delete, stringResource(R.string.action_delete), MaterialTheme.colorScheme.error) { deleting = true }
+        }
         val stepByStep = remember(app.id, app.updatedAt) {
             app.kind == AppKind.FEATURE && runCatching { com.gonzaroman.acornix.core.ShortcutRecipe.fromHtml(c.apps.indexFile(app.id).readText()) }.getOrNull() != null
         }
@@ -250,7 +254,9 @@ fun AppActionsSheet(app: AppMeta, nav: NavHostController, onDismiss: () -> Unit)
             )
         }
         SheetAction(Icons.Rounded.DriveFileRenameOutline, stringResource(R.string.action_rename)) { renaming = true }
-        SheetAction(Icons.Rounded.Delete, stringResource(R.string.action_delete), MaterialTheme.colorScheme.error) { deleting = true }
+        if (app.kind != AppKind.FEATURE) {
+            SheetAction(Icons.Rounded.Delete, stringResource(R.string.action_delete), MaterialTheme.colorScheme.error) { deleting = true }
+        }
         Spacer(Modifier.windowInsetsPadding(WindowInsets.navigationBars).height(16.dp))
     }
 

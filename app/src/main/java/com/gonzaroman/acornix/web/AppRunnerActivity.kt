@@ -2,6 +2,7 @@ package com.gonzaroman.acornix.web
 
 import android.app.ActivityManager
 import android.graphics.Bitmap
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -47,6 +48,33 @@ class AppRunnerActivity : ComponentActivity(), ShortcutHost {
     private val thumbnailTask = Runnable { takeThumbnail() }
 
     private val webAccess = WebAccess(this)
+
+    private var bluetoothAnswer: kotlinx.coroutines.CompletableDeferred<Boolean>? = null
+    private val bluetoothPermission = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) askToEnableBluetooth() else bluetoothAnswer?.complete(false)
+    }
+    private val bluetoothEnable = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()) {
+        bluetoothAnswer?.complete(it.resultCode == RESULT_OK)
+    }
+
+    private fun askToEnableBluetooth() {
+        runCatching { bluetoothEnable.launch(Intent(android.bluetooth.BluetoothAdapter.ACTION_REQUEST_ENABLE)) }
+            .onFailure { bluetoothAnswer?.complete(false) }
+    }
+
+    override suspend fun enableBluetooth(): Boolean {
+        val answer = kotlinx.coroutines.CompletableDeferred<Boolean>()
+        bluetoothAnswer = answer
+        if (android.os.Build.VERSION.SDK_INT >= 31 &&
+            androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) !=
+            android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) {
+            bluetoothPermission.launch(android.Manifest.permission.BLUETOOTH_CONNECT)
+        } else {
+            askToEnableBluetooth()
+        }
+        return answer.await()
+    }
 
     // Trying a gallery app: after a while, offer to install it, and ask once more when leaving.
     private var trialApp: GalleryApp? = null

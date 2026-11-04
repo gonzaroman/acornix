@@ -44,6 +44,9 @@ import java.security.MessageDigest
 /** An activity that can end a shortcut: Acornix.done() shows "✓ …" and closes it. */
 interface ShortcutHost {
     fun shortcutDone(message: String?)
+
+    /** Turns Bluetooth on the way Android allows (its "Allow" dialog), asking first for permission; waits for the answer. */
+    suspend fun enableBluetooth(): Boolean
 }
 
 object AppLauncher {
@@ -400,6 +403,18 @@ class AcornixJsBridge(
                 JsonPrimitive(device.addCalendarEvent(o["title"]?.jsonPrimitive?.contentOrNull.orEmpty(), start, end, o["location"]?.jsonPrimitive?.contentOrNull))
             }
             "clipboard" -> JsonPrimitive(device.clipboardText())
+            "alarmSound" -> JsonPrimitive(device.playAlarm(int(0) ?: 30))
+            "stopAlarm" -> { device.stopAlarm(); JsonPrimitive(true) }
+            "bluetooth" -> {
+                val on = (arg(0) as? JsonPrimitive)?.booleanOrNull ?: true
+                val host = context as? ShortcutHost
+                // In a shortcut on screen, wait for the user's answer so the next steps (Maps…) don't cover the dialog.
+                if (on && host != null && device.bluetooth(true, dryRun = true) != "done") {
+                    JsonPrimitive(if (kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) { host.enableBluetooth() }) "done" else "failed")
+                } else {
+                    JsonPrimitive(device.bluetooth(on))
+                }
+            }
             // A web page or API, read by Acornix so the app isn't blocked by CORS. Text only, at most 1 MB.
             "http" -> {
                 val url = str(0).orEmpty()
@@ -571,6 +586,9 @@ class AcornixJsBridge(
                   return call('calendar', [{ title: String(ev.title || ''), start: t(ev.start), end: t(ev.end), location: ev.location || null }]);
                 },
                 clipboard: function () { return call('clipboard'); },
+                alarmSound: function (seconds) { return call('alarmSound', [seconds || 30]); },
+                stopAlarm: function () { return call('stopAlarm'); },
+                bluetooth: function (on) { return call('bluetooth', [on !== false]); },
                 http: function (url) { return call('http', [String(url)]); },
                 done: function (msg) { return call('done', [msg ? String(msg) : null]); },
                 trigger: 'tap',

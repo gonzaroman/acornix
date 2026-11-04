@@ -58,10 +58,20 @@ val SHORTCUT_ACTIONS = listOf(
     ActionDef("flashlight", "🔦", R.string.sa_flashlight, R.string.sg_screen, listOf(
         FieldDef("mode", R.string.sf_mode, FieldKind.CHOICE, "on", listOf("on" to R.string.sc_on, "off" to R.string.sc_off, "sos" to R.string.sc_sos)),
     )),
+    ActionDef("strobe", "🔦", R.string.sa_strobe, R.string.sg_screen, listOf(
+        FieldDef("seconds", R.string.sf_seconds, FieldKind.NUMBER, "15", variables = true),
+        FieldDef("speed", R.string.sf_speed, FieldKind.CHOICE, "slow", listOf("slow" to R.string.sc_slow, "fast" to R.string.sc_fast)),
+    )),
     ActionDef("vibrate", "📳", R.string.sa_vibrate, R.string.sg_screen),
+    ActionDef("bluetooth", "🔵", R.string.sa_bluetooth, R.string.sg_screen, listOf(
+        FieldDef("on", R.string.sf_mode, FieldKind.CHOICE, "on", listOf("on" to R.string.sc_on, "off" to R.string.sc_off)),
+    )),
     ActionDef("alarm", "⏰", R.string.sa_alarm, R.string.sg_time, listOf(
         FieldDef("time", R.string.sf_time, FieldKind.TIME, "07:00"),
         FieldDef("label", R.string.sf_label, FieldKind.TEXT, variables = true),
+    )),
+    ActionDef("alarmSound", "🚨", R.string.sa_alarm_sound, R.string.sg_time, listOf(
+        FieldDef("seconds", R.string.sf_seconds, FieldKind.NUMBER, "30", variables = true),
     )),
     ActionDef("timer", "⏲️", R.string.sa_timer, R.string.sg_time, listOf(
         FieldDef("minutes", R.string.sf_minutes, FieldKind.NUMBER, "10"),

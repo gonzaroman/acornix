@@ -302,7 +302,7 @@ class AppRepository(
 
         /** Calls that make it a shortcut: it does things for the user, not just speak or vibrate. */
         private val SHORTCUT_CALL = Regex(
-            """Acornix\.(done|alarm|timer|volume|ringer|doNotDisturb|brightness|media|whatsapp|sms|call|launchApp|maps|calendar|youtube)\b""",
+            """Acornix\.(done|alarm|alarmSound|timer|volume|ringer|doNotDisturb|brightness|media|whatsapp|sms|call|launchApp|maps|calendar|youtube|bluetooth)\b""",
         )
 
         /** Whether an imported app is a shortcut (same rule as the community gallery's "shortcut" tag). */

@@ -927,4 +927,10 @@
     <string name="sc_send_it">Enviarlo solo</string>
     <string name="send_needs_control">Para enviar un WhatsApp solo, Acornix necesita el Control total (Ajustes › Control total). Sin él, el mensaje se queda escrito.</string>
     <string name="send_sms_denied">Sin permiso para enviar SMS, el mensaje se queda escrito para que lo envíes tú.</string>
+    <string name="sa_strobe">Linterna parpadeando</string>
+    <string name="sa_alarm_sound">Hacer sonar la alarma</string>
+    <string name="sa_bluetooth">Bluetooth</string>
+    <string name="sf_speed">Velocidad</string>
+    <string name="sc_slow">Lenta</string>
+    <string name="sc_fast">Rápida</string>
 </resources>

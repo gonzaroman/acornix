@@ -204,6 +204,8 @@ object Prompts {
         - Acornix.keepAwake(on)                // keep the screen on while the app is open
         - Acornix.media('play'|'pause'|'toggle'|'next'|'previous')   // controls the music app that is playing
         - Acornix.calendar({ title, start: Date, end: Date, location? })   // opens the calendar with the event filled in
+        - Acornix.alarmSound(seconds) · Acornix.stopAlarm()   // rings the phone's alarm tone
+        - Acornix.bluetooth(on) -> 'done' | 'asked' (Android shows "Allow") | 'settings' | 'failed'
         - Acornix.clipboard() -> text            · Acornix.http(url) -> the page or API's text (no CORS limits; JSON.parse it)
         - Acornix.input                        // text shared with the shortcut ("Share with Acornix"), or 
         - Acornix.done(message?)               // the shortcut finished: Acornix shows "✓ message" and closes it
@@ -223,6 +225,8 @@ object Prompts {
         Actions and their params (every value is a string):
         - volume {level: 0-100, stream: media|ring|alarm} · ringer {mode: normal|vibrate|silent} · dnd {on: on|off}
         - media {action: play|pause|next|previous} · brightness {level: 0-100} · flashlight {mode: on|off|sos} · vibrate {}
+        - strobe {seconds, speed: slow|fast} (flashing flashlight) · alarmSound {seconds} (the alarm tone) · bluetooth {on: on|off}
+        - Turn-by-turn navigation: openUrl {url: "google.navigation:q=<place>"}
         - alarm {time: "HH:MM", label} · timer {minutes, label} · wait {seconds}
         - whatsapp {number: international or "", text, send: yes|no} · sms {number, text, send: yes|no} · call {number}
           (send "yes" when the user wants it sent on its own, e.g. "send … every day at 9")

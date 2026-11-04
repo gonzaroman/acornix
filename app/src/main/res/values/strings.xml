@@ -928,4 +928,10 @@
     <string name="sc_send_it">Send it on its own</string>
     <string name="send_needs_control">To send a WhatsApp on its own, Acornix needs Total control (Settings › Total control). Without it, the message is left written.</string>
     <string name="send_sms_denied">Without permission to send SMS, the message is left written for you to send.</string>
+    <string name="sa_strobe">Flashing flashlight</string>
+    <string name="sa_alarm_sound">Ring the alarm</string>
+    <string name="sa_bluetooth">Bluetooth</string>
+    <string name="sf_speed">Speed</string>
+    <string name="sc_slow">Slow</string>
+    <string name="sc_fast">Fast</string>
 </resources>

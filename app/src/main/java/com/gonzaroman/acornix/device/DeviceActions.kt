@@ -236,6 +236,46 @@ class DeviceActions(private val context: Context) {
         return true
     }
 
+    private var alarm: android.media.Ringtone? = null
+    private val alarmHandler by lazy { android.os.Handler(android.os.Looper.getMainLooper()) }
+
+    /** Plays the phone's alarm tone for [seconds] (on the alarm volume, so it sounds even in silent mode). */
+    fun playAlarm(seconds: Int): Boolean {
+        stopAlarm()
+        val uri = android.media.RingtoneManager.getActualDefaultRingtoneUri(context, android.media.RingtoneManager.TYPE_ALARM)
+            ?: android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_RINGTONE) ?: return false
+        val tone = android.media.RingtoneManager.getRingtone(context, uri) ?: return false
+        tone.audioAttributes = android.media.AudioAttributes.Builder()
+            .setUsage(android.media.AudioAttributes.USAGE_ALARM)
+            .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .build()
+        if (Build.VERSION.SDK_INT >= 28) tone.isLooping = true
+        tone.play()
+        alarm = tone
+        alarmHandler.postDelayed({ stopAlarm() }, seconds.coerceIn(1, 600) * 1000L)
+        return true
+    }
+
+    fun stopAlarm() {
+        alarmHandler.removeCallbacksAndMessages(null)
+        alarm?.stop()
+        alarm = null
+    }
+
+    /**
+     * Turns Bluetooth on or off as far as Android lets an app: since Android 13 only the system's "Allow" dialog
+     * (or the Bluetooth settings) can do it. Returns "done" when it already was, "asked", "settings" or "failed".
+     */
+    fun bluetooth(on: Boolean, dryRun: Boolean = false): String {
+        val adapter = (context.getSystemService(Context.BLUETOOTH_SERVICE) as? android.bluetooth.BluetoothManager)?.adapter ?: return "failed"
+        if (adapter.isEnabled == on) return "done"
+        if (dryRun) return "needed"
+        val allowed = Build.VERSION.SDK_INT < 31 ||
+            ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED
+        if (on && allowed && launch(Intent(android.bluetooth.BluetoothAdapter.ACTION_REQUEST_ENABLE))) return "asked"
+        return if (launch(Intent(Settings.ACTION_BLUETOOTH_SETTINGS))) "settings" else "failed"
+    }
+
     /** The clipboard's text (only readable while an Acornix screen is in front). */
     fun clipboardText(): String {
         val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager

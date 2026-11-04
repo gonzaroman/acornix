@@ -29,7 +29,7 @@ class ShortcutTemplatesTest {
     fun everyExampleIsWellFormed() {
         listOf(true, false).forEach { spanish ->
             val all = ShortcutTemplates.all(spanish)
-            assertEquals(15, all.size)
+            assertEquals(23, all.size)
             all.forEach { t ->
                 t.recipe.steps.forEach { assertNotNull("${t.id}: unknown action ${it.action}", shortcutAction(it.action)) }
                 // Blocks close: the nesting after the last step is back to zero.
