@@ -16,7 +16,7 @@ android {
         minSdk = 26
         targetSdk = 35
         versionCode = 51
-        versionName = "2.6.1"
+        versionName = "2.6.1-beta1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // The community gallery (gonzaroman/acornix-apps). Override with -PacornixGalleryUrl=… to test a copy.
         val galleryUrl = (project.findProperty("acornixGalleryUrl") as String?)
