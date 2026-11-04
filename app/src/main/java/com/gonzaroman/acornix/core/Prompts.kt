@@ -45,6 +45,10 @@ object Prompts {
 
         $AI_DOCS
 
+        If the app needs the phone (flashlight, volume, alarms, opening apps, messages, speech, notifications…), it can use
+        the window.Acornix bridge:
+        $BRIDGE_DOCS
+
         ${format(language)}
     """.trimIndent()
 

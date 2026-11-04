@@ -92,11 +92,16 @@ fun ShortcutsScreen(nav: NavHostController) {
 
     LaunchedEffect(Unit) { if (c.gallery.state.value.catalog == null) c.gallery.refresh() }
 
-    val mine = apps.filter { it.kind == AppKind.FEATURE }
+    // Gallery apps installed before shortcuts had their own tag may be marked as shortcuts: trust the catalog.
+    val catalog = gallery.catalog?.apps.orEmpty().associateBy { it.id }
+    val templates = com.gonzaroman.acornix.core.ShortcutTemplates.all(context.resources.configuration.locales[0].language == "es")
+    val mine = apps.filter { app ->
+        app.kind == AppKind.FEATURE && app.source?.gallery?.let { id -> catalog[id]?.let { "shortcut" in it.tags } ?: true } != false
+    }
     val installed = apps.mapNotNull { it.source?.gallery }.toSet()
     val discover = gallery.catalog?.apps.orEmpty()
         // Only ones that work without an AI key, like the user's own shortcuts.
-        .filter { "phone" in it.tags && "ai" !in it.tags && it.id !in installed }
+        .filter { "shortcut" in it.tags && "ai" !in it.tags && it.id !in installed }
         .let { Gallery.sorted(it, Gallery.Companion.Sort.FEATURED) }
         .take(12)
 
@@ -175,15 +180,24 @@ fun ShortcutsScreen(nav: NavHostController) {
                 }
             }
 
-            if (discover.isNotEmpty()) {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    Column {
-                        SectionTitle(stringResource(R.string.shortcuts_discover)) {
+            // Shortcuts from the community; until there are any, the built-in examples.
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Column {
+                    SectionTitle(stringResource(R.string.shortcuts_discover)) {
+                        if (discover.isNotEmpty()) {
                             TextButton(onClick = { nav.navigate(Routes.explore(Gallery.SHORTCUTS)) }) { Text(stringResource(R.string.shortcuts_see_all)) }
+                        } else {
+                            TextButton(onClick = { nav.navigate(Routes.SHORTCUTS_HELP) }) { Text(stringResource(R.string.shortcuts_see_all)) }
                         }
-                        LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    }
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        if (discover.isNotEmpty()) {
                             items(discover, key = { it.id }) { app ->
                                 GalleryPickCard(app, c.gallery.screenshotUrl(app), Modifier.width(140.dp)) { nav.navigate(Routes.galleryApp(app.id)) }
+                            }
+                        } else {
+                            items(templates, key = { it.id }) { t ->
+                                TemplateCard(t) { nav.navigate(Routes.shortcutEditor(template = t.id)) }
                             }
                         }
                     }
@@ -219,6 +233,21 @@ private fun NewShortcutOption(emoji: String, title: String, text: String, onClic
                 Text(title, style = MaterialTheme.typography.titleMedium)
                 Text(text, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
+        }
+    }
+}
+
+/** A ready-made example: tapping it opens it in the editor. */
+@Composable
+private fun TemplateCard(t: com.gonzaroman.acornix.core.ShortcutTemplate, onClick: () -> Unit) {
+    Surface(onClick = onClick, shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainerLow,
+        modifier = Modifier.width(160.dp).height(150.dp)) {
+        Column(Modifier.padding(14.dp)) {
+            Text(t.emoji, fontSize = 30.sp)
+            Spacer(Modifier.height(6.dp))
+            Text(t.name, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(t.description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 3, overflow = TextOverflow.Ellipsis)
         }
     }
 }

@@ -98,6 +98,17 @@ class Gallery(
             }
         }.getOrNull()
         _state.update { GalleryState(catalog = fresh ?: it.catalog, loading = false, failed = fresh == null) }
+        fresh?.let { fixKinds(it) }
+    }
+
+    /** Gallery apps installed when anything that used the phone counted as a shortcut go back to being apps. */
+    private suspend fun fixKinds(catalog: GalleryCatalog) {
+        val byId = catalog.apps.associateBy { it.id }
+        apps.apps.value.forEach { mine ->
+            val app = mine.source?.gallery?.let { byId[it] } ?: return@forEach
+            val kind = kindOf(app)
+            if (mine.kind != kind && mine.kind != AppKind.SAMPLE) apps.edit(mine.id) { it.copy(kind = kind) }
+        }
     }
 
     fun find(id: String): GalleryApp? = _state.value.catalog?.apps?.firstOrNull { it.id == id }
@@ -244,20 +255,21 @@ class Gallery(
         /** Apps that use the user's AI only work for people who set one up, so they can be told apart. */
         enum class Ai { ANY, WITH, WITHOUT }
 
-        /** The gallery filter for shortcuts (apps that use the phone), next to the real categories. */
+        /** The gallery filter for shortcuts (tagged "shortcut" by the catalog), next to the real categories. */
         const val SHORTCUTS = "shortcuts"
 
         /** [category] is a category id, [SHORTCUTS], or null for all. */
         fun search(apps: List<GalleryApp>, query: String, category: String?, sort: Sort = Sort.POPULAR, ai: Ai = Ai.ANY): List<GalleryApp> {
             val words = query.trim().lowercase().split(Regex("\\s+")).filter { it.isNotEmpty() }
             return sorted(apps, sort).filter { app ->
-                (category == null || app.category == category || (category == SHORTCUTS && "phone" in app.tags)) &&
+                (category == null || app.category == category || (category == SHORTCUTS && "shortcut" in app.tags)) &&
                     (ai == Ai.ANY || ("ai" in app.tags) == (ai == Ai.WITH)) &&
                     words.all { w -> (listOfNotNull(app.name, app.description, app.prompt, app.author, "acornix".takeIf { app.official }) + app.descriptionI18n.values).any { it.lowercase().contains(w) } }
             }
         }
 
-        fun kindOf(app: GalleryApp) = if ("phone" in app.tags) AppKind.FEATURE else AppKind.APP
+        /** Only real shortcuts go to the Shortcuts tab; an app that speaks or uses the flashlight is still an app. */
+        fun kindOf(app: GalleryApp) = if ("shortcut" in app.tags) AppKind.FEATURE else AppKind.APP
 
         fun sha256(bytes: ByteArray): String = MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
     }

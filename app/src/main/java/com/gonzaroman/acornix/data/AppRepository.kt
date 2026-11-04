@@ -300,14 +300,13 @@ class AppRepository(
             listOf("game", "juego") to "🎮",
         )
 
-        /** Calls that make it a shortcut (same list as the community gallery's "phone" tag). */
-        private val PHONE_CALL = Regex(
-            """Acornix\.(speak|flashlight|notify|battery|deviceInfo|listApps|openApp|alarm|timer|call|sms|whatsapp|maps|launchApp|""" +
-                """volume|ringer|doNotDisturb|brightness|keepAwake|media|calendar|clipboard|youtube|http|done)\b""",
+        /** Calls that make it a shortcut: it does things for the user, not just speak or vibrate. */
+        private val SHORTCUT_CALL = Regex(
+            """Acornix\.(done|alarm|timer|volume|ringer|doNotDisturb|brightness|media|whatsapp|sms|call|launchApp|maps|calendar|youtube)\b""",
         )
 
-        /** Whether the code makes the phone do things, so an imported app counts as a shortcut. */
-        fun usesPhone(html: String) = PHONE_CALL.containsMatchIn(html) || "id=\"acornix-recipe\"" in html
+        /** Whether an imported app is a shortcut (same rule as the community gallery's "shortcut" tag). */
+        fun usesPhone(html: String) = SHORTCUT_CALL.containsMatchIn(html) || "id=\"acornix-recipe\"" in html
 
         /**
          * The emoji the app shows next to its own name, in its <title> or its first <h1>, if it has one:

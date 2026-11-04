@@ -50,7 +50,9 @@ class GalleryTest {
 
     @Test
     fun shortcutsFilterShowsAppsThatUseThePhone() {
-        assertEquals(listOf("bowling"), Gallery.search(catalog.apps, "", Gallery.SHORTCUTS).map { it.id })
+        assertEquals(emptyList<String>(), Gallery.search(catalog.apps, "", Gallery.SHORTCUTS).map { it.id })
+        val sleep = GalleryApp(id = "sleep", name = "Sleep", tags = listOf("phone", "shortcut"))
+        assertEquals(listOf("sleep"), Gallery.search(catalog.apps + sleep, "", Gallery.SHORTCUTS).map { it.id })
     }
 
     @Test
@@ -78,9 +80,11 @@ class GalleryTest {
     }
 
     @Test
-    fun phoneAppsInstallAsFunctionalities() {
-        assertEquals(AppKind.FEATURE, Gallery.kindOf(catalog.apps.first { it.id == "bowling" }))
+    fun onlyRealShortcutsInstallAsShortcuts() {
+        // Bowling uses the phone (it vibrates) but it is a game, not a shortcut.
+        assertEquals(AppKind.APP, Gallery.kindOf(catalog.apps.first { it.id == "bowling" }))
         assertEquals(AppKind.APP, Gallery.kindOf(catalog.apps.first { it.id == "chef" }))
+        assertEquals(AppKind.FEATURE, Gallery.kindOf(GalleryApp(id = "sleep", name = "Sleep", tags = listOf("phone", "shortcut"))))
     }
 
     @Test

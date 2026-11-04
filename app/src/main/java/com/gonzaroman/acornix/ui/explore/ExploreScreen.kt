@@ -129,7 +129,7 @@ fun ExploreScreen(nav: NavHostController, startFilter: String? = null) {
 
     val all = state.catalog?.apps.orEmpty()
     // Only the categories that have apps.
-    val filters = listOfNotNull(Gallery.SHORTCUTS.takeIf { all.any { "phone" in it.tags } }) +
+    val filters = listOfNotNull(Gallery.SHORTCUTS.takeIf { all.any { "shortcut" in it.tags } }) +
         CATEGORIES.map { it.id }.filter { cat -> all.any { it.category == cat } }
     val shown = Gallery.search(all, query, filter, sort, ai)
 

@@ -95,7 +95,7 @@ class AppRepositoryTest {
     @Test
     fun shortcutsAreAppsThatUseThePhone() {
         assertTrue(AppRepository.usesPhone("await Acornix.ringer('silent'); Acornix.done('ok')"))
-        assertTrue(AppRepository.usesPhone("Acornix.speak('hi')"))
+        assertFalse(AppRepository.usesPhone("Acornix.speak('hi'); Acornix.flashlight(true)"))
         assertFalse(AppRepository.usesPhone("await Acornix.db.set('a', 1); Acornix.askAI('x'); Acornix.vibrate(20)"))
     }
 
