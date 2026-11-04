@@ -20,6 +20,8 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -97,10 +99,16 @@ fun ScheduleCard(appId: String, schedule: ShortcutSchedule?, onChange: (Shortcut
 fun ScheduleDialog(app: AppMeta, onDismiss: () -> Unit) {
     val c = LocalContext.current.container
     var schedule by remember { mutableStateOf(c.schedules.get(app.id)) }
+    val triggers by c.triggers.all.collectAsState()
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("${app.emoji} ${app.name}") },
-        text = { ScheduleCard(app.id, schedule) { schedule = it } },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                ScheduleCard(app.id, schedule) { schedule = it }
+                TriggersCard(app.id, triggers.filter { it.appId == app.id }, onAdd = { c.triggers.add(it) }, onRemove = { c.triggers.remove(it.id) })
+            }
+        },
         confirmButton = {
             TextButton(onClick = {
                 schedule?.let { c.schedules.set(it) } ?: c.schedules.remove(app.id)

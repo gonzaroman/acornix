@@ -3,6 +3,9 @@ package com.gonzaroman.acornix.ui.shortcuts
 import android.app.TimePickerDialog
 import android.widget.Toast
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.material3.AssistChip
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -91,6 +94,7 @@ fun ShortcutEditorScreen(nav: NavHostController, appId: String?) {
     var picking by remember { mutableStateOf(false) }
     var saving by remember { mutableStateOf(false) }
     var schedule by remember { mutableStateOf(appId?.let { c.schedules.get(it) }) }
+    val triggers = remember { mutableStateListOf<com.gonzaroman.acornix.data.ShortcutTrigger>().apply { appId?.let { addAll(c.triggers.forApp(it)) } } }
 
     LaunchedEffect(appId) {
         if (appId == null) return@LaunchedEffect
@@ -118,6 +122,8 @@ fun ShortcutEditorScreen(nav: NavHostController, appId: String?) {
                 appId
             }
             schedule?.let { c.schedules.set(it.copy(appId = id)) } ?: c.schedules.remove(id)
+            c.triggers.forApp(id).filter { old -> triggers.none { it.id == old.id } }.forEach { c.triggers.remove(it.id) }
+            triggers.filter { t -> c.triggers.forApp(id).none { it.id == t.id } }.forEach { c.triggers.add(it.copy(appId = id)) }
             Toast.makeText(context, R.string.shortcut_saved, Toast.LENGTH_SHORT).show()
             nav.popBackStack()
             if (andRun) AppLauncher.open(context, id)
@@ -169,10 +175,15 @@ fun ShortcutEditorScreen(nav: NavHostController, appId: String?) {
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
+            val recipe = ShortcutRecipe(steps = steps.toList())
+            val depths = recipe.depths()
+            val builtIn = if (context.resources.configuration.locales[0].language == "es") BUILT_IN_ES else BUILT_IN_EN
             itemsIndexed(steps) { index, step ->
                 StepCard(
                     number = index + 1,
                     step = step,
+                    depth = depths.getOrElse(index) { 0 },
+                    variables = recipe.variablesBefore(index) + builtIn,
                     onChange = { steps[index] = it },
                     onUp = if (index > 0) ({ steps.add(index - 1, steps.removeAt(index)) }) else null,
                     onDown = if (index < steps.lastIndex) ({ steps.add(index + 1, steps.removeAt(index)) }) else null,
@@ -187,19 +198,24 @@ fun ShortcutEditorScreen(nav: NavHostController, appId: String?) {
                 }
             }
             item { ScheduleCard(appId ?: "", schedule) { schedule = it } }
-            if (steps.any { s -> shortcutAction(s.action)?.fields?.any { it.variables } == true }) {
-                item {
-                    Text(stringResource(R.string.shortcut_variables), style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
+            item { TriggersCard(appId ?: "", triggers, onAdd = { triggers.add(it) }, onRemove = { triggers.remove(it) }) }
         }
     }
 
     if (picking) {
+        var query by remember { mutableStateOf("") }
         ModalBottomSheet(onDismissRequest = { picking = false }) {
-            LazyColumn(Modifier.windowInsetsPadding(WindowInsets.navigationBars)) {
-                SHORTCUT_ACTIONS.groupBy { it.group }.forEach { (group, actions) ->
+            OutlinedTextField(
+                value = query,
+                onValueChange = { query = it },
+                placeholder = { Text(stringResource(R.string.shortcut_search_actions)) },
+                leadingIcon = { Icon(Icons.Rounded.Search, null) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            )
+            LazyColumn(Modifier.fillMaxHeight(0.85f).windowInsetsPadding(WindowInsets.navigationBars)) {
+                SHORTCUT_ACTIONS.filter { !it.hidden && (query.isBlank() || context.getString(it.label).contains(query.trim(), ignoreCase = true)) }
+                    .groupBy { it.group }.forEach { (group, actions) ->
                     item {
                         Text(stringResource(group), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(start = 24.dp, top = 12.dp, bottom = 4.dp))
@@ -210,7 +226,12 @@ fun ShortcutEditorScreen(nav: NavHostController, appId: String?) {
                                 headlineContent = { Text(stringResource(action.label)) },
                                 leadingContent = { Text(action.emoji, fontSize = 22.sp) },
                                 modifier = Modifier.clickable {
-                                    steps.add(ShortcutStep(action.id, action.defaults()))
+                                    steps.add(ShortcutStep(action.id, action.defaults(context)))
+                                    // Blocks come with their end, like in iPhone Shortcuts.
+                                    when (action.id) {
+                                        "if" -> steps.add(ShortcutStep("endif"))
+                                        "repeat" -> steps.add(ShortcutStep("endrepeat"))
+                                    }
                                     picking = false
                                 },
                             )
@@ -223,19 +244,30 @@ fun ShortcutEditorScreen(nav: NavHostController, appId: String?) {
     }
 }
 
+private val BUILT_IN_ES = listOf("hora", "fecha", "ubicación", "batería", "portapapeles", "entrada")
+private val BUILT_IN_EN = listOf("time", "date", "location", "battery", "clipboard", "input")
+
 /** One step: what it does and its settings, with buttons to move it or take it out. */
 @Composable
 private fun StepCard(
     number: Int,
     step: ShortcutStep,
+    depth: Int,
+    variables: List<String>,
     onChange: (ShortcutStep) -> Unit,
     onUp: (() -> Unit)?,
     onDown: (() -> Unit)?,
     onRemove: () -> Unit,
 ) {
     val action = shortcutAction(step.action) ?: return
-    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)) {
-        Column(Modifier.padding(start = 16.dp, end = 4.dp, top = 6.dp, bottom = 12.dp)) {
+    val block = step.action in setOf("if", "else", "endif", "repeat", "endrepeat")
+    Card(
+        modifier = Modifier.padding(start = (depth * 20).dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (block) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceContainerLow,
+        ),
+    ) {
+        Column(Modifier.padding(start = 16.dp, end = 4.dp, top = 6.dp, bottom = if (action.fields.isEmpty()) 6.dp else 12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("$number.  ${action.emoji}", fontSize = 18.sp)
                 Spacer(Modifier.width(8.dp))
@@ -246,7 +278,7 @@ private fun StepCard(
             }
             Column(Modifier.padding(end = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 action.fields.forEach { field ->
-                    FieldEditor(field, step.params) { changes -> onChange(step.copy(params = step.params + changes)) }
+                    FieldEditor(field, step.params, variables) { changes -> onChange(step.copy(params = step.params + changes)) }
                 }
             }
         }
@@ -258,7 +290,7 @@ private fun packageKey(key: String) = if (key == "name") "package" else key + "P
 
 /** Edits one setting; [onChange] receives the settings that changed (an app or a contact sets two). */
 @Composable
-private fun FieldEditor(field: FieldDef, params: Map<String, String>, onChanges: (Map<String, String>) -> Unit) {
+private fun FieldEditor(field: FieldDef, params: Map<String, String>, variables: List<String>, onChanges: (Map<String, String>) -> Unit) {
     val context = LocalContext.current
     val value = params[field.key] ?: field.default
     val onChange: (String) -> Unit = { onChanges(mapOf(field.key to it)) }
@@ -306,17 +338,29 @@ private fun FieldEditor(field: FieldDef, params: Map<String, String>, onChanges:
                 TimePickerDialog(context, { _, hour, minute -> onChange("%02d:%02d".format(hour, minute)) }, h, m, true).show()
             }) { Text("🕒  " + stringResource(field.label) + ": " + "%02d:%02d".format(h, m)) }
         }
-        else -> OutlinedTextField(
-            value = value,
-            onValueChange = onChange,
-            label = { Text(stringResource(field.label)) },
-            singleLine = field.kind != FieldKind.TEXT,
-            keyboardOptions = KeyboardOptions(keyboardType = when (field.kind) {
-                FieldKind.NUMBER -> KeyboardType.Number
-                FieldKind.PHONE -> KeyboardType.Phone
-                else -> KeyboardType.Text
-            }),
-            modifier = Modifier.fillMaxWidth(),
-        )
+        else -> Column {
+            OutlinedTextField(
+                value = value,
+                onValueChange = onChange,
+                label = { Text(stringResource(field.label)) },
+                placeholder = if (field.hint != 0) ({ Text(stringResource(field.hint)) }) else null,
+                singleLine = field.kind != FieldKind.TEXT && field.kind != FieldKind.MULTILINE,
+                minLines = if (field.kind == FieldKind.MULTILINE) 3 else 1,
+                keyboardOptions = KeyboardOptions(keyboardType = when (field.kind) {
+                    FieldKind.NUMBER -> if (field.variables) KeyboardType.Text else KeyboardType.Number
+                    FieldKind.PHONE -> KeyboardType.Phone
+                    else -> KeyboardType.Text
+                }),
+                modifier = Modifier.fillMaxWidth(),
+            )
+            // Variables to drop into the text with a tap, like the "magic variables" of iPhone Shortcuts.
+            if (field.variables && variables.isNotEmpty()) {
+                Row(Modifier.horizontalScroll(rememberScrollState()).padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    variables.distinct().forEach { v ->
+                        AssistChip(onClick = { onChange(value + "{" + v + "}") }, label = { Text("{$v}") })
+                    }
+                }
+            }
+        }
     }
 }

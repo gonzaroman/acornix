@@ -47,11 +47,18 @@ interface ShortcutHost {
 }
 
 object AppLauncher {
-    /** [trigger] says what opened it ("tap", "home", "nfc"…); apps read it as Acornix.trigger. */
-    fun intent(context: Context, appId: String, trigger: String = "tap"): Intent =
+    /**
+     * [trigger] says what opened it ("tap", "home", "nfc"…); apps read it as Acornix.trigger. [input] is text shared
+     * with the shortcut (a link, a note…), read as Acornix.input.
+     */
+    fun intent(context: Context, appId: String, trigger: String = "tap", input: String? = null): Intent =
         Intent(context, AppRunnerActivity::class.java)
             .setAction(Intent.ACTION_VIEW)
             .setData(Uri.parse("acornix://app/${Uri.encode(appId)}?trigger=${Uri.encode(trigger)}"))
+            .apply { if (input != null) putExtra(EXTRA_INPUT, input.take(MAX_INPUT)) }
+
+    const val EXTRA_INPUT = "com.gonzaroman.acornix.INPUT"
+    private const val MAX_INPUT = 20_000
 
     /** The link an NFC sticker holds to open a shortcut. */
     fun link(appId: String): String = "acornix://app/${Uri.encode(appId)}"
@@ -93,6 +100,8 @@ object AcornixWebView {
         appId: String,
         /** What opened the app ("tap", "nfc", "home"…), for Acornix.trigger. */
         trigger: String = "tap",
+        /** Text shared with it, for Acornix.input. */
+        input: String? = null,
         onPageFinished: () -> Unit = {},
     ) {
         val c = context.container
@@ -139,7 +148,7 @@ object AcornixWebView {
 
             override fun onPageStarted(view: WebView, url: String?, favicon: android.graphics.Bitmap?) {
                 if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT) && url?.startsWith(origin(appId)) == true) {
-                    view.evaluateJavascript(AcornixJsBridge.script(context, trigger), null)
+                    view.evaluateJavascript(AcornixJsBridge.script(context, trigger, input), null)
                 }
             }
 
@@ -153,7 +162,7 @@ object AcornixWebView {
                 }
             }
         }
-        AcornixJsBridge(context, scope, appId, trigger).attach(webView)
+        AcornixJsBridge(context, scope, appId, trigger, input).attach(webView)
 
         // When someone else (the assistant, the Data screen) changes this app's data, tell the page.
         scope.launch {
@@ -175,6 +184,7 @@ class AcornixJsBridge(
     private val scope: CoroutineScope,
     private val appId: String,
     private val trigger: String = "tap",
+    private val input: String? = null,
 ) {
     private val origin = AcornixWebView.origin(appId)
 
@@ -207,7 +217,7 @@ class AcornixJsBridge(
             }
         }
         if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
-            WebViewCompat.addDocumentStartJavaScript(webView, script(context, trigger), setOf(origin))
+            WebViewCompat.addDocumentStartJavaScript(webView, script(context, trigger, input), setOf(origin))
         }
     }
 
@@ -385,6 +395,22 @@ class AcornixJsBridge(
                 JsonPrimitive(device.addCalendarEvent(o["title"]?.jsonPrimitive?.contentOrNull.orEmpty(), start, end, o["location"]?.jsonPrimitive?.contentOrNull))
             }
             "clipboard" -> JsonPrimitive(device.clipboardText())
+            // A web page or API, read by Acornix so the app isn't blocked by CORS. Text only, at most 1 MB.
+            "http" -> {
+                val url = str(0).orEmpty()
+                require(url.startsWith("https://") || url.startsWith("http://")) { "Only http and https addresses" }
+                JsonPrimitive(kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                    com.gonzaroman.acornix.ai.HttpClients.default.newCall(
+                        okhttp3.Request.Builder().url(url).header("User-Agent", "Acornix").build(),
+                    ).execute().use { r ->
+                        if (!r.isSuccessful) throw IllegalStateException("HTTP ${r.code}")
+                        val source = r.body?.source() ?: return@use ""
+                        source.request(1_048_577)
+                        if (source.buffer.size > 1_048_576) throw IllegalStateException("The answer is too big")
+                        source.buffer.readUtf8()
+                    }
+                })
+            }
             "done" -> {
                 val host = context as? ShortcutHost
                 if (host != null) kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) { host.shortcutDone(str(0)) }
@@ -429,9 +455,11 @@ class AcornixJsBridge(
         }
 
         /** The shim plus Acornix.language (to show the app in the language picked in Acornix) and Acornix.trigger. */
-        fun script(context: Context, trigger: String = "tap"): String = SHIM +
+        fun script(context: Context, trigger: String = "tap", input: String? = null): String = SHIM +
             "\nif (window.Acornix) { window.Acornix.language = '" + language(context).filter { it.isLetter() }.take(8) + "';" +
-            " window.Acornix.trigger = '" + trigger.filter { it.isLetterOrDigit() }.take(16) + "'; }"
+            " window.Acornix.trigger = '" + trigger.filter { it.isLetterOrDigit() }.take(16) + "';" +
+            // JSON-encoded, so any shared text is a safe JS string.
+            " window.Acornix.input = " + kotlinx.serialization.json.JsonPrimitive(input.orEmpty()).toString().replace("</", "<\\/") + "; }"
 
         /** Injected before any page script runs; builds the Promise-based API on top of AcornixNative. */
         val SHIM = """
@@ -538,6 +566,7 @@ class AcornixJsBridge(
                   return call('calendar', [{ title: String(ev.title || ''), start: t(ev.start), end: t(ev.end), location: ev.location || null }]);
                 },
                 clipboard: function () { return call('clipboard'); },
+                http: function (url) { return call('http', [String(url)]); },
                 done: function (msg) { return call('done', [msg ? String(msg) : null]); },
                 trigger: 'tap',
                 askAI: askAI,

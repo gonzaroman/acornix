@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The Shortcuts widget: up to four of the user's shortcuts as buttons. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background"
+    android:orientation="horizontal"
+    android:padding="6dp">
+
+    <LinearLayout
+        android:id="@+id/widget_cell_0"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_margin="4dp"
+        android:background="@drawable/widget_cell"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="6dp">
+        <TextView
+            android:id="@+id/widget_emoji_0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="24sp" />
+        <TextView
+            android:id="@+id/widget_name_0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/widget_cell_1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_margin="4dp"
+        android:background="@drawable/widget_cell"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="6dp">
+        <TextView
+            android:id="@+id/widget_emoji_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="24sp" />
+        <TextView
+            android:id="@+id/widget_name_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/widget_cell_2"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_margin="4dp"
+        android:background="@drawable/widget_cell"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="6dp">
+        <TextView
+            android:id="@+id/widget_emoji_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="24sp" />
+        <TextView
+            android:id="@+id/widget_name_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/widget_cell_3"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_margin="4dp"
+        android:background="@drawable/widget_cell"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="6dp">
+        <TextView
+            android:id="@+id/widget_emoji_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="24sp" />
+        <TextView
+            android:id="@+id/widget_name_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+</LinearLayout>

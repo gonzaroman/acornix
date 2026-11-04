@@ -20,27 +20,37 @@ import androidx.core.app.NotificationManagerCompat
 import com.gonzaroman.acornix.R
 import com.gonzaroman.acornix.container
 
-/**
- * A scheduled shortcut's alarm went off. Android only lets an app open a screen from the background while one of
- * its windows is visible, so with "Display over other apps" allowed a small "⚡ name" chip shows for a moment and
- * the shortcut opens; without it, a notification offers to run it.
- */
+/** A scheduled shortcut's alarm went off: set the next one and run it. */
 class ScheduleReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val id = intent.data?.lastPathSegment.orEmpty()
         val c = context.container
-        val app = c.apps.get(id)
-        if (app == null || !c.apps.indexFile(id).exists()) { c.schedules.remove(id); return }
+        if (c.apps.get(id) == null || !c.apps.indexFile(id).exists()) { c.schedules.remove(id); return }
         c.schedules.ranNow(id)
-        val run = AppLauncher.intent(context, id, "schedule").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        ShortcutRunner.run(context, id, "schedule")
+    }
+}
+
+/**
+ * Runs a shortcut from the background (a time, the car's Bluetooth, the charger…). Android only lets an app open
+ * a screen from the background while one of its windows is visible, so with "Display over other apps" allowed a
+ * small "⚡ name" chip shows for a moment and the shortcut opens; without it, a notification offers to run it.
+ */
+object ShortcutRunner {
+    private const val CHANNEL = "schedules"
+
+    fun run(context: Context, appId: String, trigger: String) {
+        val app = context.container.apps.get(appId) ?: return
+        val run = AppLauncher.intent(context, appId, trigger).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         if (Settings.canDrawOverlays(context)) {
-            val done = goAsync()
-            val chip = showChip(context, "${app.emoji}  ${app.name}")
             val handler = Handler(Looper.getMainLooper())
-            handler.postDelayed({ runCatching { context.startActivity(run) } }, 300)
-            handler.postDelayed({ chip?.let { runCatching { wm(context).removeView(it) } }; done.finish() }, 2500)
+            handler.post {
+                val chip = showChip(context, "${app.emoji}  ${app.name}")
+                handler.postDelayed({ runCatching { context.startActivity(run) } }, 300)
+                handler.postDelayed({ chip?.let { runCatching { wm(context).removeView(it) } } }, 2500)
+            }
         } else {
-            notify(context, id, "${app.emoji} ${app.name}", run)
+            notify(context, appId, "${app.emoji} ${app.name}", run)
         }
     }
 
@@ -90,15 +100,14 @@ class ScheduleReceiver : BroadcastReceiver() {
         }
     }
 
-    private companion object {
-        const val CHANNEL = "schedules"
-    }
 }
+
 
 /** Alarms are forgotten when the phone restarts or the clock changes: set them again. */
 class ScheduleRearmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val c = context.container
         c.schedules.rearmAll { id -> c.apps.indexFile(id).exists() }
+        com.gonzaroman.acornix.device.AutomationService.sync(context)
     }
 }

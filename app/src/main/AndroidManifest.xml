@@ -14,6 +14,13 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!-- Lets a scheduled shortcut open itself from the background (see ScheduleReceiver). -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!-- Automations: the charger, battery and wifi (a foreground service) and Bluetooth devices. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
     <uses-permission
         android:name="android.permission.WRITE_SETTINGS"
@@ -108,6 +115,61 @@
                 <data android:scheme="acornix" android:host="app" />
             </intent-filter>
         </activity>
+
+        <!-- Shortcuts outside Acornix: a Quick Settings tile, a widget, and "Share with a shortcut". -->
+        <service
+            android:name=".device.ShortcutTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_notification"
+            android:label="@string/tab_shortcuts"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name=".device.ShortcutsWidget"
+            android:exported="false"
+            android:label="@string/widget_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_shortcuts_info" />
+        </receiver>
+
+        <activity
+            android:name=".web.ShareToShortcutActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:label="@string/share_to_shortcut"
+            android:theme="@style/Theme.Acornix">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".device.AutomationService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Runs the user's shortcuts when the charger, battery level or wifi changes, as the user set up." />
+        </service>
+
+        <receiver
+            android:name=".device.BluetoothTriggerReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
+                <action android:name="android.bluetooth.device.action.ACL_DISCONNECTED" />
+            </intent-filter>
+        </receiver>
 
         <receiver
             android:name=".web.ScheduleReceiver"

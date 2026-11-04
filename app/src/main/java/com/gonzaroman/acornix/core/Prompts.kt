@@ -199,7 +199,8 @@ object Prompts {
         - Acornix.keepAwake(on)                // keep the screen on while the app is open
         - Acornix.media('play'|'pause'|'toggle'|'next'|'previous')   // controls the music app that is playing
         - Acornix.calendar({ title, start: Date, end: Date, location? })   // opens the calendar with the event filled in
-        - Acornix.clipboard() -> text
+        - Acornix.clipboard() -> text            · Acornix.http(url) -> the page or API's text (no CORS limits; JSON.parse it)
+        - Acornix.input                        // text shared with the shortcut ("Share with Acornix"), or 
         - Acornix.done(message?)               // the shortcut finished: Acornix shows "✓ message" and closes it
         - Acornix.trigger                      // what opened it: 'tap', 'home' (home screen icon) or 'nfc' (NFC sticker)
         The phone's location: navigator.geolocation. Calls can fail (e.g. no flashlight): use try/catch and show a friendly message.

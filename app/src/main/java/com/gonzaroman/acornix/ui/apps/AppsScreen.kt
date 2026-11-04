@@ -214,6 +214,11 @@ fun AppActionsSheet(app: AppMeta, nav: NavHostController, onDismiss: () -> Unit)
         }
         if (app.kind == AppKind.FEATURE) {
             SheetAction(Icons.Rounded.Alarm, stringResource(R.string.action_schedule)) { scheduling = true }
+            SheetAction(Icons.Rounded.Tune, stringResource(R.string.action_tile)) {
+                com.gonzaroman.acornix.device.ShortcutLaunchers.setTileApp(context, app.id)
+                Toast.makeText(context, R.string.tile_set, Toast.LENGTH_LONG).show()
+                onDismiss()
+            }
         }
         if (app.kind == AppKind.FEATURE && NfcStickers.isSupported(context)) {
             SheetAction(Icons.Rounded.Nfc, stringResource(R.string.action_nfc)) { writingNfc = true }

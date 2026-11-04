@@ -80,7 +80,8 @@ class AppRunnerActivity : ComponentActivity(), ShortcutHost {
         webView = WebView(this)
         webView.webChromeClient = webAccess.chromeClient()
         val trigger = intent?.data?.getQueryParameter("trigger")?.takeIf { it.isNotBlank() } ?: "tap"
-        AcornixWebView.configure(webView, this, lifecycleScope, appId, trigger) { scheduleThumbnail() }
+        val input = intent?.getStringExtra(AppLauncher.EXTRA_INPUT)
+        AcornixWebView.configure(webView, this, lifecycleScope, appId, trigger, input) { scheduleThumbnail() }
         val root = FrameLayout(this).apply {
             setBackgroundColor(0xFF000000.toInt())
             addView(webView, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))

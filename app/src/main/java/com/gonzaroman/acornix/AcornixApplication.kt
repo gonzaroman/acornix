@@ -24,7 +24,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /** Manual dependency container shared by every screen. */
-class AppContainer(context: Context) {
+class AppContainer(private val context: Context) {
     val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     val settings = SettingsRepository(context)
     val data = AppDataStore(context)
@@ -35,6 +35,7 @@ class AppContainer(context: Context) {
     val device = DeviceActions(context)
     val media = MediaExport(context)
     val schedules = com.gonzaroman.acornix.data.ShortcutSchedules(context)
+    val triggers = com.gonzaroman.acornix.data.ShortcutTriggers(context)
     val aiPermissions = com.gonzaroman.acornix.data.AiPermissions(context)
     val appReview = com.gonzaroman.acornix.core.AppReview(settings)
     val gallery = com.gonzaroman.acornix.data.Gallery(context.filesDir, apps, importExport, aiPermissions)
@@ -49,6 +50,14 @@ class AppContainer(context: Context) {
     private val samples = SampleAppsInstaller(context, apps)
 
     fun start() {
+        runCatching { com.gonzaroman.acornix.device.AutomationService.sync(context) }
+        // Keep the Acornix icon's menu, the widget and the Quick Settings tile in step with the user's shortcuts.
+        appScope.launch {
+            apps.apps.collect { list ->
+                delay(500)
+                runCatching { com.gonzaroman.acornix.device.ShortcutLaunchers.refresh(context) }
+            }
+        }
         appScope.launch {
             apps.refresh()
             samples.installIfNeeded()
