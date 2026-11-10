@@ -194,6 +194,27 @@ class ProvidersTest {
     }
 
     @Test
+    fun geminiFallsBackWhenTheModelIsBusyOrGone() = runTest {
+        server.enqueue(MockResponse().setResponseCode(503).setBody("""{"error":{"code":503,"message":"high demand"}}"""))
+        server.enqueue(MockResponse().setResponseCode(404).setBody("""{"error":{"code":404,"message":"no longer available"}}"""))
+        server.enqueue(sse("""data: {"candidates":[{"content":{"parts":[{"text":"OK"}]},"finishReason":"STOP"}]}"""))
+        val p = GeminiProvider("gk", "gemini-x", base = server.url("/v1beta").toString().trimEnd('/'))
+        assertEquals("OK", p.streamText("s", "p").text)
+        assertEquals("/v1beta/models/gemini-x:streamGenerateContent?alt=sse", server.takeRequest().path)
+        assertEquals("/v1beta/models/gemini-flash-lite-latest:streamGenerateContent?alt=sse", server.takeRequest().path)
+        assertEquals("/v1beta/models/gemini-3.5-flash:streamGenerateContent?alt=sse", server.takeRequest().path)
+    }
+
+    @Test
+    fun geminiDoesNotFallBackOnAWrongKey() = runTest {
+        server.enqueue(MockResponse().setResponseCode(400).setBody("""{"error":{"code":400,"message":"API key not valid"}}"""))
+        val p = GeminiProvider("bad", "gemini-x", base = server.url("/v1beta").toString().trimEnd('/'))
+        val error = runCatching { p.streamText("s", "p") }.exceptionOrNull() as AiException
+        assertEquals(400, error.status)
+        assertEquals(1, server.requestCount)
+    }
+
+    @Test
     fun geminiFunctionCalls() = runTest {
         server.enqueue(MockResponse().setBody("""
             {"candidates":[{"content":{"role":"model","parts":[{"functionCall":{"name":"get_weather","args":{"city":"Cádiz"}},"thoughtSignature":"sig"}]}}]}

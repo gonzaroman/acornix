@@ -16,8 +16,17 @@ import kotlinx.serialization.json.put
 enum class ProviderType(val id: String, val label: String, val defaultModel: String) {
     ANTHROPIC("anthropic", "Anthropic (Claude)", "claude-opus-5-5"),
     OPENAI("openai", "OpenAI", "gpt-5"),
-    GEMINI("gemini", "Google Gemini", "gemini-2.5-flash"),
+    GEMINI("gemini", "Google Gemini", "gemini-flash-lite-latest"),
     CUSTOM("custom", "OpenAI-compatible", "");
+
+    /**
+     * Models to try, in order, when the chosen one can't answer. Only Gemini needs it: on its free tier a
+     * model is often busy, slow to the point of hanging, or not included, while another answers at once.
+     * The light one goes first: with a free key (November 2026) it wrote the same app in 34 s, against
+     * 2 min for 3.5-flash and 6 min for a busy flash-latest.
+     */
+    val fallbackModels: List<String>
+        get() = if (this == GEMINI) listOf("gemini-flash-lite-latest", "gemini-3.5-flash", "gemini-flash-latest") else emptyList()
 
     companion object {
         fun fromId(id: String?): ProviderType = entries.firstOrNull { it.id == id } ?: ANTHROPIC
@@ -59,7 +68,8 @@ data class AgentReply(
 /** Result of a streamed text generation. */
 data class TextResult(val text: String, val truncated: Boolean, val refused: Boolean = false)
 
-open class AiException(message: String, cause: Throwable? = null) : Exception(message, cause)
+/** [status] is the HTTP status when the provider answered with an error, so callers can tell "busy" from "wrong key". */
+open class AiException(message: String, cause: Throwable? = null, val status: Int? = null) : Exception(message, cause)
 
 /** No usable provider yet; the UI shows its own translated message for this one. */
 class ProviderNotConfiguredException : AiException("AI provider not configured. Add your API key in Settings.")

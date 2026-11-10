@@ -18,7 +18,29 @@ class GeminiProvider(
 ) : AiProvider {
 
     private val headers get() = mapOf("x-goog-api-key" to apiKey)
-    private val modelPath get() = if (model.startsWith("models/")) model else "models/$model"
+    /** The model answering: the chosen one, or the one that took over when it wasn't available. */
+    private var active = model
+    private val modelPath get() = if (active.startsWith("models/")) active else "models/$active"
+
+    /**
+     * Runs [call] with the chosen model and, when Google says that model is busy (503), gone (404) or out
+     * of quota (429), with the next ones in [ProviderType.fallbackModels]. On the free tier one of those is common at any
+     * given moment, and another model usually answers. The error comes before any text, so nothing repeats.
+     */
+    private suspend fun <T> withFallback(call: suspend () -> T): T {
+        var last: AiException? = null
+        for (candidate in listOf(active) + ProviderType.GEMINI.fallbackModels.filter { it != active && it != model }) {
+            active = candidate
+            try {
+                return call()
+            } catch (e: AiException) {
+                if (e.status !in UNAVAILABLE) throw e
+                last = e
+            }
+        }
+        active = model
+        throw last ?: AiException("No model available")
+    }
 
     override suspend fun streamText(
         system: String,
@@ -33,7 +55,7 @@ class GeminiProvider(
         }
         val out = StringBuilder()
         var finish: String? = null
-        http.streamSse("$base/$modelPath:streamGenerateContent?alt=sse", body, headers) { data ->
+        withFallback { http.streamSse("$base/$modelPath:streamGenerateContent?alt=sse", body, headers) { data ->
             val chunk = runCatching { AiJson.parseToJsonElement(data).jsonObject }.getOrNull() ?: return@streamSse
             chunk["error"]?.let { throw AiException("API error: ${(it as? JsonObject)?.str("message") ?: it}") }
             val candidate = (chunk["candidates"] as? JsonArray)?.firstOrNull() as? JsonObject ?: return@streamSse
@@ -44,7 +66,7 @@ class GeminiProvider(
                 part.str("text")?.let { if (it.isNotEmpty()) { out.append(it); onDelta(it) } }
             }
             candidate.str("finishReason")?.let { finish = it }
-        }
+        } }
         return TextResult(
             out.toString(),
             truncated = finish == "MAX_TOKENS",
@@ -131,7 +153,7 @@ class GeminiProvider(
                 put("contents", JsonArray(contents))
                 if (toolsJson.isNotEmpty()) put("tools", toolsJson)
             }
-            val res = http.postJson("$base/$modelPath:generateContent", body, headers)
+            val res = withFallback { http.postJson("$base/$modelPath:generateContent", body, headers) }
             val candidate = (res["candidates"] as? JsonArray)?.firstOrNull() as? JsonObject
                 ?: throw AiException("Empty response from the model")
             val content = candidate["content"] as? JsonObject ?: buildJsonObject {
@@ -155,3 +177,5 @@ class GeminiProvider(
         }
     }
 }
+
+private val UNAVAILABLE = setOf(404, 429, 503)

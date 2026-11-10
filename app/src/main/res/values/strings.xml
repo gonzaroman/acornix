@@ -954,11 +954,21 @@
     <string name="quick_paste">Paste</string>
     <string name="quick_connect">Connect</string>
     <string name="quick_checking">Checking the key…</string>
-    <string name="quick_failed">That key didn\'t work: %1$s</string>
+    <string name="quick_failed">Couldn\'t connect: %1$s</string>
     <string name="quick_privacy">The key is stored encrypted on this phone and only sent to its provider. Keys from OpenAI and Anthropic work too.</string>
     <string name="quick_other">Other providers and models</string>
     <string name="quick_back">Back to the short way</string>
     <string name="connect_ai_banner_assistant">Connect an AI to use the assistant</string>
     <string name="connect_ai_banner_shortcuts">Connect an AI to create shortcuts just by describing them</string>
     <string name="connect_ai_banner_app">This app needs an AI, and you haven\'t connected one yet</string>
+    <string name="quick_try_model">It may be the model. Try another one:</string>
+    <string name="change_model_button">Try another model</string>
+    <string name="change_model_title">Try another model</string>
+    <string name="change_model_text">One model may be busy or not included in your key while another works.</string>
+    <string name="quick_timeout">the AI took too long to answer</string>
+    <string name="gen_slow">This model is busy and is taking longer than usual. Wait, or try another.</string>
+    <string name="gen_slow_button">Try another</string>
+    <string name="model_change_inline">Model: %1$s · Change</string>
+    <string name="change_model_gemini_hint">Those with “lite” in the name answer faster; the “pro” ones are usually not free.</string>
+    <string name="gen_patience">Free models are sometimes busy, and then an app can take a few minutes instead of seconds. It\'s still working.</string>
 </resources>

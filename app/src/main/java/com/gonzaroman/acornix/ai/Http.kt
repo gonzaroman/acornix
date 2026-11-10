@@ -63,7 +63,7 @@ internal suspend fun OkHttpClient.postJson(url: String, body: JsonElement, heade
     return withContext(Dispatchers.IO) {
         response.use {
             val text = it.body?.string().orEmpty()
-            if (!it.isSuccessful) throw AiException(httpErrorMessage(it.code, text))
+            if (!it.isSuccessful) throw AiException(httpErrorMessage(it.code, text), status = it.code)
             AiJson.parseToJsonElement(text).jsonObject
         }
     }
@@ -75,7 +75,7 @@ internal suspend fun OkHttpClient.getJson(url: String, headers: Map<String, Stri
     return withContext(Dispatchers.IO) {
         response.use {
             val text = it.body?.string().orEmpty()
-            if (!it.isSuccessful) throw AiException(httpErrorMessage(it.code, text))
+            if (!it.isSuccessful) throw AiException(httpErrorMessage(it.code, text), status = it.code)
             AiJson.parseToJsonElement(text).jsonObject
         }
     }
@@ -94,7 +94,7 @@ internal suspend fun OkHttpClient.streamSse(
     val response = await(jsonRequest(url, body, headers + ("Accept" to "text/event-stream")))
     withContext(Dispatchers.IO) {
         response.use {
-            if (!it.isSuccessful) throw AiException(httpErrorMessage(it.code, it.body?.string().orEmpty()))
+            if (!it.isSuccessful) throw AiException(httpErrorMessage(it.code, it.body?.string().orEmpty()), status = it.code)
             val source = it.body?.source() ?: return@withContext
             val data = StringBuilder()
             while (true) {

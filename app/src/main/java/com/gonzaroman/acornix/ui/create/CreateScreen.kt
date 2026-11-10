@@ -1,5 +1,6 @@
 package com.gonzaroman.acornix.ui.create
 
+import com.gonzaroman.acornix.ui.settings.ChangeModelDialog
 import com.gonzaroman.acornix.ui.components.ConnectAiBanner
 import com.gonzaroman.acornix.ai.ProviderNotConfiguredException
 import com.gonzaroman.acornix.ui.components.ConnectAiSheet
@@ -144,7 +145,7 @@ fun CreateScreen(nav: NavHostController, feature: Boolean, improveAppId: String?
         ) { state ->
             when (state) {
                 is CreateUi.Form -> FormContent(vm, feature, onStudio = { nav.navigate(Routes.STUDIO) })
-                is CreateUi.Generating -> GeneratingContent(state, onCancel = vm::cancel)
+                is CreateUi.Generating -> GeneratingContent(state, onCancel = vm::cancel, onRetry = vm::retry)
                 is CreateUi.Done -> DoneContent(state, vm, onShare = { nav.navigate(Routes.share(it.id)) },
                     onEditSteps = { nav.navigate(Routes.shortcutEditor(it.id)) })
                 is CreateUi.Failed -> FailedContent(state, onRetry = vm::retry, onEdit = vm::backToForm, onStudio = { nav.navigate(Routes.STUDIO) })
@@ -236,6 +237,16 @@ private fun FormContent(vm: CreateViewModel, feature: Boolean, onStudio: () -> U
             Text(stringResource(if (target != null) R.string.apply_change else R.string.create_button), style = MaterialTheme.typography.titleMedium)
         }
 
+        // Which model will write it, and a way to change it without going to Settings.
+        val settings by context.container.settings.settings.collectAsState(initial = null)
+        var changeModel by remember { mutableStateOf(false) }
+        if (changeModel) ChangeModelDialog(onDismiss = { changeModel = false }, onPicked = { changeModel = false })
+        settings?.config()?.takeIf { it.isUsable }?.let { config ->
+            TextButton(onClick = { changeModel = true }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                Text(stringResource(R.string.model_change_inline, config.model), style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+        }
+
         if (target == null && !feature) {
             Text(stringResource(R.string.field_category), style = MaterialTheme.typography.titleSmall)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -264,7 +275,20 @@ private fun FormContent(vm: CreateViewModel, feature: Boolean, onStudio: () -> U
 }
 
 @Composable
-private fun GeneratingContent(state: CreateUi.Generating, onCancel: () -> Unit) {
+private fun GeneratingContent(state: CreateUi.Generating, onCancel: () -> Unit, onRetry: () -> Unit) {
+    // Nothing written after a while: the model is probably busy, and another one may answer at once.
+    val waiting = state.chars == 0
+    var slow by remember { mutableStateOf(false) }
+    LaunchedEffect(waiting) {
+        slow = false
+        if (waiting) {
+            delay(20_000)
+            slow = true
+        }
+    }
+    var changeModel by remember { mutableStateOf(false) }
+    if (changeModel) ChangeModelDialog(onDismiss = { changeModel = false }, onPicked = { changeModel = false; onRetry() })
+
     val pulse = rememberInfiniteTransition(label = "pulse")
     val scale by pulse.animateFloat(0.9f, 1.1f, infiniteRepeatable(tween(700), RepeatMode.Reverse), label = "scale")
     val scroll = rememberScrollState()
@@ -290,7 +314,29 @@ private fun GeneratingContent(state: CreateUi.Generating, onCancel: () -> Unit) 
         )
         Spacer(Modifier.height(16.dp))
         LinearProgressIndicator(Modifier.fillMaxWidth().clip(MaterialTheme.shapes.small))
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(12.dp))
+        // Google's free models are busy at times: say so from the start, so a long wait isn't taken for a hang.
+        val context = LocalContext.current
+        val free by produceState(false) { value = context.container.settings.current().provider == com.gonzaroman.acornix.ai.ProviderType.GEMINI }
+        if (free) {
+            Text(
+                stringResource(R.string.gen_patience),
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(12.dp))
+        }
+        if (slow && waiting) {
+            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer), shape = MaterialTheme.shapes.large) {
+                Row(Modifier.padding(start = 16.dp, end = 8.dp, top = 10.dp, bottom = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text("🐢 " + stringResource(R.string.gen_slow), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+                    Spacer(Modifier.width(8.dp))
+                    FilledTonalButton(onClick = { changeModel = true }) { Text(stringResource(R.string.gen_slow_button)) }
+                }
+            }
+            Spacer(Modifier.height(16.dp))
+        }
         Box(
             Modifier
                 .weight(1f)
@@ -462,6 +508,8 @@ private fun FailedContent(state: CreateUi.Failed, onRetry: () -> Unit, onEdit: (
             onStudio = { connect = false; onStudio() },
         )
     }
+    var changeModel by remember { mutableStateOf(false) }
+    if (changeModel) ChangeModelDialog(onDismiss = { changeModel = false }, onPicked = { changeModel = false; onRetry() })
     Column(Modifier.fillMaxSize().padding(32.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
         Text(if (noAi) "🔑" else "🥀", fontSize = 56.sp)
         Spacer(Modifier.height(12.dp))
@@ -485,6 +533,11 @@ private fun FailedContent(state: CreateUi.Failed, onRetry: () -> Unit, onEdit: (
                     Text(stringResource(R.string.retry))
                 }
             }
+        }
+        // The AI answered with an error: another model of the same key often works.
+        if (!noAi && state.error is com.gonzaroman.acornix.ai.AiException) {
+            Spacer(Modifier.height(4.dp))
+            TextButton(onClick = { changeModel = true }) { Text(stringResource(R.string.change_model_button)) }
         }
     }
 }

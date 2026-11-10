@@ -260,7 +260,7 @@ Acornix is free: download the APK from GitHub releases and install it in a minut
 |---|---|---|
 | **Anthropic (Claude)** | [console.anthropic.com](https://console.anthropic.com/settings/keys) | Excellent for code; uses the official Anthropic SDK |
 | **OpenAI** | [platform.openai.com](https://platform.openai.com/api-keys) | Any chat model your account can use |
-| **Google Gemini** | [aistudio.google.com](https://aistudio.google.com/apikey) | Has a free tier |
+| **Google Gemini** | [aistudio.google.com](https://aistudio.google.com/apikey) | Has a free tier (no card in most countries). Acornix starts with the fast `gemini-flash-lite-latest` and switches model by itself when one is busy |
 | **OpenAI-compatible** | OpenRouter, Groq, Together, a local Ollama… | Set your own base URL |
 
 Tap **▾** next to *Model* in Settings to load the models available to your account.

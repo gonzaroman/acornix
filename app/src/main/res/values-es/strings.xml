@@ -953,11 +953,21 @@
     <string name="quick_paste">Pegar</string>
     <string name="quick_connect">Conectar</string>
     <string name="quick_checking">Comprobando la clave…</string>
-    <string name="quick_failed">Esa clave no ha funcionado: %1$s</string>
+    <string name="quick_failed">No se ha podido conectar: %1$s</string>
     <string name="quick_privacy">La clave se guarda cifrada en este móvil y solo se envía a su proveedor. También sirven las claves de OpenAI y Anthropic.</string>
     <string name="quick_other">Otros proveedores y modelos</string>
     <string name="quick_back">Volver al modo corto</string>
     <string name="connect_ai_banner_assistant">Conecta una IA para usar el asistente</string>
     <string name="connect_ai_banner_shortcuts">Conecta una IA para crear atajos solo describiéndolos</string>
     <string name="connect_ai_banner_app">Esta app necesita una IA y aún no has conectado ninguna</string>
+    <string name="quick_try_model">Puede ser el modelo. Prueba con otro:</string>
+    <string name="change_model_button">Probar con otro modelo</string>
+    <string name="change_model_title">Probar con otro modelo</string>
+    <string name="change_model_text">Un modelo puede estar saturado o no entrar en tu clave y otro sí funcionar.</string>
+    <string name="quick_timeout">la IA ha tardado demasiado en responder</string>
+    <string name="gen_slow">Este modelo está saturado y tarda más de lo normal. Espera, o prueba con otro.</string>
+    <string name="gen_slow_button">Probar otro</string>
+    <string name="model_change_inline">Modelo: %1$s · Cambiar</string>
+    <string name="change_model_gemini_hint">Los que llevan «lite» en el nombre responden más rápido; los «pro» no suelen ser gratis.</string>
+    <string name="gen_patience">Los modelos gratuitos a veces están saturados, y entonces una app puede tardar unos minutos en vez de segundos. Sigue trabajando.</string>
 </resources>
