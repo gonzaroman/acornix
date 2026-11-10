@@ -1,5 +1,6 @@
 package com.gonzaroman.acornix.ui.explore
 
+import com.gonzaroman.acornix.ui.components.ConnectAiBanner
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
@@ -411,12 +412,7 @@ fun GalleryAppScreen(nav: NavHostController, id: String) {
 
             // Apps that use the AI do nothing useful until one is connected: say so before installing.
             if ("ai" in app.tags && settings?.config()?.isUsable == false) {
-                Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainerHigh) {
-                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Text(stringResource(R.string.gallery_needs_ai), style = MaterialTheme.typography.bodyMedium)
-                        FilledTonalButton(onClick = { nav.navigateTab(Routes.SETTINGS) }) { Text(stringResource(R.string.ai_missing_connect)) }
-                    }
-                }
+                ConnectAiBanner(title = R.string.connect_ai_banner_app)
             }
 
             Screenshot(c.gallery.screenshotUrl(app), Modifier.fillMaxWidth().aspectRatio(0.75f).clip(MaterialTheme.shapes.large))

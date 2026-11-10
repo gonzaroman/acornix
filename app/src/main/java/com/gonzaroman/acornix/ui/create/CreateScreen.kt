@@ -1,5 +1,6 @@
 package com.gonzaroman.acornix.ui.create
 
+import com.gonzaroman.acornix.ui.components.ConnectAiBanner
 import com.gonzaroman.acornix.ai.ProviderNotConfiguredException
 import com.gonzaroman.acornix.ui.components.ConnectAiSheet
 import com.gonzaroman.acornix.ui.components.Confetti
@@ -171,6 +172,7 @@ private fun FormContent(vm: CreateViewModel, feature: Boolean, onStudio: () -> U
         Modifier.fillMaxSize().verticalScroll(scroll).imePadding().padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+        ConnectAiBanner(onStudio = onStudio)
         if (target != null) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 AppIcon(target, 56.dp)

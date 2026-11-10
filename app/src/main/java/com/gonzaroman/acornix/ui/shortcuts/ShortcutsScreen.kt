@@ -1,5 +1,6 @@
 package com.gonzaroman.acornix.ui.shortcuts
 
+import com.gonzaroman.acornix.ui.components.ConnectAiBanner
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -147,6 +148,9 @@ fun ShortcutsScreen(nav: NavHostController) {
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
+            }
+            if (settings != null && !hasAi) {
+                item(key = "connect", span = { GridItemSpan(maxLineSpan) }) { ConnectAiBanner(title = R.string.connect_ai_banner_shortcuts) }
             }
 
             if (mine.isEmpty()) {

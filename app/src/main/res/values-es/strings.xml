@@ -563,7 +563,6 @@
     <string name="ai_missing_text">Para funcionar necesita tu IA. Conéctala en Ajustes: eliges un proveedor y pegas tu clave.</string>
     <string name="ai_missing_connect">Conectar mi IA</string>
     <string name="ai_missing_later">Ahora no</string>
-    <string name="gallery_needs_ai">🧠 Esta app necesita tu IA y aún no la has conectado.</string>
     <!-- Revisar una app compartida antes de instalarla -->
     <string name="import_review_title">¿Instalar «%1$s»?</string>
     <string name="import_review_warning">Esta app la ha creado otra persona. Instálala solo si confías en quien te la pasa: lo haces bajo tu responsabilidad. Tu IA puede revisar su código antes.</string>
@@ -958,4 +957,7 @@
     <string name="quick_privacy">La clave se guarda cifrada en este móvil y solo se envía a su proveedor. También sirven las claves de OpenAI y Anthropic.</string>
     <string name="quick_other">Otros proveedores y modelos</string>
     <string name="quick_back">Volver al modo corto</string>
+    <string name="connect_ai_banner_assistant">Conecta una IA para usar el asistente</string>
+    <string name="connect_ai_banner_shortcuts">Conecta una IA para crear atajos solo describiéndolos</string>
+    <string name="connect_ai_banner_app">Esta app necesita una IA y aún no has conectado ninguna</string>
 </resources>

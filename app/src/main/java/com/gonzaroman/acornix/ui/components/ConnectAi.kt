@@ -1,5 +1,8 @@
 package com.gonzaroman.acornix.ui.components
 
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -60,20 +63,44 @@ fun ConnectAiSheet(onDismiss: () -> Unit, onConnected: () -> Unit, onStudio: (()
     }
 }
 
-/** Home, while no AI is connected: says what is missing and what it costs, instead of a warning. */
+/** True while no AI is connected (false until the settings are read, so nothing flashes). */
 @Composable
-fun ConnectAiCard(onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Surface(onClick = onClick, shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.tertiaryContainer, modifier = modifier.fillMaxWidth()) {
+fun rememberAiMissing(): Boolean {
+    val settings by LocalContext.current.container.settings.settings.collectAsState(initial = null)
+    return settings?.config()?.isUsable == false
+}
+
+/**
+ * The standing reminder that the AI can be had for free, shown wherever the AI is needed while none is
+ * connected. It opens [ConnectAiSheet] right there and goes away by itself once an AI is connected.
+ */
+@Composable
+fun ConnectAiBanner(
+    modifier: Modifier = Modifier,
+    title: Int = R.string.connect_ai_card_title,
+    onStudio: (() -> Unit)? = null,
+    onConnected: () -> Unit = {},
+) {
+    if (!rememberAiMissing()) return
+    var open by remember { mutableStateOf(false) }
+    if (open) {
+        ConnectAiSheet(
+            onDismiss = { open = false },
+            onConnected = { open = false; onConnected() },
+            onStudio = onStudio?.let { { open = false; it() } },
+        )
+    }
+    Surface(onClick = { open = true }, shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.tertiaryContainer, modifier = modifier.fillMaxWidth()) {
         Row(Modifier.padding(start = 16.dp, top = 12.dp, bottom = 12.dp, end = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text("🔑", fontSize = 28.sp)
+            Text("🎁", fontSize = 28.sp)
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                Text(stringResource(R.string.connect_ai_card_title), style = MaterialTheme.typography.titleSmall)
+                Text(stringResource(title), style = MaterialTheme.typography.titleSmall)
                 Text(stringResource(R.string.connect_ai_card_text), style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f))
             }
             Spacer(Modifier.width(8.dp))
-            Button(onClick = onClick) { Text(stringResource(R.string.connect_ai_button)) }
+            Button(onClick = { open = true }) { Text(stringResource(R.string.connect_ai_button)) }
         }
     }
 }

@@ -113,7 +113,11 @@ fun SettingsScreen(nav: NavHostController) {
         Text(stringResource(R.string.tab_settings), style = MaterialTheme.typography.headlineMedium)
 
         SectionTitle(stringResource(R.string.settings_ai))
-        SettingsCard { ProviderEditor(s, modifier = Modifier.padding(16.dp)) }
+        // No AI yet: the short, free way first; the full form is one tap away inside it.
+        SettingsCard {
+            if (s.config().isUsable) ProviderEditor(s, modifier = Modifier.padding(16.dp))
+            else QuickConnect(s, modifier = Modifier.padding(16.dp), onSaved = {})
+        }
 
         SectionTitle(stringResource(R.string.settings_language))
         SettingsCard {

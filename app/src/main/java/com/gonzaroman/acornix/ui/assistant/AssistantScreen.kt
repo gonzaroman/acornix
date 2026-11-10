@@ -1,5 +1,7 @@
 package com.gonzaroman.acornix.ui.assistant
 
+import com.gonzaroman.acornix.ui.components.ConnectAiBanner
+import com.gonzaroman.acornix.ui.components.rememberAiMissing
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -136,12 +138,14 @@ fun AssistantScreen(
             IconButton(onClick = { assistant.newChat() }) { Icon(Icons.Rounded.AddComment, stringResource(R.string.new_chat)) }
         }
 
+        val aiMissing = rememberAiMissing()
         LazyColumn(
             state = listState,
             modifier = Modifier.weight(1f).fillMaxWidth(),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
+            if (aiMissing) item(key = "connect") { ConnectAiBanner(title = R.string.connect_ai_banner_assistant) }
             if (controlState == ControlState.STALLED || (!controlEnabled && (controlMode || state.items.isEmpty()))) {
                 item { ControlBanner(controlState, onHelp = onOpenControlHelp) }
             }

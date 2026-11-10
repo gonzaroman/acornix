@@ -90,8 +90,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.setValue
 import com.gonzaroman.acornix.core.Idea
-import com.gonzaroman.acornix.ui.components.ConnectAiCard
-import com.gonzaroman.acornix.ui.components.ConnectAiSheet
+import com.gonzaroman.acornix.ui.components.ConnectAiBanner
 import java.time.LocalDate
 
 @Composable
@@ -114,14 +113,6 @@ fun HomeScreen(nav: NavHostController) {
     // Installed from here: it leaves the list without reshuffling the rest.
     val picks = mix.filter { app -> apps.none { it.source?.gallery == app.id } }
 
-    var connect by remember { mutableStateOf(false) }
-    if (connect) {
-        ConnectAiSheet(
-            onDismiss = { connect = false },
-            onConnected = { connect = false },
-            onStudio = { connect = false; nav.navigate(Routes.STUDIO) },
-        )
-    }
     // One built-in idea a day, the same all day: a reason to come back and something to start from.
     val idea by produceState<Idea?>(null, settings?.appLanguage, apps.size) {
         // Not one they already have (several ideas are the bundled examples).
@@ -151,7 +142,7 @@ fun HomeScreen(nav: NavHostController) {
 
         update?.let { info -> item(key = "update") { UpdateCard(info) } }
 
-        if (config != null && !config.isUsable) item(key = "connect") { ConnectAiCard(onClick = { connect = true }) }
+        if (config != null && !config.isUsable) item(key = "connect") { ConnectAiBanner(onStudio = { nav.navigate(Routes.STUDIO) }) }
 
         item {
             HeroCard(
