@@ -19,6 +19,8 @@ suspend fun shareAppZip(context: Context, app: AppMeta, includeData: Boolean) {
     val uri = FileProvider.getUriForFile(context, "${context.packageName}.files", zip)
     val send = Intent(Intent.ACTION_SEND).setType("application/zip")
         .putExtra(Intent.EXTRA_STREAM, uri)
+        // Whoever receives the file learns what it is and where to get Acornix to open it.
+        .putExtra(Intent.EXTRA_TEXT, context.getString(R.string.share_zip_text, app.name))
         .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     context.startActivity(Intent.createChooser(send, app.name))
 }

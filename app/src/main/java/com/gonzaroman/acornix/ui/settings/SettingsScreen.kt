@@ -48,6 +48,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -362,6 +363,25 @@ fun ProviderEditor(settings: AppSettings, modifier: Modifier = Modifier, onSaved
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             modifier = Modifier.fillMaxWidth(),
         )
+        // No key yet: point to the provider that gives one for free, instead of leaving them stuck.
+        if (key.isBlank() && (type == ProviderType.ANTHROPIC || type == ProviderType.OPENAI)) {
+            Surface(
+                onClick = { type = ProviderType.GEMINI; saved = false },
+                shape = MaterialTheme.shapes.medium,
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    "🎁 " + stringResource(R.string.free_key_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                )
+            }
+        }
+        if (key.isBlank() && type == ProviderType.GEMINI) {
+            Text(stringResource(R.string.free_key_steps), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
         keyHelp(type)?.let { (label, url) ->
             Text(
                 label,

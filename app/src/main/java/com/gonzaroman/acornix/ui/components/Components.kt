@@ -1,5 +1,7 @@
 package com.gonzaroman.acornix.ui.components
 
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.runtime.LaunchedEffect
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -393,6 +395,43 @@ fun PromptBar(
                         Icon(Icons.AutoMirrored.Rounded.Send, stringResource(R.string.send))
                     }
                 }
+            }
+        }
+    }
+}
+
+private class ConfettiPiece(val x: Float, val delay: Float, val speed: Float, val spin: Float, val drift: Float, val color: Color, val size: Float)
+
+private val CONFETTI_COLORS = listOf(Color(0xFFFF5C8A), Color(0xFFFFC24B), Color(0xFF4BD6A0), Color(0xFF5AA9FF), Color(0xFFB18CFF), Color(0xFFFF8A4B))
+
+/** Paper confetti falling once over whatever is behind it; it doesn't take touches. */
+@Composable
+fun Confetti(modifier: Modifier = Modifier, onEnd: () -> Unit = {}) {
+    val progress = remember { androidx.compose.animation.core.Animatable(0f) }
+    val pieces = remember {
+        val r = kotlin.random.Random(System.nanoTime())
+        List(110) {
+            ConfettiPiece(
+                x = r.nextFloat(), delay = r.nextFloat() * 0.35f, speed = 0.75f + r.nextFloat() * 0.6f, spin = r.nextFloat() * 360f,
+                drift = (r.nextFloat() - 0.5f) * 0.3f, color = CONFETTI_COLORS[r.nextInt(CONFETTI_COLORS.size)], size = 7f + r.nextFloat() * 8f,
+            )
+        }
+    }
+    LaunchedEffect(Unit) {
+        progress.animateTo(1f, androidx.compose.animation.core.tween(2800, easing = androidx.compose.animation.core.LinearEasing))
+        onEnd()
+    }
+    androidx.compose.foundation.Canvas(modifier.fillMaxSize()) {
+        val t = progress.value
+        pieces.forEach { p ->
+            val local = (t - p.delay) / (1f - p.delay)
+            if (local <= 0f) return@forEach
+            val x = (p.x + p.drift * local + 0.02f * kotlin.math.sin(local * 14f + p.spin)) * size.width
+            val y = (-0.05f + local * 1.15f * p.speed) * size.height
+            val alpha = if (local > 0.8f) ((1f - local) / 0.2f).coerceIn(0f, 1f) else 1f
+            val s = p.size.dp.toPx()
+            rotate(p.spin + local * 720f, pivot = androidx.compose.ui.geometry.Offset(x, y)) {
+                drawRect(p.color.copy(alpha = alpha), topLeft = androidx.compose.ui.geometry.Offset(x - s / 2, y - s / 4), size = androidx.compose.ui.geometry.Size(s, s / 2))
             }
         }
     }

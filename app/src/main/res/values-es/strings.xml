@@ -146,7 +146,7 @@
     <string name="gen_failed">Algo ha fallado</string>
     <string name="gen_error_no_code">La IA respondió sin una app. Prueba a reformular la petición.</string>
     <string name="gen_error_refused">La IA ha rechazado esta petición.</string>
-    <string name="error_not_configured">Aún no has configurado un proveedor de IA. Añade tu API key en Ajustes.</string>
+    <string name="error_not_configured">Aún no has conectado una IA. Conecta una para crear.</string>
     <string name="gen_error_generic">Error inesperado</string>
     <string name="suggestion_title">Mejora sugerida</string>
     <string name="apply_suggestion">Aplicar sugerencia</string>
@@ -274,15 +274,15 @@
     <string name="onb_feature_feature">Atajos que hacen que tu móvil haga cosas por ti</string>
     <string name="onb_feature_control">Un asistente que hace cosas por ti</string>
     <string name="onb_feature_apps">Tus apps en el escritorio, como si fueran de verdad</string>
-    <string name="onb_ai_title">Conecta tu IA</string>
-    <string name="onb_ai_text">Elige un proveedor y pega tu API key. Se guarda cifrada en este móvil y solo se envía a ese proveedor.</string>
+    <string name="onb_ai_title">Conecta tu IA, gratis</string>
+    <string name="onb_ai_text">Acornix escribe tus apps con una IA. Google te da una clave gratis en un minuto.</string>
     <string name="onb_perm_title">Último paso</string>
     <string name="onb_perm_text">Ambos son opcionales y puedes cambiarlos luego en Ajustes.</string>
     <string name="onb_perm_notif">Notificaciones</string>
     <string name="onb_perm_notif_text">Para ver el progreso y un botón de Detener mientras el asistente trabaja, y para las notificaciones de tus apps.</string>
     <string name="onb_perm_control_text">Permite al asistente ver la pantalla y pulsar dentro de otras apps (p. ej. «abre WhatsApp y escribe a María»). Solo actúa cuando se lo pides y confirma antes de enviar, pagar o borrar.</string>
     <string name="onb_start">Empezar</string>
-    <string name="onb_later">Más tarde</string>
+    <string name="onb_later">Ahora no</string>
     <string name="onb_finish">¡Vamos!</string>
     <string name="edited_by_hand">Editada a mano</string>
     <string name="unsaved_title">Cambios sin guardar</string>
@@ -410,8 +410,8 @@
         <item quantity="other">%d archivos</item>
     </plurals>
     <plurals name="section_apps_desc">
-        <item quantity="one">%d app creada</item>
-        <item quantity="other">%d apps creadas</item>
+        <item quantity="one">%d app</item>
+        <item quantity="other">%d apps</item>
     </plurals>
     <plurals name="versions_count">
         <item quantity="one">%d versión</item>
@@ -934,4 +934,28 @@
     <string name="sf_speed">Velocidad</string>
     <string name="sc_slow">Lenta</string>
     <string name="sc_fast">Rápida</string>
+    <!-- Connecting an AI without leaving the screen -->
+    <string name="connect_ai_title">Conecta una IA para crear</string>
+    <string name="connect_ai_text">Acornix escribe tus apps con una IA. Google te da una clave gratis en un minuto, y lo que has escrito no se pierde.</string>
+    <string name="connect_ai_studio">O usa cualquier chat de IA, sin clave</string>
+    <string name="connect_ai_card_title">Conecta una IA para crear tus propias apps</string>
+    <string name="connect_ai_card_text">Gratis con una clave de Google. Es un minuto.</string>
+    <string name="connect_ai_button">Conectar</string>
+    <string name="free_key_hint">¿Aún no tienes clave? Google Gemini tiene nivel gratuito en casi todos los países. Toca aquí para usarlo.</string>
+    <string name="free_key_steps">Abre el enlace de abajo, entra con tu cuenta de Google, pulsa «Create API key», cópiala y pégala aquí.</string>
+    <string name="onb_ai_skip_hint">¿Sin clave? Sáltate este paso: las apps de la comunidad y los atajos paso a paso funcionan sin IA.</string>
+    <string name="home_idea_today">Idea del día</string>
+    <string name="share_zip_text">«%1$s», una app que he hecho con Acornix 🌰 Para abrirla, instala Acornix (gratis y de código abierto) y abre este archivo con ella: https://github.com/gonzaroman/acornix</string>
+    <string name="gen_first_hint">Tu app está lista y es tuya. Ponla en tu pantalla de inicio o enséñasela a alguien.</string>
+    <string name="quick_step1">1 · Consigue tu clave gratis</string>
+    <string name="quick_step1_text">Entra con tu cuenta de Google y pulsa «Create API key». Sin tarjeta. Gratis en casi todos los países.</string>
+    <string name="quick_get_key">Conseguir mi clave gratis</string>
+    <string name="quick_step2">2 · Cópiala y pégala aquí</string>
+    <string name="quick_paste">Pegar</string>
+    <string name="quick_connect">Conectar</string>
+    <string name="quick_checking">Comprobando la clave…</string>
+    <string name="quick_failed">Esa clave no ha funcionado: %1$s</string>
+    <string name="quick_privacy">La clave se guarda cifrada en este móvil y solo se envía a su proveedor. También sirven las claves de OpenAI y Anthropic.</string>
+    <string name="quick_other">Otros proveedores y modelos</string>
+    <string name="quick_back">Volver al modo corto</string>
 </resources>

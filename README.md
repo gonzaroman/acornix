@@ -252,7 +252,7 @@ Acornix is free: download the APK from GitHub releases and install it in a minut
 
 1. **Download** [`acornix.apk`](https://github.com/gonzaroman/acornix/releases/latest/download/acornix.apk) from the [latest release](https://github.com/gonzaroman/acornix/releases/latest) on your phone.
 2. **Open it.** If Android asks, allow your browser or file manager to install apps, then tap **Install**. Google Play Protect may warn you because the app doesn't come from the Play Store; tap **More details › Install anyway**.
-3. **Open Acornix** and follow the three-step welcome: choose your AI provider, paste your API key and tap **Test connection**.
+3. **Open Acornix** and follow the three-step welcome: tap **Get my free key** (Google Gemini, no card needed in most countries), paste it and tap **Connect**. Acornix works out the provider from the key, checks it and takes you straight to your first app. Keys from OpenAI and Anthropic work the same way, and you can skip the step and connect later.
 
 **Requirements:** Android 8.0 or newer, and an API key from one of these providers:
 

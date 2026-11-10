@@ -51,11 +51,11 @@ import com.gonzaroman.acornix.ui.components.openAccessibilitySettings
 import com.gonzaroman.acornix.ui.components.ControlState
 import com.gonzaroman.acornix.R
 import com.gonzaroman.acornix.container
-import com.gonzaroman.acornix.ui.settings.ProviderEditor
+import com.gonzaroman.acornix.ui.settings.QuickConnect
 import kotlinx.coroutines.launch
 
 @Composable
-fun OnboardingScreen(onDone: () -> Unit, onControlHelp: () -> Unit) {
+fun OnboardingScreen(onDone: (connected: Boolean) -> Unit, onControlHelp: () -> Unit) {
     val context = LocalContext.current
     val repo = context.container.settings
     val settings by repo.settings.collectAsState(initial = null)
@@ -63,8 +63,11 @@ fun OnboardingScreen(onDone: () -> Unit, onControlHelp: () -> Unit) {
     val scope = rememberCoroutineScope()
 
     fun finish() = scope.launch {
+        // With an AI connected the next thing is their first app, not a tour (it stays in Settings and Help).
+        val connected = repo.current().config().isUsable
+        if (connected) repo.setTourSeen()
         repo.setOnboardingDone()
-        onDone()
+        onDone(connected)
     }
 
     Column(Modifier.fillMaxSize().safeDrawingPadding().imePadding()) {
@@ -76,15 +79,22 @@ fun OnboardingScreen(onDone: () -> Unit, onControlHelp: () -> Unit) {
                 when (page) {
                     0 -> WelcomePage()
                     1 -> {
-                        PageHeader("🔑", stringResource(R.string.onb_ai_title), stringResource(R.string.onb_ai_text))
+                        PageHeader("🎁", stringResource(R.string.onb_ai_title), stringResource(R.string.onb_ai_text))
                         settings?.let { s ->
                             Card(
                                 shape = MaterialTheme.shapes.large,
                                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
                             ) {
-                                ProviderEditor(s, Modifier.padding(16.dp), onSaved = { scope.launch { pager.animateScrollToPage(2) } })
+                                QuickConnect(s, Modifier.padding(16.dp), onSaved = { scope.launch { pager.animateScrollToPage(2) } })
                             }
                         }
+                        Spacer(Modifier.height(16.dp))
+                        Text(
+                            stringResource(R.string.onb_ai_skip_hint),
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                     }
                     else -> PermissionsPage(onControlHelp)
                 }

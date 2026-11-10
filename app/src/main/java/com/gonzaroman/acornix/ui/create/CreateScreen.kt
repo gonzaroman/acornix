@@ -1,5 +1,9 @@
 package com.gonzaroman.acornix.ui.create
 
+import com.gonzaroman.acornix.ai.ProviderNotConfiguredException
+import com.gonzaroman.acornix.ui.components.ConnectAiSheet
+import com.gonzaroman.acornix.ui.components.Confetti
+import androidx.compose.ui.text.style.TextAlign
 import android.annotation.SuppressLint
 import android.view.ViewGroup
 import android.webkit.WebView
@@ -138,11 +142,11 @@ fun CreateScreen(nav: NavHostController, feature: Boolean, improveAppId: String?
             label = "create",
         ) { state ->
             when (state) {
-                is CreateUi.Form -> FormContent(vm, feature)
+                is CreateUi.Form -> FormContent(vm, feature, onStudio = { nav.navigate(Routes.STUDIO) })
                 is CreateUi.Generating -> GeneratingContent(state, onCancel = vm::cancel)
                 is CreateUi.Done -> DoneContent(state, vm, onShare = { nav.navigate(Routes.share(it.id)) },
                     onEditSteps = { nav.navigate(Routes.shortcutEditor(it.id)) })
-                is CreateUi.Failed -> FailedContent(state, onRetry = vm::retry, onEdit = vm::backToForm)
+                is CreateUi.Failed -> FailedContent(state, onRetry = vm::retry, onEdit = vm::backToForm, onStudio = { nav.navigate(Routes.STUDIO) })
             }
         }
     }
@@ -150,7 +154,8 @@ fun CreateScreen(nav: NavHostController, feature: Boolean, improveAppId: String?
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun FormContent(vm: CreateViewModel, feature: Boolean) {
+private fun FormContent(vm: CreateViewModel, feature: Boolean, onStudio: () -> Unit) {
+    val context = LocalContext.current
     val attachments = rememberAttachments()
     val target = vm.improveTarget
     var idea by rememberSaveable { mutableStateOf(vm.lastIdea) }
@@ -209,8 +214,18 @@ private fun FormContent(vm: CreateViewModel, feature: Boolean) {
         }
 
         // Right under the request, so nobody has to scroll past the ideas to find it.
+        val start = { vm.generate(idea, name, category, attachments.images(), picked?.takeIf { it.prompt == idea }?.emoji) }
+        // No AI yet: connect it right here and carry on, instead of failing and sending them to Settings.
+        var connect by remember { mutableStateOf(false) }
+        if (connect) {
+            ConnectAiSheet(
+                onDismiss = { connect = false },
+                onConnected = { connect = false; start() },
+                onStudio = { connect = false; onStudio() },
+            )
+        }
         Button(
-            onClick = { vm.generate(idea, name, category, attachments.images(), picked?.takeIf { it.prompt == idea }?.emoji) },
+            onClick = { scope.launch { if (context.container.settings.current().config().isUsable) start() else connect = true } },
             enabled = idea.isNotBlank(),
             modifier = Modifier.fillMaxWidth().height(56.dp),
         ) {
@@ -306,14 +321,19 @@ private fun DoneContent(state: CreateUi.Done, vm: CreateViewModel, onShare: (App
 
     // Third app of their own, freshly created: they are enjoying it, so ask for a star (once ever).
     LaunchedEffect(state.app.id) {
-        val own = context.container.apps.apps.value.count { it.kind != AppKind.SAMPLE }
+        // Only what the AI wrote on this phone counts: the examples and gallery apps are not theirs.
+        val own = context.container.apps.apps.value.count { it.buildSeconds > 0 && it.source == null }
         if (state.app.versionCount == 1 && own >= 3 && SupportPrefs(context).shouldAskForStar()) {
-            delay(1500)
+            delay(4000)
             askStar = true
         }
     }
     if (askStar) StarDialog(onDismiss = { askStar = false })
 
+    // The first version of a new app is a moment worth celebrating (once, not after every change).
+    var celebrate by rememberSaveable(state.app.id) { mutableStateOf(state.app.versionCount == 1) }
+
+    Box(Modifier.fillMaxSize()) {
     // The preview takes all the free space; the actions stay visible below it.
     Column(Modifier.fillMaxSize().imePadding()) {
         Column(
@@ -325,7 +345,9 @@ private fun DoneContent(state: CreateUi.Done, vm: CreateViewModel, onShare: (App
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
                     Text(state.app.name, style = MaterialTheme.typography.titleLarge, maxLines = 1)
-                    Text(stringResource(R.string.gen_done_version, state.app.versionCount), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        if (state.app.versionCount == 1) stringResource(R.string.gen_first_hint) else stringResource(R.string.gen_done_version, state.app.versionCount),
+                        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             // Say it plainly when the app will spend tokens of the user's key.
@@ -421,24 +443,45 @@ private fun DoneContent(state: CreateUi.Done, vm: CreateViewModel, onShare: (App
             modifier = Modifier.fillMaxWidth().padding(12.dp).navigationBarsPadding(),
         )
     }
+    if (celebrate) Confetti(onEnd = { celebrate = false })
+    }
 }
 
 @Composable
-private fun FailedContent(state: CreateUi.Failed, onRetry: () -> Unit, onEdit: () -> Unit) {
+private fun FailedContent(state: CreateUi.Failed, onRetry: () -> Unit, onEdit: () -> Unit, onStudio: () -> Unit) {
+    val context = LocalContext.current
+    // Not a failure: the AI just isn't connected. Connect it here and the same request goes on.
+    val noAi = state.error is ProviderNotConfiguredException
+    var connect by remember { mutableStateOf(false) }
+    if (connect) {
+        ConnectAiSheet(
+            onDismiss = { connect = false },
+            onConnected = { connect = false; onRetry() },
+            onStudio = { connect = false; onStudio() },
+        )
+    }
     Column(Modifier.fillMaxSize().padding(32.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-        Text("🥀", fontSize = 56.sp)
+        Text(if (noAi) "🔑" else "🥀", fontSize = 56.sp)
         Spacer(Modifier.height(12.dp))
-        Text(stringResource(R.string.gen_failed), style = MaterialTheme.typography.titleLarge)
+        Text(stringResource(if (noAi) R.string.connect_ai_title else R.string.gen_failed), style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Center)
         Spacer(Modifier.height(8.dp))
-        val context = LocalContext.current
-        Text(state.error?.let { errorMessage(context, it) } ?: state.message, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            state.error?.let { errorMessage(context, it) } ?: state.message,
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
         Spacer(Modifier.height(20.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             OutlinedButton(onClick = onEdit) { Text(stringResource(R.string.edit_request)) }
-            Button(onClick = onRetry) {
-                Icon(Icons.Rounded.Refresh, null, Modifier.size(18.dp))
-                Spacer(Modifier.width(6.dp))
-                Text(stringResource(R.string.retry))
+            if (noAi) {
+                Button(onClick = { connect = true }) { Text(stringResource(R.string.connect_ai_button)) }
+            } else {
+                Button(onClick = onRetry) {
+                    Icon(Icons.Rounded.Refresh, null, Modifier.size(18.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text(stringResource(R.string.retry))
+                }
             }
         }
     }

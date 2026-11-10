@@ -21,6 +21,13 @@ enum class ProviderType(val id: String, val label: String, val defaultModel: Str
 
     companion object {
         fun fromId(id: String?): ProviderType = entries.firstOrNull { it.id == id } ?: ANTHROPIC
+
+        /** The provider a pasted key belongs to, by its prefix; anything else is taken as a Google key. */
+        fun forKey(key: String): ProviderType = when {
+            key.trim().startsWith("sk-ant-") -> ANTHROPIC
+            key.trim().startsWith("sk-") -> OPENAI
+            else -> GEMINI
+        }
     }
 }
 

@@ -86,6 +86,13 @@ import coil.compose.AsyncImage
 import com.gonzaroman.acornix.data.Gallery
 import com.gonzaroman.acornix.data.GalleryApp
 import kotlin.random.Random
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.setValue
+import com.gonzaroman.acornix.core.Idea
+import com.gonzaroman.acornix.ui.components.ConnectAiCard
+import com.gonzaroman.acornix.ui.components.ConnectAiSheet
+import java.time.LocalDate
 
 @Composable
 fun HomeScreen(nav: NavHostController) {
@@ -107,6 +114,21 @@ fun HomeScreen(nav: NavHostController) {
     // Installed from here: it leaves the list without reshuffling the rest.
     val picks = mix.filter { app -> apps.none { it.source?.gallery == app.id } }
 
+    var connect by remember { mutableStateOf(false) }
+    if (connect) {
+        ConnectAiSheet(
+            onDismiss = { connect = false },
+            onConnected = { connect = false },
+            onStudio = { connect = false; nav.navigate(Routes.STUDIO) },
+        )
+    }
+    // One built-in idea a day, the same all day: a reason to come back and something to start from.
+    val idea by produceState<Idea?>(null, settings?.appLanguage, apps.size) {
+        // Not one they already have (several ideas are the bundled examples).
+        val all = c.ideas.builtIn(false, -1).filter { idea -> apps.none { it.name.equals(idea.title, ignoreCase = true) } }
+        value = if (all.isEmpty()) null else all[(LocalDate.now().toEpochDay() % all.size).toInt()]
+    }
+
     LazyColumn(
         Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.statusBars),
         contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 20.dp, vertical = 16.dp),
@@ -116,48 +138,49 @@ fun HomeScreen(nav: NavHostController) {
             Column {
                 Text(stringResource(greeting()), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(stringResource(R.string.home_title), style = MaterialTheme.typography.headlineMedium)
-                Spacer(Modifier.height(8.dp))
-                if (config != null) {
-                    if (config.isUsable) {
-                        AssistChip(
-                            onClick = { nav.navigateTab(Routes.SETTINGS) },
-                            label = { Text("${config.type.label} · ${config.model}", maxLines = 1, overflow = TextOverflow.Ellipsis) },
-                            leadingIcon = { Box(Modifier.size(8.dp).clip(CircleShape).background(Color(0xFF3DBE6C))) },
-                        )
-                    } else {
-                        AssistChip(
-                            onClick = { nav.navigateTab(Routes.SETTINGS) },
-                            label = { Text(stringResource(R.string.home_configure_ai)) },
-                            leadingIcon = { Icon(Icons.Rounded.Warning, null, Modifier.size(18.dp)) },
-                            colors = AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.errorContainer),
-                        )
-                    }
+                if (config != null && config.isUsable) {
+                    Spacer(Modifier.height(8.dp))
+                    AssistChip(
+                        onClick = { nav.navigateTab(Routes.SETTINGS) },
+                        label = { Text("${config.type.label} · ${config.model}", maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                        leadingIcon = { Box(Modifier.size(8.dp).clip(CircleShape).background(Color(0xFF3DBE6C))) },
+                    )
                 }
             }
         }
 
         update?.let { info -> item(key = "update") { UpdateCard(info) } }
 
-        item { ExploreBanner { nav.navigate(Routes.EXPLORE) } }
-
-        item { HeroCard(onClick = { nav.navigate(Routes.create()) }) }
+        if (config != null && !config.isUsable) item(key = "connect") { ConnectAiCard(onClick = { connect = true }) }
 
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    SectionTile("⚡", stringResource(R.string.section_feature), stringResource(R.string.section_feature_desc),
-                        MaterialTheme.colorScheme.secondaryContainer, Modifier.weight(1f)) { nav.navigateTab(Routes.SHORTCUTS) }
-                    SectionTile("🤖", stringResource(R.string.section_control), stringResource(R.string.section_control_desc),
-                        MaterialTheme.colorScheme.tertiaryContainer, Modifier.weight(1f)) { nav.navigateTab(Routes.assistant(control = true)) }
+            HeroCard(
+                idea = idea,
+                onClick = { nav.navigate(Routes.create()) },
+                onIdea = { nav.navigate(Routes.create(prompt = it.prompt)) },
+            )
+        }
+
+        // Their own apps come right after: opening one is what people return for most.
+        if (apps.isNotEmpty()) {
+            item(key = "recent") {
+                SectionTitle(stringResource(R.string.home_recent)) {
+                    androidx.compose.material3.TextButton(onClick = { nav.navigateTab(Routes.APPS) }) { Text(stringResource(R.string.see_all)) }
                 }
-                Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    SectionTile("📱", stringResource(R.string.section_apps), pluralStringResource(R.plurals.section_apps_desc, apps.size, apps.size),
-                        MaterialTheme.colorScheme.primaryContainer, Modifier.weight(1f)) { nav.navigateTab(Routes.APPS) }
-                    SectionTile("📋", stringResource(R.string.section_studio), stringResource(R.string.section_studio_desc),
-                        MaterialTheme.colorScheme.surfaceContainerHighest, Modifier.weight(1f)) { nav.navigate(Routes.STUDIO) }
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    items(apps.take(10), key = { it.id }) { app ->
+                        AppCard(
+                            app = app,
+                            onClick = { AppLauncher.open(context, app.id) },
+                            onLongClick = { nav.navigate(Routes.improve(app.id)) },
+                            modifier = Modifier.width(128.dp),
+                        )
+                    }
                 }
             }
         }
+
+        item(key = "explore") { ExploreBanner { nav.navigate(Routes.EXPLORE) } }
 
         if (picks.isNotEmpty()) {
             item(key = "picks") {
@@ -172,20 +195,19 @@ fun HomeScreen(nav: NavHostController) {
             }
         }
 
-        if (apps.isNotEmpty()) {
-            item {
-                SectionTitle(stringResource(R.string.home_recent)) {
-                    androidx.compose.material3.TextButton(onClick = { nav.navigateTab(Routes.APPS) }) { Text(stringResource(R.string.see_all)) }
+        item(key = "sections") {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    SectionTile("⚡", stringResource(R.string.section_feature), stringResource(R.string.section_feature_desc),
+                        MaterialTheme.colorScheme.secondaryContainer, Modifier.weight(1f)) { nav.navigateTab(Routes.SHORTCUTS) }
+                    SectionTile("🤖", stringResource(R.string.section_control), stringResource(R.string.section_control_desc),
+                        MaterialTheme.colorScheme.tertiaryContainer, Modifier.weight(1f)) { nav.navigateTab(Routes.assistant(control = true)) }
                 }
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    items(apps.take(10), key = { it.id }) { app ->
-                        AppCard(
-                            app = app,
-                            onClick = { AppLauncher.open(context, app.id) },
-                            onLongClick = { nav.navigate(Routes.improve(app.id)) },
-                            modifier = Modifier.width(128.dp),
-                        )
-                    }
+                Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    SectionTile("📱", stringResource(R.string.section_apps), pluralStringResource(R.plurals.section_apps_desc, apps.size, apps.size),
+                        MaterialTheme.colorScheme.primaryContainer, Modifier.weight(1f)) { nav.navigateTab(Routes.APPS) }
+                    SectionTile("📋", stringResource(R.string.section_studio), stringResource(R.string.section_studio_desc),
+                        MaterialTheme.colorScheme.surfaceContainerHighest, Modifier.weight(1f)) { nav.navigate(Routes.STUDIO) }
                 }
             }
         }
@@ -218,31 +240,54 @@ private fun greeting(): Int = when (Calendar.getInstance().get(Calendar.HOUR_OF_
 }
 
 @Composable
-private fun HeroCard(onClick: () -> Unit) {
+private fun HeroCard(idea: Idea?, onClick: () -> Unit, onIdea: (Idea) -> Unit) {
     val scheme = MaterialTheme.colorScheme
-    Box(
+    Column(
         Modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.extraLarge)
             .background(Brush.linearGradient(listOf(scheme.primary, scheme.tertiary)))
             .clickable(onClick = onClick)
-            .padding(24.dp),
+            .padding(20.dp),
     ) {
-        Column(Modifier.fillMaxWidth(0.78f)) {
-            Text(stringResource(R.string.hero_title), style = MaterialTheme.typography.headlineSmall, color = scheme.onPrimary)
-            Spacer(Modifier.height(6.dp))
-            Text(stringResource(R.string.hero_desc), style = MaterialTheme.typography.bodyMedium, color = scheme.onPrimary.copy(alpha = 0.9f))
-            Spacer(Modifier.height(16.dp))
-            Button(
-                onClick = onClick,
-                colors = ButtonDefaults.buttonColors(containerColor = scheme.onPrimary, contentColor = scheme.primary),
+        Box(Modifier.fillMaxWidth()) {
+            Column(Modifier.fillMaxWidth(0.8f)) {
+                Text(stringResource(R.string.hero_title), style = MaterialTheme.typography.headlineSmall, color = scheme.onPrimary)
+                Spacer(Modifier.height(4.dp))
+                Text(stringResource(R.string.hero_desc), style = MaterialTheme.typography.bodyMedium, color = scheme.onPrimary.copy(alpha = 0.9f))
+                Spacer(Modifier.height(14.dp))
+                Button(
+                    onClick = onClick,
+                    colors = ButtonDefaults.buttonColors(containerColor = scheme.onPrimary, contentColor = scheme.primary),
+                ) {
+                    Text(stringResource(R.string.hero_button))
+                    Spacer(Modifier.width(6.dp))
+                    Icon(Icons.AutoMirrored.Rounded.ArrowForward, null, Modifier.size(18.dp))
+                }
+            }
+            Text("✨", fontSize = 52.sp, modifier = Modifier.align(Alignment.TopEnd))
+        }
+        if (idea != null) {
+            Spacer(Modifier.height(14.dp))
+            Surface(
+                onClick = { onIdea(idea) },
+                shape = MaterialTheme.shapes.large,
+                color = scheme.onPrimary.copy(alpha = 0.16f),
+                contentColor = scheme.onPrimary,
+                modifier = Modifier.fillMaxWidth(),
             ) {
-                Text(stringResource(R.string.hero_button))
-                Spacer(Modifier.width(6.dp))
-                Icon(Icons.AutoMirrored.Rounded.ArrowForward, null, Modifier.size(18.dp))
+                Row(Modifier.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(idea.emoji, fontSize = 24.sp)
+                    Spacer(Modifier.width(12.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text("💡 " + stringResource(R.string.home_idea_today), style = MaterialTheme.typography.labelMedium,
+                            color = scheme.onPrimary.copy(alpha = 0.85f))
+                        Text(idea.title, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                    Icon(Icons.AutoMirrored.Rounded.ArrowForward, null, Modifier.size(18.dp))
+                }
             }
         }
-        Text("✨", fontSize = 64.sp, modifier = Modifier.align(Alignment.TopEnd))
     }
 }
 
@@ -251,16 +296,18 @@ private fun SectionTile(emoji: String, title: String, subtitle: String, color: C
     Surface(
         onClick = onClick,
         // Grows with large fonts instead of cutting the text; both tiles of a row stay the same height.
-        modifier = modifier.fillMaxHeight().heightIn(min = 140.dp),
+        modifier = modifier.fillMaxHeight().heightIn(min = 76.dp),
         shape = MaterialTheme.shapes.large,
         color = color,
     ) {
-        Column(Modifier.padding(16.dp)) {
-            Text(emoji, fontSize = 32.sp)
-            Spacer(Modifier.weight(1f))
-            Text(title, style = MaterialTheme.typography.titleMedium, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            Text(subtitle, style = MaterialTheme.typography.bodySmall, maxLines = 3, overflow = TextOverflow.Ellipsis,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+        Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(emoji, fontSize = 26.sp)
+            Spacer(Modifier.width(10.dp))
+            Column {
+                Text(title, style = MaterialTheme.typography.titleSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(subtitle, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+            }
         }
     }
 }

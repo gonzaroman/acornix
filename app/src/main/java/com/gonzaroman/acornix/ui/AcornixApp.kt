@@ -186,7 +186,10 @@ fun AcornixApp(
             ) {
                 composable(Routes.ONBOARDING) {
                     OnboardingScreen(
-                        onDone = { nav.popBackStack(Routes.HOME, inclusive = false) },
+                        onDone = { connected ->
+                            nav.popBackStack(Routes.HOME, inclusive = false)
+                            if (connected) nav.navigate(Routes.create())
+                        },
                         onControlHelp = { nav.navigate(Routes.CONTROL_HELP) },
                     )
                 }
